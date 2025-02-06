@@ -10,7 +10,6 @@ use App\Models\TsekapV2\Forms\RiskAssessment\RiskProfile;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 
 use Illuminate\Http\Request;
@@ -33,6 +32,14 @@ class DataController extends Controller
     // retrieval without facility
     public function retrievePatientRiskProfileWithoutFacility(Request $request)
     {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
         // Validate the request
         $validator = Validator::make($request->all(), [
             'fields.filter' => 'required|string',
@@ -43,12 +50,6 @@ class DataController extends Controller
             return response()->json(['error' => 'Invalid input'], 400);
         }
 
-        // Check if the user is authenticated
-        if (!Auth::check()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        $user = Auth::user();
         $fields = $request->input('fields', []);
 
         $filter = isset($fields['filter']) ? $fields['filter'] : null;
@@ -128,6 +129,14 @@ class DataController extends Controller
     // retrieval with facility
     public function retrievePatientRiskProfileByFacility(Request $request)
     {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
         // Validate the request
         $validator = Validator::make($request->all(), [
             'fields.filter' => 'required|string',
@@ -138,12 +147,6 @@ class DataController extends Controller
             return response()->json(['error' => 'Invalid input'], 400);
         }
 
-        // Check if the user is authenticated
-        if (!Auth::check()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        $user = Auth::user();
         $fields = $request->input('fields', []);
 
         $filter = isset($fields['filter']) ? $fields['filter'] : null;
@@ -230,6 +233,14 @@ class DataController extends Controller
 
     public function retrievePatientRiskAssessment(Request $request)
     {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
         // Validate the request using the Validator facade
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
@@ -239,12 +250,6 @@ class DataController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => 'Invalid input'], 400);
         }
-
-        // check authentication if user is logged in
-        if (!Auth::check()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
 
         $fields = $request->input('fields');
         $id = $fields['profile_id'];
@@ -349,8 +354,11 @@ class DataController extends Controller
     {
         $fields = $request->input('fields');
 
-        // Check if the user is authenticated
-        if (!Auth::check()) {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -443,8 +451,11 @@ class DataController extends Controller
     {
         $fields = $request->input('fields');
 
-        // Check authentication if user is logged in
-        if (!Auth::check()) {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -592,8 +603,11 @@ class DataController extends Controller
     {
         $fields = $request->input('fields');
 
-        // check authentication if user is logged in
-        if (!Auth::check()) {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -658,8 +672,11 @@ class DataController extends Controller
     {
         $fields = $request->input('fields');
 
-        // check authentication if user is logged in
-        if (!Auth::check()) {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -789,24 +806,24 @@ class DataController extends Controller
     // delete risk profile
     public function deleteRiskProfile(Request $request)
     {
-        $fields = $request->input('fields');
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
 
-        $riskProfileId = $fields['risk_profile_id'];
-
-        // check authentication if user is logged in
-        if (!Auth::check()) {
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        // get user
-        $user = Auth::user();
-
-        if (!$riskProfileId) {
-            return response()->json(['error' => 'Profile ID is required.'], 400);
         }
 
         if ($user['user_priv'] != 1) {
             return response()->json(['error' => 'Unauthorized.'], 401);
+        }
+
+        $fields = $request->input('fields');
+
+        $riskProfileId = $fields['risk_profile_id'];
+
+        if (!$riskProfileId) {
+            return response()->json(['error' => 'Profile ID is required.'], 400);
         }
 
         if (!$riskProfileId) {
@@ -835,16 +852,12 @@ class DataController extends Controller
 
         $riskProfileId = $fields['risk_profile_id'];
 
-        // check authentication if user is logged in
-        if (!Auth::check()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
 
-        // get user
-        $user = Auth::user();
-
+        // Check if the user exists
         if (!$user) {
-            return response()->json(['error' => 'No user is logged in.'], 401);
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         if ($user['user_priv'] != 1) {

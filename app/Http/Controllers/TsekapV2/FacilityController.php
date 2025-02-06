@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\TsekapV2\Facilities;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 
 class FacilityController extends Controller{
 
@@ -15,17 +14,12 @@ class FacilityController extends Controller{
     public function retrieveFacilityByCode(Request $request){
         $fields = $request->input('fields');
 
-        // check authentication if user is logged in
-        if(!Auth::check()){
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }        
-       
-        // get user
-        $user = Auth::user();
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
 
-        // do not allow access unless no user is logged in.
-        if(!$user){
-            return response()->json(['error' => 'No user is logged in.'], 401);
+        // Check if the user exists
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         // do not authorize update unless admin
@@ -42,13 +36,13 @@ class FacilityController extends Controller{
     public function addFacility(Request $request){
         $fields = $request->input('fields');
 
-        // check authentication if user is logged in
-        if(!Auth::check()){
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
-        }        
-       
-        // get user
-        $user = Auth::user();       
+        }       
  
         // do not authorize update unless admin
         if ($user['user_priv'] != 1) {
@@ -91,19 +85,14 @@ class FacilityController extends Controller{
     public function updateFacility(Request $request){
         $fields = $request->input('fields');
 
-        // check authentication if user is logged in
-        if(!Auth::check()){
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
-        }        
-       
-        // get user
-        $user = Auth::user();       
-
-        // do not allow access unless no user is logged in.
-        if(!$user){
-            return response()->json(['error' => 'No user is logged in.'], 401);
         }
-
+        
         // do not authorize update unless admin
         if($user['user_priv'] != 1){
             return response()->json(['error' => 'Unauthorized.'], 401);
@@ -147,37 +136,35 @@ class FacilityController extends Controller{
         return response()->json($facility);
     }
 
-    // delete a health facility
-    public function deleteFacility(Request $request){
-        $fields = $request->input('fields');
+    public function deleteFacility(Request $request)
+    {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
 
-        // check authentication if user is logged in
-        if(!Auth::check()){
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
-        }        
-       
-        // get user
-        $user = Auth::user();
-
-        // do not allow access unless no user is logged in.
-        if(!$user){
-            return response()->json(['error' => 'No user is logged in.'], 401);
         }
 
-        // do not authorize update unless admin
-        if($user['user_priv'] != 1){
-            return response()->json(['error' => 'Unauthorized.'], 401);
+        // Check if the user has admin privileges
+        if ($user->user_priv != 1) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        // Validate request input
+        $fields = $request->validate([
+            'facility_code' => 'required|exists:facilities,id',
+        ]);
+
+        // Find and delete the facility
         $facility = Facilities::find($fields['facility_code']);
 
         if (!$facility) {
-            return response()->json(['message' => 'Facilities not found'], 404);
+            return response()->json(['message' => 'Facility not found'], 404);
         }
 
-        // delete facility
         $facility->delete();
 
-        return response()->json(['message' => 'Facilities deleted']);
+        return response()->json(['message' => 'Facility deleted successfully']);
     }
 }

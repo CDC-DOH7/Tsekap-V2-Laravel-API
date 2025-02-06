@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 use App\Models\TsekapV2\Profile;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use App\Jobs\RetrieveProfileJob;
 
 class ProfileController extends Controller
@@ -19,6 +18,15 @@ class ProfileController extends Controller
 
     public function retrieveProfile(Request $request)
     {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
             'fields.firstname' => 'string',
@@ -60,6 +68,19 @@ class ProfileController extends Controller
     // add profile
     public function addProfile(Request $request)
     {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Check if the user has admin privileges
+        if ($user->user_priv != 1) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         // Validation rules
         $rules = [
             'unique_id' => 'required|unique:profiles',
@@ -106,11 +127,6 @@ class ProfileController extends Controller
             'other_med_history' => 'required',
         ];
 
-        // check authentication if user is logged in
-        if (!Auth::check()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
         // Validate input
         $validator = Validator::make($request->fields, $rules);
 
@@ -144,17 +160,17 @@ class ProfileController extends Controller
     {
         $fields = $request->input('fields');
 
-        // check authentication if user is logged in
-        if (!Auth::check()) {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // get user
-        $user = Auth::user();
-
-        // do not authorize update unless admin
-        if ($user['user_priv'] != 1) {
-            return response()->json(['error' => 'Unauthorized.'], 401);
+        // Check if the user has admin privileges
+        if ($user->user_priv != 1) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         // Check if profile exists
@@ -229,17 +245,17 @@ class ProfileController extends Controller
     {
         $fields = $request->input('fields');
 
-        // check authentication if user is logged in
-        if (!Auth::check()) {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // get user
-        $user = Auth::user();
-
-        // do not authorize deletion unless admin
-        if ($user['user_priv'] != 1) {
-            return response()->json(['error' => 'Unauthorized.'], 401);
+        // Check if the user has admin privileges
+        if ($user->user_priv != 1) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         $profile = Profile::find($fields['id']);

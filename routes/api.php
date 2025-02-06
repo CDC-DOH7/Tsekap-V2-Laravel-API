@@ -33,7 +33,10 @@ Route::prefix('v2')->group(function () {
             Route::post('/update-name', [UserController::class, 'updateUserFullName'])->name('api-v2-update-name');
             Route::post('/update-contact', [UserController::class, 'updateUserContact'])->name('api-v2-update-contact');
             Route::post('/update-email', [UserController::class, 'updateUserEmail'])->name('api-v2-update-email');
+            
+            // two logouts for different functions
             Route::post('/logout', [AuthController::class, 'logout'])->name('api-v2-logout');
+            Route::post('/logout-all-sessions', [AuthController::class, 'logoutAllSessions'])->name('api-v2-logout-all-sessions');
         });
 
         // Facility Routes

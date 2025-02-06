@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\TsekapV2\UserHealthFacility;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 
 class UserHealthFacilityController extends Controller
 {
@@ -15,8 +14,11 @@ class UserHealthFacilityController extends Controller
     {
         $fields = $request->input('fields');
 
-        // check authentication if user is logged in
-        if (!Auth::check()) {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -46,14 +48,17 @@ class UserHealthFacilityController extends Controller
     {
         $fields = $request->input('fields');
 
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
         // Check if the fields array is provided
         if (!$fields) {
             return response()->json(['error' => 'Invalid input: fields are required'], 400);
-        }
-
-        // Check authentication
-        if (!Auth::check()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         $rules = [
@@ -88,14 +93,23 @@ class UserHealthFacilityController extends Controller
     {
         $fields = $request->input('fields');
 
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Check if the user has admin privileges
+        if ($user->user_priv != 1) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+
         // Check if the fields array is provided
         if (!$fields) {
             return response()->json(['error' => 'Invalid input: fields are required'], 400);
-        }
-
-        // Check authentication
-        if (!Auth::check()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         $rules = [
@@ -151,17 +165,17 @@ class UserHealthFacilityController extends Controller
     {
         $fields = $request->input('fields');
 
-        // check authentication if user is logged in
-        if (!Auth::check()) {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // get user
-        $user = Auth::user();
-
-        // Do not authorize update unless admin
-        if ($user['user_priv'] != 1) {
-            return response()->json(['error' => 'Unauthorized.'], 401);
+        // Check if the user has admin privileges
+        if ($user->user_priv != 1) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         $userHealthFacility = UserHealthFacility::where('user_id', $fields['user_id'])

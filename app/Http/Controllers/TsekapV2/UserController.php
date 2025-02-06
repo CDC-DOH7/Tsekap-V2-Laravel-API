@@ -7,27 +7,27 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
     // changes the user's password
     public function updateUserPassword(Request $request)
-    {        
+    {
         $fields = $request->input('fields');
 
-        // check authentication if user is logged in
-        if(!Auth::check()){
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
-        $user = Auth::user();
 
         // Validate the input
         $fieldsValidator = Validator::make($fields, [
             'currentPassword' => 'required|string',
-            'newPassword' => 'required|string|min:8' 
+            'newPassword' => 'required|string|min:8'
         ]);
 
         if ($fieldsValidator->fails()) {
@@ -63,8 +63,11 @@ class UserController extends Controller
     {
         $fields = $request->input('fields');
 
-        // check authentication if user is logged in
-        if(!Auth::check()){
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -78,8 +81,6 @@ class UserController extends Controller
         if ($fieldsValidator->fails()) {
             return response()->json(['error' => array_merge($fieldsValidator->errors()->all())], 400);
         }
-
-        $user = Auth::user();
 
         $username = $user->username; // user auth
 
@@ -113,16 +114,17 @@ class UserController extends Controller
     {
         $fields = $request->input('fields');
 
-        // check authentication if user is logged in
-        if(!Auth::check()){
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         $fieldsValidator = Validator::make($fields, [
             'contact' => 'required|string|min:11|max:11'
         ]);
-
-        $user = Auth::user();
 
         if ($fieldsValidator->fails()) {
             return response()->json(['error' => array_merge($fieldsValidator->errors()->all())], 400);
@@ -154,8 +156,11 @@ class UserController extends Controller
     {
         $fields = $request->input('fields');
 
-        // check authentication if user is logged in
-        if(!Auth::check()){
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -166,8 +171,6 @@ class UserController extends Controller
         if ($fieldsValidator->fails()) {
             return response()->json(['error' => array_merge($fieldsValidator->errors()->all())], 400);
         }
-
-        $user = Auth::user();
 
         // Get username and contact from the fields
         $username = $user->username; // user auth
