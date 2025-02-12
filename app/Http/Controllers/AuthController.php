@@ -16,75 +16,6 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
-    {
-        // Ensure that the request contains all fields
-        $fields = $request->all();
-
-        // **Validate the input**
-        $fieldsValidator = Validator::make($fields, [
-            'fname' => 'nullable|string|max:255',
-            'mname' => 'nullable|string|max:255',
-            'lname' => 'nullable|string|max:255',
-            'muncity' => 'required|integer',
-            'province' => 'required|integer',
-            'facility_id' => 'required|integer',
-            'user_designation' => 'nullable|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username',
-            'password' => 'required|string|min:8|max:255',
-            'contact' => 'required|string|max:11',
-            'user_priv' => 'required|integer',
-            'email' => 'string|max:255'
-        ]);
-
-        // **Trigger validation and return 422 if it fails**
-        try {
-            $validatedFields = $fieldsValidator->validate();
-        } catch (ValidationException $e) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422);
-        }
-
-        // **Check if the username already exists**
-        $existingUser = User::where('username', "=", $validatedFields['username'])->first();
-
-        if ($existingUser) {
-            return response()->json(['status' => 'error', 'message' => 'This account has already been taken.'], 400);
-        }
-
-        try {
-            // **Create and save new user**
-            $user = User::create([
-                'fname' => $validatedFields['fname'] ?? null,
-                'mname' => $validatedFields['mname'] ?? null,
-                'lname' => $validatedFields['lname'] ?? null,
-                'muncity' => $validatedFields['muncity'],
-                'province' => $validatedFields['province'],
-                'facility_id' => $validatedFields['facility_id'],
-                'username' => $validatedFields['username'],
-                'password' => bcrypt($validatedFields['password']), // Encrypt password
-                'contact' => $validatedFields['contact'],
-                'user_priv' => $validatedFields['user_priv'],
-                'email' => $validatedFields['email']
-            ]);
-
-            $userHfMapping = UserHealthFacility::create([
-                'user_id' => $user['id'] ?? null,
-                'facility_id' => $validatedFields['facility_id'],
-                'user_designation' => $validatedFields['user_designation'],
-                'assigned_at' => \Carbon\Carbon::now() // set current timestamp
-            ]);
-
-        } catch (Exception $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
-        }
-
-        $message = "Welcome to Tsekapp, " . $user['fname'] . " (" . $userHfMapping['user_designation'] . ")!";
-        return response()->json(['status' => 'success', 'message' => $message], 201);
-    }
-
     // Used to login users
     public function login(Request $request)
     {
@@ -107,7 +38,7 @@ class AuthController extends Controller
             ], 422);
         }
 
-        if (!$validatedFields['username'] || !$validatedFields['password']) {
+        if (!$validatedFields['user'] || !$validatedFields['pass']) {
             return response()->json(['status' => 'error', 'message' => 'Username and password are required'], 400);
         }
 
@@ -120,14 +51,14 @@ class AuthController extends Controller
             'facilities.name as facility_name',
             'user_health_facility.user_designation as user_designation'
         )
-            ->where('username', '=', $validatedFields['username'])
+            ->where('username', '=', $validatedFields['user'])
             ->join('muncity', 'users.muncity', '=', 'muncity.id')
             ->join('province', 'users.province', '=', 'province.id')
             ->leftJoin('user_health_facility', 'users.id', '=', 'user_health_facility.user_id')
             ->leftJoin('facilities', 'user_health_facility.facility_id', '=', 'facilities.id')
             ->first();
 
-        if ($user && Hash::check($validatedFields['password'], $user->password)) {
+        if ($user && Hash::check($validatedFields['pass'], $user->password)) {
 
             // Generate Sanctum token
             $token = $user->createToken('auth_token')->plainTextToken;

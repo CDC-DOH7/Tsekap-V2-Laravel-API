@@ -32,7 +32,7 @@ class UserHealthFacilityController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $userHealthFacility = UserHealthFacility::where('user_id', $fields['user_id'])
+        $userHealthFacility = UserHealthFacility::where('user_id', "=", $fields['user_id'])
             ->where('facility_id', $fields['facility_id'])
             ->first();
 
@@ -75,7 +75,7 @@ class UserHealthFacilityController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $existingMapping = UserHealthFacility::where('user_id', $fields['user_id'])
+        $existingMapping = UserHealthFacility::where('user_id', "=", $fields['user_id'])
             ->where('facility_id', $fields['facility_id'])
             ->first();
 
@@ -128,7 +128,7 @@ class UserHealthFacilityController extends Controller
         }
 
         // Find the existing mapping
-        $userHealthFacility = UserHealthFacility::where('user_id', $fields['user_id'])
+        $userHealthFacility = UserHealthFacility::where('user_id', "=", $fields['user_id'])
             ->where('facility_id', $fields['facility_id'])
             ->first();
 
@@ -178,7 +178,7 @@ class UserHealthFacilityController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $userHealthFacility = UserHealthFacility::where('user_id', $fields['user_id'])
+        $userHealthFacility = UserHealthFacility::where('user_id', "=", $fields['user_id'])
             ->where('facility_id', $fields['facility_id'])->first();
 
         if (!$userHealthFacility) {

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\TsekapV2\Misc;
 
 use App\Http\Controllers\Controller;
+use App\Models\TsekapV2\Citizenship;
+use App\Models\TsekapV2\Religion;
 use Illuminate\Http\Request;
 
 use App\Models\TsekapV2\Facilities;
@@ -86,7 +88,15 @@ class MiscDataController extends Controller
         return response()->json($barangay);
     }
 
-    // get all muncityities/cities
+    // get all provinces 
+    public function getAllProvinces()
+    {
+        $provinces = Province::select('id', 'description')->get();
+        return response()->json($provinces);
+    }
+
+
+    // get all muncipalities/cities
     public function getAllMuncities()
     {
         $muncities = Muncity::select('id', 'province_id', 'description')->get();
@@ -98,5 +108,19 @@ class MiscDataController extends Controller
     {
         $muncities = Barangay::select('id', 'province_id', 'muncity_id', 'description')->get();
         return response()->json($muncities);
+    }
+
+    // get all religion
+    public function getAllReligions()
+    {
+        $religions = Religion::select('id', 'name')->get();
+        return response()->json($religions);
+    }
+
+    // get all religion
+    public function getAllCitizenships()
+    {
+        $citizenships = Citizenship::select('id', 'name')->get();
+        return response()->json($citizenships);
     }
 }

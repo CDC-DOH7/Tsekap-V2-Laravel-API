@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\TsekapV2;
 
-
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -39,7 +38,7 @@ class UserController extends Controller
         $username = $user->username; // user auth
 
         // Fetch the user based on the provided username
-        $queryUser = User::where('username', $username)->first();
+        $queryUser = User::where('username', "=", $username)->first();
 
         if (!$queryUser) {
             return response()->json(['error' => 'User not found'], 404);

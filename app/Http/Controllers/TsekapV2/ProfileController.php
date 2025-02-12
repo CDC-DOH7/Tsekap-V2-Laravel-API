@@ -145,7 +145,7 @@ class ProfileController extends Controller
         );
 
         // Check if unique ID already exists
-        if (Profile::where('unique_id', $unique_id)->exists()) {
+        if (Profile::where('unique_id', "=" , $unique_id)->exists()) {
             return response()->json(['message' => 'Profile with this unique ID already exists'], 400);
         }
 
@@ -260,6 +260,7 @@ class ProfileController extends Controller
 
         $profile = Profile::find($fields['id']);
         $profile->delete();
+
         return response()->json(['message' => 'Deleted profile.'], 200);
     }
 }
