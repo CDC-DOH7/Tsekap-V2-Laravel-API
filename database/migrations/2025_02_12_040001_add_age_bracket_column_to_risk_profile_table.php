@@ -12,13 +12,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Check if any record in risk_profile has a non-null age_bracket_id
-        $exists = DB::table('risk_profile')->whereNotNull('age_bracket_id')->exists();
-
-        if ($exists) {
-            throw new \Exception("Migration aborted: 'risk_profile' table already contains 'age_bracket_id' values.");
-        }
-
         Schema::table('risk_profile', function (Blueprint $table) {
             $table->integer('age_bracket_id')->nullable()->after('age'); // Adjust as needed
             $table->foreign('age_bracket_id')->references('id')->on('new_age_brackets')->onDelete('cascade');

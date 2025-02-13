@@ -13,27 +13,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Check if the table already has data
-        $exists = DB::table('new_age_brackets')->exists();
-
-        if ($exists) {
-            throw new \Exception("Migration aborted: 'new_age_brackets' table already contains data.");
-        }
-
         Schema::create('new_age_brackets', function (Blueprint $table) {
             $table->integer('id')->autoIncrement();
-            $table->string('name');
-            $table->integer('min_age')->nullable();
-            $table->integer('max_age')->nullable();
+            $table->string('range');
+            $table->string('description')->nullable();
             $table->timestamps();
         });
 
         DB::table('new_age_brackets')->insert([
-            ['name' => 'Infant', 'min_age' => null, 'max_age' => 0, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
-            ['name' => 'Child', 'min_age' => 1, 'max_age' => 9, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
-            ['name' => 'Adolescent', 'min_age' => 10, 'max_age' => 19, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
-            ['name' => 'Adult', 'min_age' => 20, 'max_age' => 59, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
-            ['name' => 'Senior Citizen', 'min_age' => 60, 'max_age' => null, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '20-29 years old', 'description' => 'Young Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '30-39 years old', 'description' => 'Young Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '40-49 years old', 'description' => 'Middle-aged Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '50-59 years old', 'description' => 'Middle-aged Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '60+ years old', 'description' => 'Senior Citizen', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
         ]);
     }
 

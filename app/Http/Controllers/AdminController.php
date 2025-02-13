@@ -14,35 +14,32 @@ class AdminController extends Controller
     public function registerUser(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $admin = $request->user(); // This replaces Auth::check()
+        $admin = $request->user();
 
-        // Check if the user exists
         if (!$admin || $admin->user_priv !== 1) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // Ensure that the request contains all fields
-        $fields = $request->all();
-
-        // **Validate the input**
-        $fieldsValidator = Validator::make($fields, [
-            'fname' => 'nullable|string|max:255',
-            'mname' => 'nullable|string|max:255',
-            'lname' => 'nullable|string|max:255',
-            'muncity' => 'required|integer',
-            'province' => 'required|integer',
-            'facility_id' => 'required|integer',
-            'user_designation' => 'nullable|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username',
-            'password' => 'required|string|min:8|max:255',
-            'contact' => 'required|string|max:11',
-            'user_priv' => 'required|integer',
-            'email' => 'string|max:255'
+        // Validate the input
+        $validator = Validator::make($request->all(), [
+            'fields' => 'required|array',
+            'fields.fname' => 'nullable|string|max:255',
+            'fields.mname' => 'nullable|string|max:255',
+            'fields.lname' => 'nullable|string|max:255',
+            'fields.muncity' => 'required|integer',
+            'fields.province' => 'required|integer',
+            'fields.facility_id' => 'required|integer',
+            'fields.user_designation' => 'nullable|string|max:255',
+            'fields.username' => 'required|string|max:255|unique:users,username',
+            'fields.password' => 'required|string|min:8|max:255',
+            'fields.contact' => 'required|string|max:11',
+            'fields.user_priv' => 'required|integer',
+            'fields.email' => 'nullable|string|max:255|email',
         ]);
 
-        // **Trigger validation and return 422 if it fails**
+        // Trigger validation and return 422 if it fails
         try {
-            $validatedFields = $fieldsValidator->validate();
+            $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation failed',
@@ -50,10 +47,10 @@ class AdminController extends Controller
             ], 422);
         }
 
-        // **Check if the username already exists**
-        $existingUser = User::where('username', "=", $validatedFields['username'])->first();
+        $validatedFields = $validatedFields['fields']; // Extract fields correctly
 
-        if ($existingUser) {
+        // Check if the username already exists
+        if (User::where('username', $validatedFields['username'])->exists()) {
             return response()->json(['status' => 'error', 'message' => 'This account has already been taken.'], 400);
         }
 
@@ -70,7 +67,7 @@ class AdminController extends Controller
                 'password' => bcrypt($validatedFields['password']), // Encrypt password
                 'contact' => $validatedFields['contact'],
                 'user_priv' => $validatedFields['user_priv'],
-                'email' => $validatedFields['email']
+                'email' => $validatedFields['email'] ?? null,
             ]);
 
             $userHfMapping = UserHealthFacility::create([
