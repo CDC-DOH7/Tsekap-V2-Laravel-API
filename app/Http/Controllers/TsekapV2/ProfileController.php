@@ -26,13 +26,15 @@ class ProfileController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
-            'fields.firstname' => 'string',
-            'fields.middlename' => 'string',
-            'fields.lastname' => 'string',
-            'fields.dob' => 'date',
+            'fields.first_name' => 'nullable|string',
+            'fields.middle_name' => 'nullable|string',
+            'fields.last_name' => 'nullable|string',
+            'fields.dob' => 'nullable|string|date',
+            'fields.barangay_id' => 'nullable|integer',
+            'fields.municipal_id' => 'nullable|integer',
+            'fields.province_id' => 'nullable|integer',
         ]);
 
         if ($validator->fails()) {
