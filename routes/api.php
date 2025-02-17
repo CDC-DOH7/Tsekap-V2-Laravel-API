@@ -16,16 +16,18 @@ Route::prefix('v2')->group(function () {
     // Misc Routes
     Route::prefix('misc')->group(function () {
         Route::get('/get-all-facility', [MiscDataController::class, 'getAllFacility'])->name('api-v2-get-all-facility');
-        Route::get('/get-province', [MiscDataController::class, 'getProvince'])->name('api-v2-get-province');
-        Route::get('/get-muncity', [MiscDataController::class, 'getMuncity'])->name('api-v2-get-muncity');
-        Route::get('/get-barangay', [MiscDataController::class, 'getBarangay'])->name('api-v2-get-barangay');
-        Route::get('/get-all-provinces', [MiscDataController::class, 'getAllProvinces'])->name('api-v2-get-all-provinces');
-        Route::get('/get-all-muncities', [MiscDataController::class, 'getAllMuncities'])->name('api-v2-get-all-muncities');
-        Route::get('/get-all-barangay', [MiscDataController::class, 'getAllBarangays'])->name('api-v2-get-all-barangay');
-
+        Route::get('/get-provinces', [MiscDataController::class, 'getProvinces'])->name('api-v2-get-all-provinces');
+        Route::get('/get-muncities', [MiscDataController::class, 'getMuncities'])->name('api-v2-get-muncity');
+        Route::get('/get-barangays', [MiscDataController::class, 'getBarangays'])->name('api-v2-get-barangay');
+        
         // Citizenships and Religions
         Route::get('/get-all-citizenships', [MiscDataController::class, 'getAllCitizenships'])->name('api-v2-get-all-citizenships');
         Route::get('/get-all-religions', [MiscDataController::class, 'getAllReligions'])->name('api-v2-get-all-religions');
+    
+        // Get By Id
+        Route::get('/get-province-by-id', [MiscDataController::class, 'getProvinceById'])->name('api-v2-get-province-by-id');
+        Route::get('/get-muncity-by-id', [MiscDataController::class, 'getMuncityById'])->name('api-v2-get-muncity-by-id');
+        Route::get('/get-barangay-by-id', [MiscDataController::class, 'getBarangayById'])->name('api-v2-get-barangay-by-id');
     });
 
     // Protected Routes (Requires Authentication)

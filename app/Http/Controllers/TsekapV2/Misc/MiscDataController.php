@@ -58,15 +58,15 @@ class MiscDataController extends Controller
         return response()->json($facilities);
     }
 
-    // get province
-    public function getProvince()
+    // get all provinces 
+    public function getProvinces()
     {
-        $province = Province::select('id', 'description')->get();
-        return response()->json($province);
+        $provinces = Province::select('id', 'description')->get();
+        return response()->json($provinces);
     }
-    
-    // get muncityity/city
-    public function getMuncity(Request $request)
+
+    // get muncity/city by provinces
+    public function getMuncities(Request $request)
     {
         $provinceId = $request->query('province_id');
 
@@ -77,8 +77,8 @@ class MiscDataController extends Controller
         return response()->json($muncity);
     }
 
-    // get barangay
-    public function getBarangay(Request $request)
+    // get barangay by muncity/cities
+    public function getBarangays(Request $request)
     {
         $muncityId = $request->query('muncity_id');
 
@@ -88,26 +88,40 @@ class MiscDataController extends Controller
         return response()->json($barangay);
     }
 
-    // get all provinces 
-    public function getAllProvinces()
+    // get province by Id 
+    public function getProvinceById(Request $request)
     {
-        $provinces = Province::select('id', 'description')->get();
-        return response()->json($provinces);
+
+        $provinceId = $request->query('province_id');
+
+        $province = Muncity::where('id', '=', $provinceId)
+            ->select('id', 'description')
+            ->get();
+
+        return response()->json($province);
     }
 
-
-    // get all muncipalities/cities
-    public function getAllMuncities()
+    // get muncity/city by Id
+    public function getMuncityById(Request $request)
     {
-        $muncities = Muncity::select('id', 'province_id', 'description')->get();
-        return response()->json($muncities);
+        $muncityId = $request->query('muncity_id');
+
+        $muncity = Muncity::where('id', '=', $muncityId)
+            ->select('id', 'description')
+            ->get();
+
+        return response()->json($muncity);
     }
 
-    // get all barangays
-    public function getAllBarangays()
+    // get barangay by Id
+    public function getBarangayById(Request $request)
     {
-        $muncities = Barangay::select('id', 'province_id', 'muncity_id', 'description')->get();
-        return response()->json($muncities);
+        $barangayId = $request->query('barangay_id');
+
+        $barangay = Barangay::where('id', '=', $barangayId)
+            ->select('id', 'description')
+            ->get();
+        return response()->json($barangay);
     }
 
     // get all religion

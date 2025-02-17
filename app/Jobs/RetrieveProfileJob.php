@@ -52,30 +52,42 @@ class RetrieveProfileJob implements ShouldQueue
         ]);
 
         // Initialize query
-        $query = Profile::select('unique_id', 'fname', 'mname', 'lname', 'dob', 'id', 'barangay_id', 'muncity_id', 'province_id');
+        $query = Profile::select(
+            'profile.unique_id',
+            'profile.fname',
+            'profile.mname',
+            'profile.lname',
+            'profile.dob',
+            'profile.id',
+            'profile.barangay_id',
+            'profile.muncity_id',
+            'profile.province_id',
+            'barangay.description as barangay_name',
+            'muncity.description as muncity_name',
+            'province.description as province_name'
+        )
+            ->join("barangay", "profile.barangay_id", "=", "barangay.id")
+            ->join("muncity", "profile.muncity_id", "=", "muncity.id")
+            ->join("province", "profile.province_id", "=", "province.id");
 
         // Add conditions based on filters
         foreach ($filters as $column => $value) {
-            if ($column === 'fname' || $column === 'mname' || $column === 'lname'){
-                $query->where($column, "like", "$value%"); // Partial match for strings
+            // Explicitly prefix the column with "profile." to avoid ambiguity
+            $columnWithTable = "profile.$column";
+
+            if (in_array($column, ['fname', 'mname', 'lname'], true)) {
+                $query->where($columnWithTable, "like", "$value%"); // Partial match for strings
             } else {
-                $query->where($column, '=', "$value"); // Exact match for everything
+                $query->where($columnWithTable, '=', $value); // Exact match for integers
             }
         }
 
-        // Simulate processing time by iterating and checking elapsed time
-        while (true) {
-            // Fetch 15 closest results
-            $profiles = $query->orderBy('lname', 'asc')->limit(15)->get();
-
-            if ($profiles->count() > 0) {
-                break;
-            }
-        }
+        // Fetch 30 closest results
+        $profiles = $query->orderBy('profile.lname', 'asc')->limit(30)->get();
 
         \Log::info('Profiles retrieved:', $profiles->toArray());
 
-        // Return the profiles as an array
         return $profiles->toArray();
     }
+
 }
