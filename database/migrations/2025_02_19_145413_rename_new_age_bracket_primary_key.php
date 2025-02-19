@@ -3,6 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 return new class extends Migration
 {
@@ -11,16 +13,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('new_age_brackets', function (Blueprint $table) {
-            $table->integer('age_id')->autoIncrement()->after('id');
+        Schema::dropIfExists('new_age_brackets');
+
+        Schema::create('new_age_brackets', function (Blueprint $table) {
+            $table->integer('age_id')->autoIncrement();
+            $table->string('range');
+            $table->string('description')->nullable();
+            $table->timestamps();
         });
 
-        // Copy data from `id` to `age_id`
-        DB::statement('UPDATE new_age_brackets SET age_id = id');
-
-        Schema::table('new_age_brackets', function (Blueprint $table) {
-            $table->dropColumn('id');
-        });
+        DB::table('new_age_brackets')->insert([
+            ['range' => '20-29 years old', 'description' => 'Young Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '30-39 years old', 'description' => 'Young Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '40-49 years old', 'description' => 'Middle-aged Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '50-59 years old', 'description' => 'Middle-aged Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '60+ years old', 'description' => 'Senior Citizen', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+        ]);
     }
 
     /**
@@ -28,15 +36,21 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('new_age_brackets', function (Blueprint $table) {
-            $table->integer('id')->autoIncrement()->after('age_id');
+        Schema::dropIfExists('new_age_brackets');
+    
+        Schema::create('new_age_brackets', function (Blueprint $table) {
+            $table->integer('id')->autoIncrement();
+            $table->string('range');
+            $table->string('description')->nullable();
+            $table->timestamps();
         });
 
-        // Copy data back to `id`
-        DB::statement('UPDATE new_age_brackets SET id = age_id');
-
-        Schema::table('new_age_brackets', function (Blueprint $table) {
-            $table->dropColumn('age_id');
-        });
+        DB::table('new_age_brackets')->insert([
+            ['range' => '20-29 years old', 'description' => 'Young Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '30-39 years old', 'description' => 'Young Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '40-49 years old', 'description' => 'Middle-aged Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '50-59 years old', 'description' => 'Middle-aged Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '60+ years old', 'description' => 'Senior Citizen', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+        ]);
     }
 };
