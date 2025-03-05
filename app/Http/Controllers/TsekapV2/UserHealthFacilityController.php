@@ -66,7 +66,6 @@ class UserHealthFacilityController extends Controller
             'fields.user_id' => 'required|integer',
             'fields.facility_id' => 'required|integer',
             'fields.user_designation' => 'string|max:255',
-            'fields.assigned_at' => 'date',
         ];
 
         $validator = Validator::make($request->all(), $rules);

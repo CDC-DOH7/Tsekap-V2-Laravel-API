@@ -8,6 +8,7 @@ use App\Http\Controllers\TsekapV2\Misc\MiscDataController;
 use App\Http\Controllers\TsekapV2\FacilityController;
 use App\Http\Controllers\TsekapV2\ProfileController;
 use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController;
+use App\Http\Controllers\TsekapV2\UserHealthFacilityController;
 
 Route::prefix('v2')->group(function () {
     // Non-authenticated Routes
@@ -58,6 +59,7 @@ Route::prefix('v2')->group(function () {
             Route::post('/add-facility', [FacilityController::class, 'addFacility'])->name('api-v2-add-facility');
             Route::post('/update-facility', [FacilityController::class, 'updateFacility'])->name('api-v2-update-facility');
             Route::post('/delete-facility', [FacilityController::class, 'deleteFacility'])->name('api-v2-delete-facility');
+            Route::post('/add-user-facility', [UserHealthFacilityController::class, 'addUserHealthFacility'])->name('api-v2-add-user-facility');
         });
 
         // Profile Routes
