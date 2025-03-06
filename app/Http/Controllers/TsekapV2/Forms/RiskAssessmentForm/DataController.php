@@ -271,9 +271,7 @@ class DataController extends Controller
             'ar_agitated_behavior',
             'ar_eye_injury',
             'ar_severe_injuries',
-            'ar_refer_physician_name',
-            'ar_refer_reason',
-            'ar_refer_facility',
+            
             'pmh_hypertension',
             'pmh_heart_disease',
             'pmh_diabetes',
@@ -411,7 +409,8 @@ class DataController extends Controller
         // Check for duplicates
         $existingRiskProfile = RiskProfile::where('fname', $fields['fname'])
             ->where('lname', $fields['lname'])
-            ->where('dob', $fields['dob']);
+            ->where('dob', $fields['dob'])
+            ->where('facility_id_updated', $fields['facility_id_updated']);
 
         if (!empty($fields['mname'])) {
             $existingRiskProfile->where('mname', $fields['mname']);
