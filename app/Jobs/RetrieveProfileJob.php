@@ -70,6 +70,8 @@ class RetrieveProfileJob implements ShouldQueue
             'profile.barangay_id',
             'profile.muncity_id',
             'profile.province_id',
+            'profile.deceased',
+            'profile.deceased_date',
             \DB::raw("DATE_FORMAT(profile.created_at, '%Y-%m-%d %H:%i:%s') as created_at"), // Extract date only
             'barangay.description as barangay_name',
             'muncity.description as muncity_name',

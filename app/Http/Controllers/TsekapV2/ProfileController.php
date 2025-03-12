@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\TsekapV2;
 
+use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -37,11 +38,8 @@ class ProfileController extends Controller
             'fields.province_id' => 'nullable|integer',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['error' => 'Invalid input'], 400);
-        }
-
         $fields = $request->input('fields');
+
         $job = new RetrieveProfileJob($fields);
         $result = $job->handle();
 
@@ -147,7 +145,7 @@ class ProfileController extends Controller
         );
 
         // Check if unique ID already exists
-        if (Profile::where('unique_id', "=" , $unique_id)->exists()) {
+        if (Profile::where('unique_id', "=", $unique_id)->exists()) {
             return response()->json(['message' => 'Profile with this unique ID already exists'], 400);
         }
 
@@ -157,89 +155,136 @@ class ProfileController extends Controller
         return response()->json(['message' => 'Profile added successfully', 'profile' => $profile], 201);
     }
 
-    // update profile
+
     public function updateProfile(Request $request)
     {
-        $fields = $request->input('fields');
-
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $request->user();
 
         // Check if the user exists
         if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
+        $fields = $request->input('fields', []);
+
+        // Convert ISO 8601 date fields to YYYY-MM-DD format
+        if (!empty($fields['dob'])) {
+            $fields['dob'] = Carbon::parse($fields['dob'])->toDateString();
+        }
+
+        if (!empty($fields['pregnant'])) {
+            $fields['pregnant'] = Carbon::parse($fields['pregnant'])->toDateString();
+        }
+
+        if (!empty($fields['deceased_date'])) {
+            $fields['deceased_date'] = Carbon::parse($fields['deceased_date'])->toDateString();
+        }
+
         // Check if the user has admin privileges
-        if ($user->user_priv != 1) {
+        if (!in_array($user->user_priv, [1, 3, 10])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Check if profile exists
-        $profile = Profile::find($fields['id']);
+        // Ensure profile ID is provided
+        $profileId = $fields['id'] ?? null;
+        if (!$profileId) {
+            return response()->json(['message' => 'Profile ID is required'], 400);
+        }
 
+        // Check if profile exists
+        $profile = Profile::find($profileId);
         if (!$profile) {
             return response()->json(['message' => 'Profile not found'], 404);
         }
 
-        // Validation rules
-        $rules = [
-            'unique_id' => 'required|unique:profiles,unique_id,',
-            'familyID' => 'required',
-            'phicID' => 'required',
-            'nhtsID' => 'required',
-            'head' => 'required',
-            'relation' => 'required',
-            'fname' => 'required',
-            'mname' => 'required',
-            'lname' => 'required',
-            'suffix' => 'required',
-            'dob' => 'required|date',
-            'sex' => 'required',
-            'barangay_id' => 'required|integer',
-            'muncity_id' => 'required|integer',
-            'province_id' => 'required|integer',
-            'income' => 'required|integer',
-            'unmet' => 'required|integer',
-            'water' => 'required|integer',
-            'toilet' => 'required|string|max:10',
-            'education' => 'required|string|max:20',
-            'hypertension' => 'required',
-            'diabetic' => 'required',
-            'pwd' => 'required',
-            'pregnant' => 'required|date',
-            'dengvaxia' => 'required|string|max:45',
-            'sexually_active' => 'required|string|max:10',
-            'nhts' => 'required',
-            'four_ps' => 'required',
-            'ip' => 'required',
-            'member_others' => 'required',
-            'balik_probinsya' => 'required',
-            'updated_by' => 'required|string|max:10',
-            'household_num' => 'required|string|max:30',
-            'philhealth_categ' => 'required|string|max:15',
-            'fourps_num' => 'required|string|max:30',
-            'health_group' => 'required|string|max:20',
-            'fam_plan' => 'required|string|max:10',
-            'fam_plan_method' => 'required|string|max:20',
-            'fam_plan_other_method' => 'required',
-            'fam_plan_status' => 'required|string|max:25',
-            'fam_plan_other_status' => 'required',
-            'other_med_history' => 'required',
-        ];
+        // Validate fields
+        $validator = Validator::make($request->all(), [
+            'fields' => 'required|array',
+            'fields.unique_id' => 'sometimes|string|max:255|unique:profiles,unique_id,' . $profile->id,
+            'fields.familyID' => 'sometimes|string|max:255',
+            'fields.phicID' => 'sometimes|string|max:100',
+            'fields.nhtsID' => 'sometimes|string|max:100',
+            'fields.head' => 'sometimes|string|max:100',
+            'fields.relation' => 'sometimes|string|max:255',
+            'fields.fname' => 'sometimes|string|max:255',
+            'fields.mname' => 'sometimes|string|max:255',
+            'fields.lname' => 'sometimes|string|max:255',
+            'fields.suffix' => 'sometimes|string|max:255',
+            'fields.dob' => 'sometimes|date',
+            'fields.sex' => 'sometimes|string|max:255',
+            'fields.barangay_id' => 'sometimes|integer',
+            'fields.muncity_id' => 'sometimes|integer',
+            'fields.province_id' => 'sometimes|integer',
+            'fields.income' => 'sometimes|integer',
+            'fields.unmet' => 'sometimes|integer',
+            'fields.water' => 'sometimes|integer',
+            'fields.toilet' => 'sometimes|string|max:10',
+            'fields.education' => 'sometimes|string|max:20',
+            'fields.hypertension' => 'sometimes|string|max:255',
+            'fields.diabetic' => 'sometimes|string|max:255',
+            'fields.pwd' => 'sometimes|string|max:255',
+            'fields.pregnant' => 'sometimes|date',
+            'fields.dengvaxia' => 'sometimes|string|max:45',
+            'fields.created_at' => 'sometimes|date',
+            'fields.updated_at' => 'sometimes|date',
+            'fields.sitio_id' => 'sometimes|integer|nullable',
+            'fields.purok_id' => 'sometimes|integer|nullable',
+            'fields.birth_place' => 'sometimes|string|max:255|nullable',
+            'fields.civil_status' => 'sometimes|string|max:255|nullable',
+            'fields.religion' => 'sometimes|string|max:255|nullable',
+            'fields.other_religion' => 'sometimes|string|max:255|nullable',
+            'fields.contact' => 'sometimes|string|max:255|nullable',
+            'fields.height' => 'sometimes|numeric',
+            'fields.weight' => 'sometimes|numeric',
+            'fields.cancer' => 'sometimes|string|max:255|nullable',
+            'fields.cancer_type' => 'sometimes|string|max:255|nullable',
+            'fields.mental_med' => 'sometimes|string|max:255|nullable',
+            'fields.tbdots_med' => 'sometimes|string|max:255|nullable',
+            'fields.cvd_med' => 'sometimes|string|max:255|nullable',
+            'fields.covid_status' => 'sometimes|string|max:255|nullable',
+            'fields.menarche' => 'sometimes|string|max:255|nullable',
+            'fields.menarche_age' => 'sometimes|integer|nullable',
+            'fields.newborn_screen' => 'sometimes|string|max:255|nullable',
+            'fields.newborn_text' => 'sometimes|string|max:255|nullable',
+            'fields.deceased' => 'sometimes|string|max:255|nullable',
+            'fields.deceased_date' => 'sometimes|date|nullable',
+            'fields.pwd_desc' => 'sometimes|string|max:255|nullable',
+            'fields.sexually_active' => 'sometimes|string|max:10',
+            'fields.nhts' => 'sometimes|string|max:255',
+            'fields.four_ps' => 'sometimes|string|max:255',
+            'fields.ip' => 'sometimes|string|max:255',
+            'fields.member_others' => 'sometimes|string|max:255',
+            'fields.balik_probinsya' => 'sometimes|string|max:255',
+            'fields.updated_by' => 'sometimes|string|max:10',
+            'fields.household_num' => 'sometimes|string|max:30',
+            'fields.philhealth_categ' => 'sometimes|string|max:15',
+            'fields.fourps_num' => 'sometimes|string|max:30',
+            'fields.health_group' => 'sometimes|string|max:20',
+            'fields.fam_plan' => 'sometimes|string|max:10',
+            'fields.fam_plan_method' => 'sometimes|string|max:20',
+            'fields.fam_plan_other_method' => 'sometimes|string|max:255',
+            'fields.fam_plan_status' => 'sometimes|string|max:25',
+            'fields.fam_plan_other_status' => 'sometimes|string|max:255',
+            'fields.other_med_history' => 'sometimes|string',
+            'fields.report_facilityId' => 'sometimes|integer|nullable',
+            'fields.Hospital_caseno' => 'sometimes|string|max:100|nullable',
+            'fields.nameof_encoder' => 'sometimes|string|max:255|nullable',
+            'fields.designation' => 'sometimes|string|max:255|nullable'
+        ]);
 
-        // Validate input
-        $validator = Validator::make($request->fields, $rules);
-
-        // Check for validation errors
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+            return response()->json(['error' => 'Invalid inputs.', 'messages' => $validator->errors()], 422);
         }
 
-        // Update profile
-        $profile->update($request->all());
+        try {
+            // Only update with validated fields
+            $profile->update($fields);
 
-        return response()->json(['message' => 'Profile updated successfully', 'profile' => $profile], 200);
+            return response()->json(['message' => 'Profile updated successfully', 'profile' => $profile], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred', 'message' => $e->getMessage()], 500);
+        }
     }
 
     // delete profile

@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
-
 use App\Models\User;
-use App\Models\TsekapV2\UserHealthFacility;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
