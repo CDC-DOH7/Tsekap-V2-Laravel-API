@@ -9,6 +9,7 @@ use App\Http\Controllers\TsekapV2\FacilityController;
 use App\Http\Controllers\TsekapV2\ProfileController;
 use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController;
 use App\Http\Controllers\TsekapV2\UserHealthFacilityController;
+use App\Http\Controllers\Tsekapv2\Forms\PatientInjuryForm\InjuryListController;
 
 Route::prefix('v2')->group(function () {
     // Non-authenticated Routes
@@ -81,6 +82,11 @@ Route::prefix('v2')->group(function () {
             Route::post('/update-risk-form', [DataController::class, 'updateRiskForm'])->name('api-v2-update-risk-form');
             Route::post('/delete-risk-profile', [DataController::class, 'deleteRiskProfile'])->name('api-v2-delete-risk-profile');
             Route::post('/delete-risk-form', [DataController::class, 'deleteRiskForm'])->name('api-v2-delete-risk-form');
+        });
+
+        // Forms - Patient Injury Routes
+        Route::prefix('forms/patient-injury')->group(function () {
+            Route::get('/list-body-parts', [InjuryListController::class, 'getBodyParts'])->name('api-v2-get-body-parts');
         });
     });
 });
