@@ -26,11 +26,19 @@ class InjuryListController extends Controller
     // get body parts
     public function getBodyParts(Request $request)
     {
-
         $user = $request->user(); // Authentication
 
         $bodyparts = BodyParts::select('id', 'name')->get();
         return response()->json($bodyparts);
+    }
+
+    // get nature of injury
+    public function getNatureInjury(Request $request)
+    {
+        $user = $request->user(); // Authentication
+
+        $natureinjury = NatureOfInjury::select('id', 'name')->get();
+        return response()->json($natureinjury);
     }
 
     // get muncity/city by provinces

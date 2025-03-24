@@ -65,6 +65,20 @@ class MiscDataController extends Controller
         return response()->json($provinces);
     }
 
+    // get all muncity 
+    public function getAllMuncities()
+    {
+        $muncity = Muncity::select('id', 'description', 'province_id')->get();
+        return response()->json($muncity);
+    }
+
+    // get all barangay
+    public function getAllBarangays()
+    {
+        $barangay = Barangay::select('id', 'description', 'province_id', 'muncity_id')->get();
+        return response()->json($barangay);
+    }
+
     // get muncity/city by provinces
     public function getMuncities(Request $request)
     {

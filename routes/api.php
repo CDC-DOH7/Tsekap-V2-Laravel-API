@@ -21,7 +21,9 @@ Route::prefix('v2')->group(function () {
         Route::get('/get-provinces', [MiscDataController::class, 'getProvinces'])->name('api-v2-get-all-provinces');
         Route::get('/get-muncities', [MiscDataController::class, 'getMuncities'])->name('api-v2-get-muncity');
         Route::get('/get-barangays', [MiscDataController::class, 'getBarangays'])->name('api-v2-get-barangay');
-        
+        Route::get('/get-all-muncities', [MiscDataController::class, 'getAllMuncities'])->name('api-v2-get-all-muncity');
+        Route::get('/get-all-barangays', [MiscDataController::class, 'getAllBarangays'])->name('api-v2-get-all-barangay');
+
         // Citizenships and Religions
         Route::get('/get-all-citizenships', [MiscDataController::class, 'getAllCitizenships'])->name('api-v2-get-all-citizenships');
         Route::get('/get-all-religions', [MiscDataController::class, 'getAllReligions'])->name('api-v2-get-all-religions');
@@ -87,6 +89,7 @@ Route::prefix('v2')->group(function () {
         // Forms - Patient Injury Routes
         Route::prefix('forms/patient-injury')->group(function () {
             Route::get('/list-body-parts', [InjuryListController::class, 'getBodyParts'])->name('api-v2-get-body-parts');
+            Route::get('/list-nature-injury', [InjuryListController::class, 'getNatureInjury'])->name('api-v2-get-nature-injuries');
         });
     });
 });
