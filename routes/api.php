@@ -90,6 +90,7 @@ Route::prefix('v2')->group(function () {
         Route::prefix('forms/patient-injury')->group(function () {
             Route::get('/list-body-parts', [InjuryListController::class, 'getBodyParts'])->name('api-v2-get-body-parts');
             Route::get('/list-nature-injury', [InjuryListController::class, 'getNatureInjury'])->name('api-v2-get-nature-injuries');
+            Route::get('/list-external-injury', [InjuryListController::class, 'getExternalInjury'])->name('api-v2-get-external-injuries');
         });
     });
 });
