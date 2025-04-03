@@ -65,7 +65,7 @@ Route::prefix('v2')->group(function () {
         // Profile Routes
         Route::prefix('profile')->group(function () {
             Route::post('/retrieve-profile', [ProfileController::class, 'retrieveProfile'])->name('api-v2-retrieve-profile');
-            Route::post('/add-profile', [ProfileController::class, 'addProfile'])->name('api-v2-retrieve-profile');
+            Route::post('/add-profile', [ProfileController::class, 'addProfile'])->name('api-v2-add-profile');
             Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('api-v2-update-profile');
             Route::post('/delete-profile', [ProfileController::class, 'deleteProfile'])->name('api-v2-delete-profile');
         });

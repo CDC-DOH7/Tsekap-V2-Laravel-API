@@ -29,6 +29,7 @@ class RetrieveProfileJob implements ShouldQueue
     {
         // Validate the fields
         $validator = Validator::make($this->fields, [
+            'family_id' => 'nullable|string',
             'first_name' => 'nullable|string',
             'middle_name' => 'nullable|string',
             'last_name' => 'nullable|string',
@@ -45,6 +46,7 @@ class RetrieveProfileJob implements ShouldQueue
 
         // Extract and filter non-empty fields efficiently
         $allowedKeys = [
+            'family_id' => 'familyID',
             'first_name' => 'fname',
             'middle_name' => 'mname',
             'last_name' => 'lname',
@@ -85,7 +87,7 @@ class RetrieveProfileJob implements ShouldQueue
         foreach ($filters as $key => $value) {
             $column = "profile." . $allowedKeys[$key];
 
-            $query->when(in_array($allowedKeys[$key], ['fname', 'mname', 'lname']), function ($q) use ($column, $value) {
+            $query->when(in_array($allowedKeys[$key], ['familyID', 'fname', 'mname', 'lname']), function ($q) use ($column, $value) {
                 return $q->where($column, 'like', Str::lower($value) . '%');
             }, function ($q) use ($column, $value) {
                 return $q->where($column, $value);

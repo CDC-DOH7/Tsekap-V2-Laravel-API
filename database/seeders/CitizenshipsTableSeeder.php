@@ -16,6 +16,7 @@ class CitizenshipsTableSeeder extends Seeder
             'Afghan',
             'Albanian',
             'Algerian',
+            'American',
             'Andorran',
             'Angolan',
             'Antiguan and Barbudan',
