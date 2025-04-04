@@ -62,7 +62,6 @@ class AdminController extends Controller
                 'lname' => $validatedFields['lname'] ?? null,
                 'muncity' => $validatedFields['muncity'],
                 'province' => $validatedFields['province'],
-                'facility_id' => $validatedFields['facility_id'],
                 'username' => $validatedFields['username'],
                 'password' => bcrypt($validatedFields['password']), // Encrypt password
                 'contact' => $validatedFields['contact'],

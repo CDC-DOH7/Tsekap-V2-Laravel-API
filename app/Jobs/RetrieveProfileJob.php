@@ -5,8 +5,10 @@ namespace App\Jobs;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\TsekapV2\Profile;
+use Illuminate\Support\Facades\DB;
 
 class RetrieveProfileJob implements ShouldQueue
 {
@@ -40,7 +42,7 @@ class RetrieveProfileJob implements ShouldQueue
         ]);
 
         if ($validator->fails()) {
-            \Log::error('Validation failed:', $validator->errors()->toArray());
+            Log::error('Validation failed:', $validator->errors()->toArray());
             return 'Validation failed';
         }
 
@@ -68,13 +70,14 @@ class RetrieveProfileJob implements ShouldQueue
             'profile.suffix',
             'profile.sex',
             'profile.dob',
+            'profile.relation',
             'profile.familyID',
             'profile.barangay_id',
             'profile.muncity_id',
             'profile.province_id',
             'profile.deceased',
             'profile.deceased_date',
-            \DB::raw("DATE_FORMAT(profile.created_at, '%Y-%m-%d %H:%i:%s') as created_at"), // Extract date only
+            DB::raw("DATE_FORMAT(profile.created_at, '%Y-%m-%d %H:%i:%s') as created_at"), // Extract date only
             'barangay.description as barangay_name',
             'muncity.description as muncity_name',
             'province.description as province_name',
@@ -97,7 +100,7 @@ class RetrieveProfileJob implements ShouldQueue
         // Fetch 50 results with sorting
         $profiles = $query->orderBy('profile.lname')->limit(50)->get();
 
-        \Log::info('Profiles retrieved:', $profiles->toArray());
+        Log::info('Profiles retrieved:', $profiles->toArray());
 
         return $profiles->toArray();
     }

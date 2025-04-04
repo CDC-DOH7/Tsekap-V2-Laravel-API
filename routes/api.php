@@ -33,7 +33,6 @@ Route::prefix('v2')->group(function () {
 
     // Protected Routes (Requires Authentication)
     Route::middleware('auth:sanctum')->group(function () {
-        
         // Admin Routes
         Route::prefix('admin')->group(function () {
             Route::post('/reset-user-password', [AdminController::class, 'resetUserPassword'])->name('api-v2-reset-user-password');
