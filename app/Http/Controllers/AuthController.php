@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
-
+use App\Models\TsekapV2\UserHealthFacility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cookie;
@@ -13,6 +13,72 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    // self-registration functionality
+    public function selfRegisterUser(Request $request)
+    {
+        // Validate the input
+        $validator = Validator::make($request->all(), [
+            'fields' => 'required|array',
+            'fields.fname' => 'nullable|string|max:255',
+            'fields.mname' => 'nullable|string|max:255',
+            'fields.lname' => 'nullable|string|max:255',
+            'fields.muncity' => 'required|integer',
+            'fields.province' => 'required|integer',
+            'fields.facility_id' => 'required|integer',
+            'fields.user_designation' => 'nullable|string|max:255',
+            'fields.username' => 'required|string|max:255|unique:users,username',
+            'fields.password' => 'required|string|min:8|max:255',
+            'fields.contact' => 'required|string|max:11',
+            'fields.user_priv' => 'required|integer',
+            'fields.email' => 'nullable|string|max:255|email',
+        ]);
+
+        // Trigger validation and return 422 if it fails
+        try {
+            $validatedFields = $validator->validate();
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        }
+
+        $validatedFields = $validatedFields['fields']; // Extract fields correctly
+
+        // Check if the username already exists
+        if (User::where('username', $validatedFields['username'])->exists()) {
+            return response()->json(['status' => 'error', 'message' => 'This account has already been taken.'], 400);
+        }
+
+        try {
+            // **Create and save new user**
+            $user = User::create([
+                'fname' => $validatedFields['fname'] ?? null,
+                'mname' => $validatedFields['mname'] ?? null,
+                'lname' => $validatedFields['lname'] ?? null,
+                'muncity' => $validatedFields['muncity'],
+                'province' => $validatedFields['province'],
+                'username' => $validatedFields['username'],
+                'password' => bcrypt($validatedFields['password']), // Encrypt password
+                'contact' => $validatedFields['contact'],
+                'user_priv' => $validatedFields['user_priv'],
+                'verified' => 0, // make this field zero because it is self-registered and still needs to be verified
+                'email' => $validatedFields['email'] ?? null,
+            ]);
+
+            $userHfMapping = UserHealthFacility::create([
+                'user_id' => $user['id'] ?? null,
+                'facility_id' => $validatedFields['facility_id'],
+                'user_designation' => $validatedFields['user_designation'],
+                'assigned_at' => \Carbon\Carbon::now() // set current timestamp
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+
+        $message = "Welcome to Tsekapp, " . $user['fname'] . " (" . $userHfMapping['user_designation'] . ")! Please wait for the admin to verify your account before you can log in.";
+        return response()->json(['status' => 'success', 'message' => $message], 201);
+    }
     // Used to login users
     public function login(Request $request)
     {
@@ -54,6 +120,11 @@ class AuthController extends Controller
             ->leftJoin('user_health_facility', 'users.id', '=', 'user_health_facility.user_id')
             ->leftJoin('facilities', 'user_health_facility.facility_id', '=', 'facilities.id')
             ->first();
+
+        // Check if the user is verified
+        if (!$user->verified) {
+            return response()->json(['status' => 'error', 'message' => 'Your account is not yet verified. Please contact the administrator.'], 403);
+        }
 
         if ($user && Hash::check($validatedFields['pass'], $user->password)) {
 

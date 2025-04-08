@@ -19,9 +19,9 @@ return new class extends Migration
             $table->string('longitude')->nullable();
             $table->string('abbr');
             $table->string('address');
-            $table->integer('brgy');
-            $table->integer('muncity');
-            $table->integer('province');
+            $table->unsignedInteger('brgy');
+            $table->unsignedInteger('muncity');
+            $table->unsignedInteger('province');
             $table->string('contact');
             $table->string('email');
             $table->integer('status');
@@ -32,6 +32,10 @@ return new class extends Migration
             $table->integer('tricity_id')->nullable();
             $table->string('referral_used', 45)->nullable();
             $table->timestamps();
+
+            // Adding foreign key constraints
+            $table->foreign('muncity')->references('id')->on('muncity')->onDelete('cascade');
+            $table->foreign('province')->references('id')->on('province')->onDelete('cascade');
         });
     }
 

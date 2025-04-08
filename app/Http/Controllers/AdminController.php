@@ -66,6 +66,7 @@ class AdminController extends Controller
                 'password' => bcrypt($validatedFields['password']), // Encrypt password
                 'contact' => $validatedFields['contact'],
                 'user_priv' => $validatedFields['user_priv'],
+                'verified' => 1, // verify automatically if created by admin
                 'email' => $validatedFields['email'] ?? null,
             ]);
 
@@ -75,7 +76,6 @@ class AdminController extends Controller
                 'user_designation' => $validatedFields['user_designation'],
                 'assigned_at' => \Carbon\Carbon::now() // set current timestamp
             ]);
-
         } catch (Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
@@ -122,5 +122,4 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'Password successfully updated for ' . $existingUser->username], 200);
     }
-
 }

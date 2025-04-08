@@ -27,6 +27,7 @@ class User extends Authenticatable
         'province',
         'facility_id',
         'username',
+        'verified',
         'password',
         'contact',
         'user_priv'
