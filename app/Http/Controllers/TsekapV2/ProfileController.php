@@ -4,14 +4,36 @@ namespace App\Http\Controllers\TsekapV2;
 
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
 use App\Models\TsekapV2\Profile;
-use Illuminate\Support\Facades\Validator;
+use App\Models\TsekapV2\ProfileOtherDetails;
 use App\Jobs\RetrieveProfileJob;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Exception;
+
 
 class ProfileController extends Controller
 {
+    // generator functions 
+    private function generateFamilyId(Request $request)
+    {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user(); // This replaces Auth::check()
+
+        // Check if the user exists
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // get formatted time to be used as metadata
+        $getFormattedDate = date('His');
+
+        $ctrlNo = str_pad($getFormattedDate, 4, 0, STR_PAD_LEFT);
+        $idNo = str_pad($user->id, 4, 0, STR_PAD_LEFT); // prove that there is a user that is logged-in
+
+        return date('mdy') . '-' . $idNo . '-' . $ctrlNo;
+    }
+
     private function generateUniqueId($fname, $mname, $lname, $barangay_id, $muncity_id)
     {
         return $fname . $mname . $lname . $barangay_id . $muncity_id;
@@ -20,15 +42,15 @@ class ProfileController extends Controller
     public function retrieveProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
-
-        // Check if the user exists
+        $user = $request->user();
         if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
+    
+            // Validate request
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
+            'fields.family_id' => 'nullable|string',
             'fields.first_name' => 'nullable|string',
             'fields.middle_name' => 'nullable|string',
             'fields.last_name' => 'nullable|string',
@@ -37,122 +59,222 @@ class ProfileController extends Controller
             'fields.municipal_id' => 'nullable|integer',
             'fields.province_id' => 'nullable|integer',
         ]);
-
+    
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+    
         $fields = $request->input('fields');
-
+    
+        if (!is_array($fields)) {
+            return response()->json(['error' => 'Invalid input format.'], 400);
+        }
+    
+        // Process the job
         $job = new RetrieveProfileJob($fields);
         $result = $job->handle();
-
+    
         if ($result === 'timeout') {
             return response()->json([
                 'message' => 'Request timed out. Please try again.',
-            ], 408); // HTTP 408 Request Timeout
+            ], 408);
         }
-
+    
         if ($result === 'Validation failed') {
             return response()->json(['error' => 'Invalid input'], 400);
         }
-
+    
         if (empty($result)) {
             return response()->json([
                 'message' => 'No profiles found. Please refine your search criteria and try again.',
             ], 404);
         }
-
+    
         return response()->json([
             'message' => 'Profiles retrieved successfully',
             'profiles' => $result,
         ], 200);
     }
+    
 
-    // add profile
     public function addProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $request->user();
 
-        // Check if the user exists
         if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // Check if the user has admin privileges
-        if ($user->user_priv != 1) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        $validator = Validator::make($request->all(), [
+            'fields' => 'required|array',
+            'fields.unique_id' => 'sometimes|string|max:255|nullable',
+            'fields.lname' => 'required|string|max:255',
+            'fields.fname' => 'required|string|max:255',
+            'fields.mname' => 'sometimes|string|max:255|nullable',
+            'fields.suffix' => 'sometimes|string|max:255|nullable',
+            'fields.sex' => 'sometimes|string|max:255|nullable',
+            'fields.dob' => 'required|date',
+            'fields.birth_place' => 'sometimes|string|max:255|nullable',
+            'fields.civil_status' => 'required|string|max:255',
+            'fields.contact' => 'sometimes|string|max:255|nullable',
+            'fields.health_group' => 'sometimes|string|max:255|nullable',
+            'fields.religion' => 'sometimes|string|max:255|nullable',
+            'fields.other_religion' => 'sometimes|string|max:255|nullable',
+            'fields.deceased' => 'sometimes|string|max:255|nullable',
+            'fields.deceased_date' => 'sometimes|date|nullable',
 
-        // Validation rules
-        $rules = [
-            'unique_id' => 'required|unique:profiles',
-            'familyID' => 'required',
-            'phicID' => 'required',
-            'nhtsID' => 'required',
-            'head' => 'required',
-            'relation' => 'required',
-            'fname' => 'required',
-            'mname' => 'required',
-            'lname' => 'required',
-            'suffix' => 'required',
-            'dob' => 'required|date',
-            'sex' => 'required',
-            'barangay_id' => 'required|integer',
-            'muncity_id' => 'required|integer',
-            'province_id' => 'required|integer',
-            'income' => 'required|integer',
-            'unmet' => 'required|integer',
-            'water' => 'required|integer',
-            'toilet' => 'required|string|max:10',
-            'education' => 'required|string|max:20',
-            'hypertension' => 'required',
-            'diabetic' => 'required',
-            'pwd' => 'required',
-            'pregnant' => 'required|date',
-            'dengvaxia' => 'required|string|max:45',
-            'sexually_active' => 'required|string|max:10',
-            'nhts' => 'required',
-            'four_ps' => 'required',
-            'ip' => 'required',
-            'member_others' => 'required',
-            'balik_probinsya' => 'required',
-            'updated_by' => 'required|string|max:10',
-            'household_num' => 'required|string|max:30',
-            'philhealth_categ' => 'required|string|max:15',
-            'fourps_num' => 'required|string|max:30',
-            'health_group' => 'required|string|max:20',
-            'fam_plan' => 'required|string|max:10',
-            'fam_plan_method' => 'required|string|max:20',
-            'fam_plan_other_method' => 'required',
-            'fam_plan_status' => 'required|string|max:25',
-            'fam_plan_other_status' => 'required',
-            'other_med_history' => 'required',
-        ];
+            // Contact & Family Information
+            'fields.familyID' => 'sometimes|string|max:255|nullable',
+            'fields.head' => 'sometimes|string|max:100|nullable',
+            'fields.relation' => 'sometimes|string|max:255|nullable',
 
-        // Validate input
-        $validator = Validator::make($request->fields, $rules);
+            // Address Information
+            'fields.barangay_id' => 'required|integer',
+            'fields.muncity_id' => 'required|integer',
+            'fields.province_id' => 'required|integer',
+            'fields.purok_id' => 'sometimes|integer|nullable',
+            'fields.sitio_id' => 'sometimes|integer|nullable',
+            'fields.purok_name' => 'sometimes|string|max:255|nullable',
+            'fields.sitio_name' => 'sometimes|string|max:255|nullable',
+            'fields.street_name' => 'sometimes|string|max:255|nullable',
 
-        // Check for validation errors
+            // Physical Attributes
+            'fields.height' => 'required|numeric',
+            'fields.weight' => 'required|numeric',
+
+            // Health & Medical Information
+            'fields.phicID' => 'sometimes|string|max:100|nullable',
+            'fields.nhtsID' => 'sometimes|string|max:100|nullable',
+            'fields.ip' => 'sometimes|string|max:255|nullable',
+            'fields.hypertension' => 'sometimes|string|max:255|nullable',
+            'fields.diabetic' => 'sometimes|string|max:255|nullable',
+            'fields.pwd' => 'sometimes|string|max:255|nullable',
+            'fields.pregnant' => 'sometimes|string|max:255|nullable',
+            'fields.dengvaxia' => 'sometimes|string|max:45|nullable',
+            'fields.cancer' => 'sometimes|string|max:255|nullable',
+            'fields.cancer_type' => 'sometimes|string|max:255|nullable',
+            'fields.mental_med' => 'sometimes|string|max:255|nullable',
+            'fields.tbdots_med' => 'sometimes|string|max:255|nullable',
+            'fields.cvd_med' => 'sometimes|string|max:255|nullable',
+            'fields.covid_status' => 'sometimes|string|max:255|nullable',
+            'fields.other_med_history' => 'sometimes|string|max:255|nullable',
+
+            // Women’s Health
+            'fields.menarche' => 'sometimes|string|max:255|nullable',
+            'fields.menarche_age' => 'sometimes|integer|nullable',
+            'fields.sexually_active' => 'sometimes|string|max:10|nullable',
+            'fields.fam_plan' => 'sometimes|string|max:10|nullable',
+            'fields.fam_plan_method' => 'sometimes|string|max:20|nullable',
+            'fields.fam_plan_other_method' => 'sometimes|string|max:255|nullable',
+            'fields.fam_plan_status' => 'sometimes|string|max:25|nullable',
+            'fields.fam_plan_other_status' => 'sometimes|string|max:255|nullable',
+
+            // Social & Economic Factors
+            'fields.income' => 'sometimes|numeric|nullable',
+            'fields.unmet' => 'sometimes|numeric|nullable',
+            'fields.water' => 'sometimes|integer|nullable',
+            'fields.toilet' => 'sometimes|string|max:10|nullable',
+            'fields.education' => 'sometimes|string|max:20|nullable',
+            'fields.four_ps' => 'sometimes|string|max:255|nullable',
+            'fields.fourps_num' => 'sometimes|string|max:30|nullable',
+            'fields.nhts' => 'sometimes|string|max:255|nullable',
+            'fields.member_others' => 'sometimes|string|max:255|nullable',
+            'fields.balik_probinsya' => 'sometimes|string|max:255|nullable',
+            'fields.household_num' => 'sometimes|string|max:30|nullable',
+            'fields.philhealth_categ' => 'sometimes|string|max:15|nullable',
+
+            // Additional Information
+            'fields.newborn_screen' => 'sometimes|string|max:255|nullable',
+            'fields.newborn_text' => 'sometimes|string|max:255|nullable',
+            'fields.pwd_desc' => 'sometimes|string|max:255|nullable',
+            'fields.report_facilityId' => 'sometimes|integer|nullable',
+            'fields.Hospital_caseno' => 'sometimes|string|max:100|nullable',
+
+            // Administrative Information
+            'fields.nameof_encoder' => 'sometimes|string|max:255|nullable',
+            'fields.designation' => 'sometimes|string|max:255|nullable',
+            'fields.updated_by' => 'sometimes|string|max:255|nullable',
+            'fields.created_at' => 'sometimes|date|nullable',
+            'fields.updated_at' => 'sometimes|date|nullable',
+        ]);
+
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Generate unique ID
-        $unique_id = $this->generateUniqueId(
-            $request->input('fname'),
-            $request->input('mname'),
-            $request->input('lname'),
-            $request->input('barangay_id'),
-            $request->input('muncity_id')
-        );
+        // Extract Profile fields
+        $profileData = collect($request->input('fields'))->except([
+            'purok_name',
+            'sitio_name',
+            'street_name'
+        ])->toArray();
 
-        // Check if unique ID already exists
-        if (Profile::where('unique_id', "=", $unique_id)->exists()) {
+        // Ensure suffix and other values that can be nullable has empty values
+        $profileData['suffix'] = isset($profileData['suffix']) && $profileData['suffix'] !== '' ? $profileData['suffix'] : ' ';
+        $profileData['phicID'] = isset($profileData['phicID']) && $profileData['phicID'] !== '' ? $profileData['phicID'] : ' ';
+        $profileData['nhtsID'] = isset($profileData['nhtsID']) && $profileData['nhtsID'] !== '' ? $profileData['nhtsID'] : ' ';
+        $profileData['unmet'] = isset($profileData['unmet']) && $profileData['unmet'] !== '' ? $profileData['unmet'] : 0;
+
+        $profileData['pregnant'] = isset($profileData['pregnant']) && $profileData['pregnant'] !== '' ? $profileData['pregnant'] : '1970-01-01 00:00:00';
+        $profileData['nhts'] = isset($profileData['nhts']) && $profileData['nhts'] !== '' ? $profileData['nhts'] : ' ';
+        $profileData['four_ps'] = isset($profileData['four_ps']) && $profileData['four_ps'] !== '' ? $profileData['four_ps'] : ' ';
+        $profileData['member_others'] = isset($profileData['member_others']) && $profileData['member_others'] !== '' ? $profileData['member_others'] : ' ';
+        $profileData['balik_probinsya'] = isset($profileData['balik_probinsya']) && $profileData['balik_probinsya'] !== '' ? $profileData['balik_probinsya'] : ' ';
+        $profileData['household_num'] = isset($profileData['household_num']) && $profileData['household_num'] !== '' ? $profileData['household_num'] : ' ';
+        $profileData['philhealth_categ'] = isset($profileData['philhealth_categ']) && $profileData['philhealth_categ'] !== '' ? $profileData['philhealth_categ'] : ' ';
+        $profileData['fourps_num'] = isset($profileData['fourps_num']) && $profileData['fourps_num'] !== '' ? $profileData['fourps_num'] : ' ';
+        $profileData['fam_plan_other_method'] = isset($profileData['fam_plan_other_method']) && $profileData['fam_plan_other_method'] !== '' ? $profileData['fam_plan_other_method'] : ' ';
+        $profileData['fam_plan_other_status'] = isset($profileData['fam_plan_other_status']) && $profileData['fam_plan_other_status'] !== '' ? $profileData['fam_plan_other_status'] : ' ';
+        $profileData['other_med_history'] = isset($profileData['other_med_history']) && $profileData['other_med_history'] !== '' ? $profileData['other_med_history'] : ' ';
+
+        // Generate unique ID if not provided
+        if (empty($profileData['unique_id'])) {
+            $profileData['unique_id'] = $this->generateUniqueId(
+                $profileData['fname'],
+                $profileData['mname'] ?? '',
+                $profileData['lname'],
+                $profileData['barangay_id'],
+                $profileData['muncity_id']
+            );
+        }
+
+        // Generate family ID if head of the family
+        if (isset($profileData['head']) && strtolower($profileData['head']) === "yes") {
+            $profileData['familyID'] = $this->generateFamilyId($request);
+        }
+
+        // Check for duplicate unique ID
+        if (Profile::where('unique_id', $profileData['unique_id'])->exists()) {
             return response()->json(['message' => 'Profile with this unique ID already exists'], 400);
         }
 
-        // Create new profile with unique ID
-        $profile = Profile::create(array_merge($request->all(), ['unique_id' => $unique_id]));
+        try {
+            // Create Profile
+            $profile = Profile::create($profileData);
 
-        return response()->json(['message' => 'Profile added successfully', 'profile' => $profile], 201);
+            // Extract ProfileOtherDetail fields
+            $profileOtherDetailsData = collect($request->input('fields'))->only([
+                'purok_name',
+                'sitio_name',
+                'street_name'
+            ])->toArray();
+
+            // Ensure profile_id is assigned even if other fields are empty
+            $profileOtherDetailsData['profile_id'] = $profile->id;
+
+            // Save ProfileOtherDetails if at least one address field exists
+            if (!empty(array_filter($profileOtherDetailsData))) {
+                ProfileOtherDetails::create($profileOtherDetailsData);
+            }
+
+            return response()->json([
+                'message' => 'Profile added successfully',
+                'profile' => $profile
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Error creating profile: ' . $e->getMessage()], 500);
+        }
     }
 
 
@@ -282,7 +404,7 @@ class ProfileController extends Controller
             $profile->update($fields);
 
             return response()->json(['message' => 'Profile updated successfully', 'profile' => $profile], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => 'An error occurred', 'message' => $e->getMessage()], 500);
         }
     }

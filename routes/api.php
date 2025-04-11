@@ -14,6 +14,7 @@ use App\Http\Controllers\Tsekapv2\Forms\PatientInjuryForm\InjuryListController;
 Route::prefix('v2')->group(function () {
     // Non-authenticated Routes
     Route::post('/login', [AuthController::class, 'login'])->name('api-v2-login');
+    Route::post('/register', [AuthController::class, 'selfRegisterUser'])->name('api-v2-register');
 
     // Misc Routes
     Route::prefix('misc')->group(function () {
@@ -27,7 +28,7 @@ Route::prefix('v2')->group(function () {
         // Citizenships and Religions
         Route::get('/get-all-citizenships', [MiscDataController::class, 'getAllCitizenships'])->name('api-v2-get-all-citizenships');
         Route::get('/get-all-religions', [MiscDataController::class, 'getAllReligions'])->name('api-v2-get-all-religions');
-    
+
         // Get By Id
         Route::get('/get-province-by-id', [MiscDataController::class, 'getProvinceById'])->name('api-v2-get-province-by-id');
         Route::get('/get-muncity-by-id', [MiscDataController::class, 'getMuncityById'])->name('api-v2-get-muncity-by-id');
@@ -36,13 +37,12 @@ Route::prefix('v2')->group(function () {
 
     // Protected Routes (Requires Authentication)
     Route::middleware('auth:sanctum')->group(function () {
-        
         // Admin Routes
         Route::prefix('admin')->group(function () {
             Route::post('/reset-user-password', [AdminController::class, 'resetUserPassword'])->name('api-v2-reset-user-password');
-            Route::post('/register-user', [AdminController::class, 'registerUser'])->name('api-v2-register-user');
+            Route::post('/register-user', [AdminController::class, 'registerUser'])->name('api-v2-admin-register-user');
         });
-        
+
         // User Routes
         Route::prefix('user')->group(function () {
             Route::post('/checkauth', [UserController::class, 'checkAuth']);
@@ -50,7 +50,7 @@ Route::prefix('v2')->group(function () {
             Route::post('/update-name', [UserController::class, 'updateUserFullName'])->name('api-v2-update-name');
             Route::post('/update-contact', [UserController::class, 'updateUserContact'])->name('api-v2-update-contact');
             Route::post('/update-email', [UserController::class, 'updateUserEmail'])->name('api-v2-update-email');
-            
+
             // two logouts for different functions
             Route::post('/logout', [AuthController::class, 'logout'])->name('api-v2-logout');
             Route::post('/logout-all-sessions', [AuthController::class, 'logoutAllSessions'])->name('api-v2-logout-all-sessions');
@@ -68,7 +68,7 @@ Route::prefix('v2')->group(function () {
         // Profile Routes
         Route::prefix('profile')->group(function () {
             Route::post('/retrieve-profile', [ProfileController::class, 'retrieveProfile'])->name('api-v2-retrieve-profile');
-            Route::post('/add-profile', [ProfileController::class, 'addProfile'])->name('api-v2-retrieve-profile');
+            Route::post('/add-profile', [ProfileController::class, 'addProfile'])->name('api-v2-add-profile');
             Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('api-v2-update-profile');
             Route::post('/delete-profile', [ProfileController::class, 'deleteProfile'])->name('api-v2-delete-profile');
         });
