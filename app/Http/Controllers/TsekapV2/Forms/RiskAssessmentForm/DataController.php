@@ -11,7 +11,6 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
-
 use Illuminate\Http\Request;
 
 class DataController extends Controller
@@ -19,13 +18,11 @@ class DataController extends Controller
     private function getHealthFacilityForUser($user)
     {
         $userHealthFacilityMapping = UserHealthFacility::where('user_id', $user->id)->first();
-
         if ($userHealthFacilityMapping) {
             return Facilities::select('id', 'name', 'address', 'hospital_type')
                 ->where('id', $userHealthFacilityMapping->facility_id)
                 ->first();
         }
-
         return null;
     }
 
@@ -54,9 +51,6 @@ class DataController extends Controller
 
         $filter = isset($fields['filter']) ? $fields['filter'] : null;
         $keyword = isset($fields['keyword']) ? $fields['keyword'] : null;
-
-        // Debugging: Log the input
-        \Log::info('Request Input:', compact('filter', 'keyword', 'user'));
 
         // Base query for risk profiles
         $query = RiskProfile::select(
@@ -158,9 +152,6 @@ class DataController extends Controller
         if ($user->user_priv === 6 && !$facility) {
             return response()->json(['error' => 'Facility not found for user'], 404);
         }
-
-        // Debugging: Log the input
-        \Log::info('Request Input:', compact('filter', 'keyword', 'user'));
 
         // Base query for risk profiles
         $query = RiskProfile::select(
@@ -271,7 +262,7 @@ class DataController extends Controller
             'ar_agitated_behavior',
             'ar_eye_injury',
             'ar_severe_injuries',
-            
+
             'pmh_hypertension',
             'pmh_heart_disease',
             'pmh_diabetes',
@@ -344,7 +335,6 @@ class DataController extends Controller
         if ($id) {
             $query->where('risk_profile_id', $id);
         }
-
         return response()->json($query->simplePaginate(30), 200);
     }
 
@@ -439,8 +429,6 @@ class DataController extends Controller
             ], 200);
         } catch (Exception $e) {
             // Log the exception for debugging
-            \Log::error('RiskProfile saving failed: ' . $e->getMessage());
-
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
@@ -588,9 +576,6 @@ class DataController extends Controller
 
             return response()->json(['message' => 'Entry successfully saved.'], 200);
         } catch (Exception $e) {
-            // Log the error for debugging
-            \Log::error('Error saving RiskFormAssessment: ' . $e->getMessage(), ['trace' => $e->getTrace()]);
-
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }

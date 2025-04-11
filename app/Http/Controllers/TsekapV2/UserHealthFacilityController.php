@@ -71,7 +71,7 @@ class UserHealthFacilityController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
         $existingMapping = UserHealthFacility::where('user_id', "=", $fields['user_id'])

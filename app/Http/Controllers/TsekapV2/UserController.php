@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-
 class UserController extends Controller
 {
     // changes the user's password
@@ -25,17 +24,18 @@ class UserController extends Controller
         }
 
         // Validate the input
-        $fieldsValidator = Validator::make($fields, [
-            'currentPassword' => 'required|string',
-            'newPassword' => 'required|string|min:8'
+        $fieldsValidator = Validator::make($request->all(), [
+            'fields' => 'required|array',
+            'fields.currentPassword' => 'required|string',
+            'fields.newPassword' => 'required|string|min:8'
         ]);
 
         if ($fieldsValidator->fails()) {
             return response()->json(['error' => array_merge($fieldsValidator->errors()->all())], 400);
         }
 
-        $currentPassword = $fields['currentPassword'];
-        $newPassword = $fields['newPassword'];
+        $currentPassword = $fields['fields.currentPassword'];
+        $newPassword = $fields['fields.newPassword'];
         $username = $user->username; // user auth
 
         // Fetch the user based on the provided username
@@ -72,10 +72,11 @@ class UserController extends Controller
         }
 
         // Validate the input
-        $fieldsValidator = Validator::make($fields, [
-            'fname' => 'string|max:255',
-            'mname' => 'string|max:255',
-            'lname' => 'string|max:255',
+        $fieldsValidator = Validator::make($request->all(), [
+            'fields' => 'required|array',
+            'fields.fname' => 'string|max:255',
+            'fields.mname' => 'string|max:255',
+            'fields.name' => 'string|max:255',
         ]);
 
         if ($fieldsValidator->fails()) {
@@ -92,14 +93,14 @@ class UserController extends Controller
         }
 
         // Update the user's full name if the fields are not blank
-        if (isset($fields['fname'])) {
-            $queryUser->fname = $fields['fname'];
+        if (isset($fields['fields.fname'])) {
+            $queryUser->fname = $fields['fields.fname'];
         }
-        if (isset($fields['mname'])) {
-            $queryUser->mname = $fields['mname'];
+        if (isset($fields['fields.mname'])) {
+            $queryUser->mname = $fields['fields.mname'];
         }
-        if (isset($fields['lname'])) {
-            $queryUser->lname = $fields['lname'];
+        if (isset($fields['fields.lname'])) {
+            $queryUser->lname = $fields['fields.lname'];
         }
 
         // Save the changes
@@ -122,8 +123,9 @@ class UserController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $fieldsValidator = Validator::make($fields, [
-            'contact' => 'required|string|min:11|max:11'
+        $fieldsValidator = Validator::make($request->all(), [
+            'fields' => 'required|array',
+            'fields.contact' => 'required|string|min:11|max:11'
         ]);
 
         if ($fieldsValidator->fails()) {
@@ -132,7 +134,7 @@ class UserController extends Controller
 
         // Get username and contact from the fields
         $username = $user->username; // user auth
-        $contact = $fields['contact'];
+        $contact = $fields['fields.contact'];
 
         // Fetch the user based on the provided username
         $queryUser = User::where('username', '=', $username)->first();

@@ -7,70 +7,85 @@ use App\Models\TsekapV2\Facilities;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
-class FacilityController extends Controller{
+class FacilityController extends Controller
+{
 
     // ---- POST FUNCTIONS ----- //
     // get a health facility
-    public function retrieveFacilityByCode(Request $request){
-        $fields = $request->input('fields');
-
+    public function retrieveFacilityByCode(Request $request)
+    {
         // Ensure the user is authenticated via Sanctum
         $user = $request->user(); // This replaces Auth::check()
+
+        $fields = $request->input('fields');
 
         // Check if the user exists
         if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // do not authorize update unless admin
-        if($user['user_priv'] != 1){
-            return response()->json(['error' => 'Unauthorized.'], 401);
+        // do not authorize update unless 1, 3, 10
+        if ((!$user || ($user->verified !== 1))) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $facility = Facilities::find($fields['facility_code']);
+        $rules = [
+            'fields' => 'required|array',
+            'fields.facility_code' => 'required|string|max:100',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $facility = Facilities::where('facility_code', "=", $fields['facility_code'])->first();
 
         return response()->json($facility);
     }
 
     // add a health facility
-    public function addFacility(Request $request){
-        $fields = $request->input('fields');
-
+    public function addFacility(Request $request)
+    {
         // Ensure the user is authenticated via Sanctum
         $user = $request->user(); // This replaces Auth::check()
+
+        $fields = $request->input('fields');
 
         // Check if the user exists
         if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
-        }       
- 
-        // do not authorize update unless admin
-        if ($user['user_priv'] != 1) {
-            return response()->json(['error' => 'Unauthorized.'], 401);
+        }
+
+        // do not authorize adding unless admin
+        if ((!$user || !in_array($user->user_priv, [1])) || ($user->verified !== 1)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         $rules = [
-            'facility_code' => 'nullable|string|max:100',
-            'name' => 'required|string|max:255',
-            'latitude' => 'nullable|string|max:255',
-            'longitude' => 'nullable|string|max:255',
-            'abbr' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'brgy' => 'required|integer',
-            'muncity' => 'required|integer',
-            'province' => 'required|integer',
-            'contact' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255',
-            'status' => 'required|integer',
-            'picture' => 'nullable|string|max:255',
-            'chief_hospital' => 'nullable|string|max:100',
-            'level' => 'nullable|string|max:255',
-            'hospital_type' => 'nullable|string|max:45',
-            'tricity_id' => 'nullable|integer',
-            'referral_used' => 'nullable|string|max:45',
+            'fields' => 'required|array',
+            'fields.facility_code' => 'required|string|max:100',
+            'fields.name' => 'required|string|max:255',
+            'fields.latitude' => 'nullable|string|max:255',
+            'fields.longitude' => 'nullable|string|max:255',
+            'fields.abbr' => 'required|string|max:255',
+            'fields.address' => 'required|string|max:255',
+            'fields.brgy' => 'required|integer',
+            'fields.muncity' => 'required|integer',
+            'fields.province' => 'required|integer',
+            'fields.contact' => 'required|string|max:255',
+            'fields.email' => 'required|string|email|max:255',
+            'fields.status' => 'required|integer',
+            'fields.picture' => 'nullable|string|max:255',
+            'fields.chief_hospital' => 'nullable|string|max:100',
+            'fields.level' => 'nullable|string|max:255',
+            'fields.hospital_type' => 'nullable|string|max:45',
+            'fields.tricity_id' => 'nullable|integer',
+            'fields.referral_used' => 'nullable|string|max:45',
         ];
 
-        $validator = Validator::make($fields, $rules);
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
@@ -82,50 +97,52 @@ class FacilityController extends Controller{
     }
 
     // update a health facility
-    public function updateFacility(Request $request){
-        $fields = $request->input('fields');
-
+    public function updateFacility(Request $request)
+    {
         // Ensure the user is authenticated via Sanctum
         $user = $request->user(); // This replaces Auth::check()
+
+        $fields = $request->input('fields');
 
         // Check if the user exists
         if (!$user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        
-        // do not authorize update unless admin
-        if($user['user_priv'] != 1){
-            return response()->json(['error' => 'Unauthorized.'], 401);
+
+        // do not authorize update unless 1, 3, 10
+        if ((!$user || !in_array($user->user_priv, [1])) || ($user->verified !== 1)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $facility = Facilities::find($fields['facility_code']);
+        $rules = [
+            'fields' => 'required|array',
+            'fields.facility_code' => 'required|string|max:100',
+            'fields.name' => 'sometimes|required|string|max:255',
+            'fields.latitude' => 'nullable|string|max:255',
+            'fields.longitude' => 'nullable|string|max:255',
+            'fields.abbr' => 'sometimes|required|string|max:255',
+            'fields.address' => 'sometimes|required|string|max:255',
+            'fields.brgy' => 'sometimes|required|integer',
+            'fields.muncity' => 'sometimes|required|integer',
+            'fields.province' => 'sometimes|required|integer',
+            'fields.contact' => 'sometimes|required|string|max:255',
+            'fields.email' => 'sometimes|required|string|email|max:255',
+            'fields.status' => 'sometimes|required|integer',
+            'fields.picture' => 'nullable|string|max:255',
+            'fields.chief_hospital' => 'nullable|string|max:100',
+            'fields.level' => 'nullable|string|max:255',
+            'fields.hospital_type' => 'nullable|string|max:45',
+            'fields.tricity_id' => 'nullable|integer',
+            'fields.referral_used' => 'nullable|string|max:45',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        $facility = Facilities::where('facility_code', "=", $fields['facility_code'])->first();
 
         if (!$facility) {
             return response()->json(['message' => 'Facilities not found'], 404);
         }
-
-        $rules = [
-            'facility_code' => 'nullable|string|max:100',
-            'name' => 'sometimes|required|string|max:255',
-            'latitude' => 'nullable|string|max:255',
-            'longitude' => 'nullable|string|max:255',
-            'abbr' => 'sometimes|required|string|max:255',
-            'address' => 'sometimes|required|string|max:255',
-            'brgy' => 'sometimes|required|integer',
-            'muncity' => 'sometimes|required|integer',
-            'province' => 'sometimes|required|integer',
-            'contact' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255',
-            'status' => 'sometimes|required|integer',
-            'picture' => 'nullable|string|max:255',
-            'chief_hospital' => 'nullable|string|max:100',
-            'level' => 'nullable|string|max:255',
-            'hospital_type' => 'nullable|string|max:45',
-            'tricity_id' => 'nullable|integer',
-            'referral_used' => 'nullable|string|max:45',
-        ];
-
-        $validator = Validator::make($fields, $rules);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
@@ -141,26 +158,29 @@ class FacilityController extends Controller{
         // Ensure the user is authenticated via Sanctum
         $user = $request->user(); // This replaces Auth::check()
 
-        // Check if the user exists
-        if (!$user) {
+        $fields = $request->input('fields');
+
+        // do not authorize deletion unless 1, 3, 10
+        if ((!$user || !in_array($user->user_priv, [1])) || ($user->verified !== 1)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // Check if the user has admin privileges
-        if ($user->user_priv != 1) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        $rules = [
+            'fields' => 'required|array',
+            'fields.facility_code' => 'required|string|max:100',
+        ];
 
         // Validate request input
-        $fields = $request->validate([
-            'facility_code' => 'required|exists:facilities,id',
-        ]);
+        $validator = Validator::make($request->all(), $rules);
 
-        // Find and delete the facility
-        $facility = Facilities::find($fields['facility_code']);
+        $facility = Facilities::where('facility_code', "=", $fields['facility_code'])->first();
 
         if (!$facility) {
             return response()->json(['message' => 'Facility not found'], 404);
+        }
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
         }
 
         $facility->delete();
