@@ -24,10 +24,4 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create()
-    ->app()->router->group([
-        'prefix' => 'api',
-        'middleware' => ['api'],
-    ], function () {
-        require base_path('routes/api.php');
-    });
+    })->create();

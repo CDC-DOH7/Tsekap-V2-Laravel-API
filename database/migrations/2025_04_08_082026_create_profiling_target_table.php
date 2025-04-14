@@ -19,6 +19,8 @@ return new class extends Migration
                 $table->unsignedInteger('facility_id'); // Foreign key for facilities table
                 $table->unsignedInteger('male_population')->nullable();
                 $table->unsignedInteger('female_population')->nullable();
+                $table->unsignedInteger('male_target')->nullable();
+                $table->unsignedInteger('female_target')->nullable();
                 $table->timestamps();
 
                 $table->foreign('facility_id')->references('id')->on('facilities')->onDelete('cascade');

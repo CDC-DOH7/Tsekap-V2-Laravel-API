@@ -24,19 +24,21 @@ class MiscDataController extends Controller
             'id',
             'facility_code',
             'name',
-            'latitude',
-            'longitude',
             'abbr',
-            'address',
             'brgy',
             'muncity',
             'province',
-            'contact',
-            'email',
-            'status',
-            'level',
-            'hospital_type',
-            'referral_used'
+
+            // redacted fields:
+            // 'address',
+            // 'latitude',
+            // 'longitude',
+            // 'contact',
+            // 'email',
+            // 'status',
+            // 'level',
+            // 'hospital_type',
+            // 'referral_used'
         );
 
         if ($province) {

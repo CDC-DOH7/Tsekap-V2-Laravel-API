@@ -552,7 +552,7 @@ class DataController extends Controller
 
         try {
             // Check for duplicate risk_profile_id
-            $existingRiskForm = RiskAssessmentForm::where('risk_profile_id', '=', $fields['profile_id'])->first();
+            $existingRiskForm = RiskAssessmentForm::where('risk_profile_id', '=', $fields['risk_profile_id'])->first();
 
             if ($existingRiskForm) {
                 return response()->json(['error' => 'Duplicate risk_profile_id detected. Please recheck.'], 409);
@@ -575,7 +575,6 @@ class DataController extends Controller
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
-
 
     // update risk profile
     public function updateRiskProfile(Request $request)
@@ -765,7 +764,7 @@ class DataController extends Controller
         }
 
         // Find the existing RiskFormAssessment
-        $riskform = RiskAssessmentForm::where('risk_profile_id', $fields['risk_profile_id'])->first();
+        $riskform = RiskAssessmentForm::where('risk_profile_id', "=", $fields['risk_profile_id'])->first();
 
         if (!$riskform) {
             return response()->json(['error' => 'Risk form not found.'], 404);
