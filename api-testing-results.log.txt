@@ -8,17 +8,17 @@ P - 201       POST       api/v2/facility/add-facility ..........................
 P - 200       POST       api/v2/facility/add-user-facility ....... api-v2-add-user-facility › TsekapV2\UserHealthFacilityController@addUserHealthFacility
 P - 200       POST       api/v2/facility/delete-facility ............................ api-v2-delete-facility › TsekapV2\FacilityController@deleteFacility
 P - 200       POST       api/v2/facility/retrieve-facility-by-code api-v2-retrieve-facility-by-code › TsekapV2\FacilityController@retrieveFacilityByCode
-p - 200       POST       api/v2/facility/update-facility ............................ api-v2-update-facility › TsekapV2\FacilityController@updateFacility
+P - 200       POST       api/v2/facility/update-facility ............................ api-v2-update-facility › TsekapV2\FacilityController@updateFacility
 
-              POST       api/v2/forms/risk-assessment/add-risk-form . api-v2-add-risk-form › TsekapV2\Forms\RiskAssessmentForm\DataController@addRiskForm
-              POST       api/v2/forms/risk-assessment/add-risk-profile api-v2-add-risk-profile › TsekapV2\Forms\RiskAssessmentForm\DataController@addRis…
-              POST       api/v2/forms/risk-assessment/delete-risk-form api-v2-delete-risk-form › TsekapV2\Forms\RiskAssessmentForm\DataController@delete…
-              POST       api/v2/forms/risk-assessment/delete-risk-profile api-v2-delete-risk-profile › TsekapV2\Forms\RiskAssessmentForm\DataController@…
-              POST       api/v2/forms/risk-assessment/retrieve-patient-risk-assessment api-v2-retrieve-patient-risk-assessment › TsekapV2\Forms\RiskAsse…
-              POST       api/v2/forms/risk-assessment/retrieve-patient-risk-profile api-v2-retrieve-patient-risk-profile-without-facility › TsekapV2\For…
-              POST       api/v2/forms/risk-assessment/retrieve-patient-risk-profile-by-facility api-v2-retrieve-patient-risk-profile-by-facility › Tseka…
-              POST       api/v2/forms/risk-assessment/update-risk-form api-v2-update-risk-form › TsekapV2\Forms\RiskAssessmentForm\DataController@update…
-              POST       api/v2/forms/risk-assessment/update-risk-profile api-v2-update-risk-profile › TsekapV2\Forms\RiskAssessmentForm\DataController@…
+P - 200       POST       api/v2/forms/risk-assessment/add-risk-form . api-v2-add-risk-form › TsekapV2\Forms\RiskAssessmentForm\DataController@addRiskForm
+P - 200       POST       api/v2/forms/risk-assessment/add-risk-profile api-v2-add-risk-profile › TsekapV2\Forms\RiskAssessmentForm\DataController@addRis…
+P - 200       POST       api/v2/forms/risk-assessment/delete-risk-form api-v2-delete-risk-form › TsekapV2\Forms\RiskAssessmentForm\DataController@delete…
+P - 200       POST       api/v2/forms/risk-assessment/delete-risk-profile api-v2-delete-risk-profile › TsekapV2\Forms\RiskAssessmentForm\DataController@…
+p - 200       POST       api/v2/forms/risk-assessment/retrieve-patient-risk-assessment api-v2-retrieve-patient-risk-assessment › TsekapV2\Forms\RiskAsse…
+P - 200       POST       api/v2/forms/risk-assessment/retrieve-patient-risk-profile api-v2-retrieve-patient-risk-profile-without-facility › TsekapV2\For…
+P - 200*      POST       api/v2/forms/risk-assessment/retrieve-patient-risk-profile-by-facility api-v2-retrieve-patient-risk-profile-by-facility › Tseka…
+p - 200       POST       api/v2/forms/risk-assessment/update-risk-form api-v2-update-risk-form › TsekapV2\Forms\RiskAssessmentForm\DataController@update…
+P - 200       POST       api/v2/forms/risk-assessment/update-risk-profile api-v2-update-risk-profile › TsekapV2\Forms\RiskAssessmentForm\DataController@…
 
 P - 200       POST       api/v2/login ............................................................................... api-v2-login › AuthController@login
 
@@ -32,21 +32,21 @@ P - 200       GET|HEAD   api/v2/misc/get-muncity-by-id ....................... a
 P - 200       GET|HEAD   api/v2/misc/get-province-by-id .................... api-v2-get-province-by-id › TsekapV2\Misc\MiscDataController@getProvinceById
 P - 200       GET|HEAD   api/v2/misc/get-provinces ............................. api-v2-get-all-provinces › TsekapV2\Misc\MiscDataController@getProvinces
 
-              POST       api/v2/profile/add-profile .......................................... api-v2-add-profile › TsekapV2\ProfileController@addProfile
-              POST       api/v2/profile/delete-profile ................................. api-v2-delete-profile › TsekapV2\ProfileController@deleteProfile
-              POST       api/v2/profile/retrieve-profile ........................... api-v2-retrieve-profile › TsekapV2\ProfileController@retrieveProfile
-              POST       api/v2/profile/update-profile ................................. api-v2-update-profile › TsekapV2\ProfileController@updateProfile
-              POST       api/v2/register .............................................................. api-v2-register › AuthController@selfRegisterUser
+P - 200       POST       api/v2/profile/add-profile .......................................... api-v2-add-profile › TsekapV2\ProfileController@addProfile
+P - 200       POST       api/v2/profile/delete-profile ................................. api-v2-delete-profile › TsekapV2\ProfileController@deleteProfile
+P - 200       POST       api/v2/profile/retrieve-profile ........................... api-v2-retrieve-profile › TsekapV2\ProfileController@retrieveProfile
+P - 200       POST       api/v2/profile/update-profile ................................. api-v2-update-profile › TsekapV2\ProfileController@updateProfile
+P - 200       POST       api/v2/register .............................................................. api-v2-register › AuthController@selfRegisterUser
         
               POST       api/v2/user/checkauth ........................................................................ TsekapV2\UserController@checkAuth
         
-              POST       api/v2/user/logout ....................................................................... api-v2-logout › AuthController@logout
-              POST       api/v2/user/logout-all-sessions .................................. api-v2-logout-all-sessions › AuthController@logoutAllSessions
+P - 200       POST       api/v2/user/logout ....................................................................... api-v2-logout › AuthController@logout
+P - 200       POST       api/v2/user/logout-all-sessions .................................. api-v2-logout-all-sessions › AuthController@logoutAllSessions
         
-              POST       api/v2/user/update-contact ................................... api-v2-update-contact › TsekapV2\UserController@updateUserContact
-              POST       api/v2/user/update-email ......................................... api-v2-update-email › TsekapV2\UserController@updateUserEmail
-              POST       api/v2/user/update-name ........................................ api-v2-update-name › TsekapV2\UserController@updateUserFullName
-              POST       api/v2/user/update-password ................................ api-v2-update-password › TsekapV2\UserController@updateUserPassword
+P - 200       POST       api/v2/user/update-contact ................................... api-v2-update-contact › TsekapV2\UserController@updateUserContact
+P - 200       POST       api/v2/user/update-email ......................................... api-v2-update-email › TsekapV2\UserController@updateUserEmail
+P - 200       POST       api/v2/user/update-name ........................................ api-v2-update-name › TsekapV2\UserController@updateUserFullName
+P - 200       POST       api/v2/user/update-password ................................ api-v2-update-password › TsekapV2\UserController@updateUserPassword
         
               POST       email/verification-notification ......................... verification.send › Auth\EmailVerificationNotificationController@store
               POST       forgot-password ........................................................ password.email › Auth\PasswordResetLinkController@store
