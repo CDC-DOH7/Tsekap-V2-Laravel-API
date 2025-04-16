@@ -16,7 +16,7 @@ class AdminController extends Controller
         // Ensure the user is authenticated via Sanctum
         $admin = $request->user();
 
-        if (!$admin || $admin->user_priv !== 1) {
+        if (!$admin || $admin->user_priv !== 1 || $admin->verified !== 1) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -43,7 +43,7 @@ class AdminController extends Controller
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation failed',
-                'errors' => $e->errors(),
+                // 'errors' => $e->errors(),
             ], 422);
         }
 
@@ -89,7 +89,7 @@ class AdminController extends Controller
     {
         $admin = $request->user();
 
-        if (!$admin || $admin->user_priv !== 1) {
+        if (!$admin || $admin->user_priv !== 1 || $admin->verified !== 1) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 

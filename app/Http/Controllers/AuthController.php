@@ -22,8 +22,8 @@ class AuthController extends Controller
             'fields.fname' => 'nullable|string|max:255',
             'fields.mname' => 'nullable|string|max:255',
             'fields.lname' => 'nullable|string|max:255',
-            'fields.muncity' => 'required|integer',
-            'fields.province' => 'required|integer',
+            'fields.muncity_id' => 'required|integer',
+            'fields.province_id' => 'required|integer',
             'fields.facility_id' => 'required|integer',
             'fields.user_designation' => 'nullable|string|max:255',
             'fields.username' => 'required|string|max:255|unique:users,username',
@@ -56,8 +56,8 @@ class AuthController extends Controller
                 'fname' => $validatedFields['fname'] ?? null,
                 'mname' => $validatedFields['mname'] ?? null,
                 'lname' => $validatedFields['lname'] ?? null,
-                'muncity' => $validatedFields['muncity'],
-                'province' => $validatedFields['province'],
+                'muncity' => $validatedFields['muncity_id'],
+                'province' => $validatedFields['province_id'],
                 'username' => $validatedFields['username'],
                 'password' => bcrypt($validatedFields['password']), // Encrypt password
                 'contact' => $validatedFields['contact'],
@@ -79,6 +79,7 @@ class AuthController extends Controller
         $message = "Welcome to Tsekapp, " . $user['fname'] . " (" . $userHfMapping['user_designation'] . ")! Please wait for the admin to verify your account before you can log in.";
         return response()->json(['status' => 'success', 'message' => $message], 201);
     }
+
     // Used to login users
     public function login(Request $request)
     {
@@ -136,7 +137,7 @@ class AuthController extends Controller
 
             /*
             // OPTIONAL: Add XSRF and CSRF tokens
-            
+
             // Generate a CSRF token
             $csrfToken = csrf_token();
 
@@ -171,7 +172,7 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // revoke all tokens 
+        // revoke all tokens
         $request->user()->tokens()->delete();
 
         return response()->json(['status' => 'success', 'message' => 'Logged out successfully'], 200);

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\TsekapV2\Citizenship;
 use App\Models\TsekapV2\Religion;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Log;
 use App\Models\TsekapV2\Facilities;
 use App\Models\TsekapV2\Muncity;
 use App\Models\TsekapV2\Province;
@@ -17,44 +17,56 @@ class MiscDataController extends Controller
     // get facilities
     public function getAllFacility(Request $request)
     {
-        $province = $request->query('province');
-        $municipality = $request->query('muncity');
+        $province = $request->query('province_id');
+        $municipality = $request->query('muncity_id');
 
         $query = Facilities::select(
             'id',
             'facility_code',
             'name',
-            'latitude',
-            'longitude',
             'abbr',
-            'address',
             'brgy',
             'muncity',
             'province',
-            'contact',
-            'email',
-            'status',
-            'level',
-            'hospital_type',
-            'referral_used'
+
+            // redacted fields:
+            // 'address',
+            // 'latitude',
+            // 'longitude',
+            // 'contact',
+            // 'email',
+            // 'status',
+            // 'level',
+            // 'hospital_type',
+            // 'referral_used'
         );
 
         if ($province) {
-            $query->where('province', $province);
+            $query->where('province', "=", $province);
         }
 
         if ($municipality) {
-            $query->where('muncity', $municipality);
+            $query->where('muncity', "=", $municipality);
         }
 
         // Log the query for debugging
-        \Log::info('Facilities Query:', [
+        Log::info('Facilities Query:', [
             'query' => $query->toSql(),
             'bindings' => $query->getBindings(),
         ]);
 
         $facilities = $query->get();
 
+        return response()->json($facilities);
+    }
+
+    public function getFacilitiesInCurrentMuncity(Request $request)
+    {
+        $muncityId = $request->query('muncity_id');
+
+        $facilities = Facilities::where('muncity_id', '=', $muncityId)
+            ->select('id', 'facility_code', 'name')
+            ->get();
         return response()->json($facilities);
     }
 

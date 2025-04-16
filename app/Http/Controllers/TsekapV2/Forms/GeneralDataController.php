@@ -1,0 +1,210 @@
+<?php
+
+namespace App\Http\Controllers\TsekapV2\Forms;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class GeneralDataController extends Controller
+{
+    public function retrieveAllForms(Request $request)
+    {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user();
+
+        // Check if the user exists
+        if (!$user || $user->verified !== 1) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $fields = $request->input('fields', ['filter' => null, 'keyword' => null]);
+
+        $filter = $fields['filter'] ?? null;
+        $keyword = $fields['keyword'] ?? null;
+
+        // Define the profiles to query
+        $profileTypes = [
+            'RiskProfile' => [
+                'table' => 'risk_profile',
+                'columns' => [
+                    'id',
+                    'fname',
+                    'mname',
+                    'lname',
+                    'dob',
+                    'sex',
+                    'age',
+                    'religion',
+                    'other_religion',
+                    'citizenship',
+                    'other_citizenship',
+                    'indigenous_person',
+                    'employment_status',
+                    'contact',
+                    'civil_status',
+                    'barangay_id',
+                    'municipal_id',
+                    'province_id',
+                    'facility_id_updated',
+                    'offline_entry',
+                    'encoded_by',
+                    'created_at',
+                    'updated_at'
+                ],
+                'joins' => [
+                    ['muncity', 'risk_profile.municipal_id', '=', 'muncity.id'],
+                    ['province', 'risk_profile.province_id', '=', 'province.id']
+                ],
+                'additional_columns' => [
+                    'muncity.description as municipal_name',
+                    'province.description as province_name'
+                ]
+            ],
+
+            // Add other profile types here if needed
+        ];
+
+        $results = [];
+
+        foreach ($profileTypes as $profileType => $config) {
+            $query = DB::table($config['table'])->select(
+                array_merge(
+                    array_map(fn($col) => "{$config['table']}.{$col}", $config['columns']),
+                    $config['additional_columns']
+                )
+            );
+
+            // Apply joins
+            foreach ($config['joins'] as $join) {
+                $query->join($join[0], $join[1], $join[2], $join[3]);
+            }
+
+            // Apply user privilege filters
+            if (!in_array($user->user_priv, [1, 3, 10])) {
+                $query->where("{$config['table']}.facility_id_updated", "=", $user->facility_id);
+            }
+
+            // Apply keyword filter
+            if ($keyword) {
+                $query->where(function ($q) use ($filter, $keyword, $config) {
+                    $columns = array_combine($config['columns'], $config['columns']);
+
+                    if ($filter && isset($columns[$filter])) {
+                        $q->where("{$config['table']}.{$filter}", 'like', "%$keyword%");
+                    } else {
+                        foreach ($columns as $column) {
+                            $q->orWhere("{$config['table']}.{$column}", 'like', "%$keyword%");
+                        }
+                    }
+                });
+            }
+
+            // Paginate and collect results
+            $results[$profileType] = $query->simplePaginate(30);
+        }
+        return response()->json($results, 200);
+    }
+
+    public function retrieveRecentlyUploadedForms(Request $request)
+    {
+        // Ensure the user is authenticated via Sanctum
+        $user = $request->user();
+
+        // Check if the user exists
+        if (!$user || $user->verified !== 1) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $fields = $request->input('fields', ['filter' => null, 'keyword' => null]);
+
+        $filter = $fields['filter'] ?? null;
+        $keyword = $fields['keyword'] ?? null;
+
+        // Define the profiles to query
+        $profileTypes = [
+            'RiskProfile' => [
+                'table' => 'risk_profile',
+                'columns' => [
+                    'id',
+                    'fname',
+                    'mname',
+                    'lname',
+                    'dob',
+                    'sex',
+                    'age',
+                    'religion',
+                    'other_religion',
+                    'citizenship',
+                    'other_citizenship',
+                    'indigenous_person',
+                    'employment_status',
+                    'contact',
+                    'civil_status',
+                    'barangay_id',
+                    'municipal_id',
+                    'province_id',
+                    'facility_id_updated',
+                    'offline_entry',
+                    'encoded_by',
+                    'created_at',
+                    'updated_at'
+                ],
+                'joins' => [
+                    ['muncity', 'risk_profile.municipal_id', '=', 'muncity.id'],
+                    ['province', 'risk_profile.province_id', '=', 'province.id']
+                ],
+                'additional_columns' => [
+                    'muncity.description as municipal_name',
+                    'province.description as province_name'
+                ]
+            ],
+
+            // Add other profile types here if needed
+        ];
+
+        $results = [];
+        $today = now()->startOfDay();
+
+        foreach ($profileTypes as $profileType => $config) {
+            $query = DB::table($config['table'])->select(
+                array_merge(
+                    array_map(fn($col) => "{$config['table']}.{$col}", $config['columns']),
+                    $config['additional_columns']
+                )
+            );
+
+            // Apply joins
+            foreach ($config['joins'] as $join) {
+                $query->join($join[0], $join[1], $join[2], $join[3]);
+            }
+
+            // Apply user privilege filters
+            if (!in_array($user->user_priv, [1, 3, 10])) {
+                $query->where("{$config['table']}.facility_id_updated", "=", $user->facility_id);
+            }
+
+            // Apply keyword filter
+            if ($keyword) {
+                $query->where(function ($q) use ($filter, $keyword, $config) {
+                    $columns = array_combine($config['columns'], $config['columns']);
+
+                    if ($filter && isset($columns[$filter])) {
+                        $q->where("{$config['table']}.{$filter}", 'like', "%$keyword%");
+                    } else {
+                        foreach ($columns as $column) {
+                            $q->orWhere("{$config['table']}.{$column}", 'like', "%$keyword%");
+                        }
+                    }
+                });
+            }
+
+            // Filter by today's date
+            $query->whereDate("{$config['table']}.created_at", '=', $today);
+
+            // Paginate and collect results
+            $results[$profileType] = $query->simplePaginate(30);
+        }
+        return response()->json($results, 200);
+    }
+}

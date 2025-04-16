@@ -21,11 +21,24 @@ return new class extends Migration
         });
 
         DB::table('new_age_brackets')->insert([
-            ['range' => '20-29 years old', 'description' => 'Young Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
-            ['range' => '30-39 years old', 'description' => 'Young Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
-            ['range' => '40-49 years old', 'description' => 'Middle-aged Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
-            ['range' => '50-59 years old', 'description' => 'Middle-aged Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
-            ['range' => '60+ years old', 'description' => 'Senior Citizen', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '0-6 days', 'description' => 'Infant', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '7-28 days', 'description' => 'Infant', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '29 days-11 months', 'description' => 'Infant', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '1-4 years old', 'description' => 'Preschool Age Children', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '5-9 years old', 'description' => 'School Age Children', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '10-14 years old', 'description' => 'Adolescent', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '15-19 years old', 'description' => 'Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '20-24 years old', 'description' => 'Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '25-29 years old', 'description' => 'Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '30-34 years old', 'description' => 'Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '35-39 years old', 'description' => 'Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '40-44 years old', 'description' => 'Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '45-49 years old', 'description' => 'Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '50-54 years old', 'description' => 'Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '55-59 years old', 'description' => 'Adult', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '60-64 years old', 'description' => 'Senior Citizen', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '65-69 years old', 'description' => 'Senior Citizen', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['range' => '70 years and above', 'description' => 'Senior Citizen', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]
         ]);
     }
 

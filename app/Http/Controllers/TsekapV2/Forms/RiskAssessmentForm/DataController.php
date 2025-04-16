@@ -11,21 +11,19 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
-
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class DataController extends Controller
 {
     private function getHealthFacilityForUser($user)
     {
         $userHealthFacilityMapping = UserHealthFacility::where('user_id', $user->id)->first();
-
         if ($userHealthFacilityMapping) {
             return Facilities::select('id', 'name', 'address', 'hospital_type')
                 ->where('id', $userHealthFacilityMapping->facility_id)
                 ->first();
         }
-
         return null;
     }
 
@@ -43,7 +41,7 @@ class DataController extends Controller
         // Validate the request
         $validator = Validator::make($request->all(), [
             'fields.filter' => 'required|string',
-            'fields.keyword' => 'string',
+            'fields.keyword' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -54,9 +52,6 @@ class DataController extends Controller
 
         $filter = isset($fields['filter']) ? $fields['filter'] : null;
         $keyword = isset($fields['keyword']) ? $fields['keyword'] : null;
-
-        // Debugging: Log the input
-        \Log::info('Request Input:', compact('filter', 'keyword', 'user'));
 
         // Base query for risk profiles
         $query = RiskProfile::select(
@@ -78,6 +73,11 @@ class DataController extends Controller
             'risk_profile.barangay_id',
             'risk_profile.municipal_id',
             'risk_profile.province_id',
+            'risk_profile.street',
+            'risk_profile.purok',
+            'risk_profile.sitio',
+            'risk_profile.phic_id',
+            'risk_profile.pwd_id',
             'risk_profile.facility_id_updated',
             'risk_profile.offline_entry',
             'risk_profile.encoded_by',
@@ -133,14 +133,14 @@ class DataController extends Controller
         $user = $request->user(); // This replaces Auth::check()
 
         // Check if the user exists
-        if (!$user) {
+        if (!$user || $user->verified !== 1) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         // Validate the request
         $validator = Validator::make($request->all(), [
             'fields.filter' => 'required|string',
-            'fields.keyword' => 'string',
+            'fields.keyword' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -155,12 +155,9 @@ class DataController extends Controller
         // Retrieve the facility for the user
         $facility = $this->getHealthFacilityForUser($user);
 
-        if ($user->user_priv === 6 && !$facility) {
+        if (($user->user_priv === 6 || $user->verified !== 1) && !$facility) {
             return response()->json(['error' => 'Facility not found for user'], 404);
         }
-
-        // Debugging: Log the input
-        \Log::info('Request Input:', compact('filter', 'keyword', 'user'));
 
         // Base query for risk profiles
         $query = RiskProfile::select(
@@ -182,6 +179,11 @@ class DataController extends Controller
             'risk_profile.barangay_id',
             'risk_profile.municipal_id',
             'risk_profile.province_id',
+            'risk_profile.street',
+            'risk_profile.purok',
+            'risk_profile.sitio',
+            'risk_profile.phic_id',
+            'risk_profile.pwd_id',
             'risk_profile.facility_id_updated',
             'risk_profile.offline_entry',
             'risk_profile.encoded_by',
@@ -192,6 +194,7 @@ class DataController extends Controller
         )
             ->join('muncity', 'risk_profile.municipal_id', '=', 'muncity.id')
             ->join('province', 'risk_profile.province_id', '=', 'province.id');
+        // ->join('profile_other_details', 'risk_profile.id', '=', 'profile_other_details.user_id');
 
         // Apply user privilege filters
         if ($user->user_priv === 3) {
@@ -271,7 +274,7 @@ class DataController extends Controller
             'ar_agitated_behavior',
             'ar_eye_injury',
             'ar_severe_injuries',
-            
+
             'pmh_hypertension',
             'pmh_heart_disease',
             'pmh_diabetes',
@@ -344,7 +347,6 @@ class DataController extends Controller
         if ($id) {
             $query->where('risk_profile_id', $id);
         }
-
         return response()->json($query->simplePaginate(30), 200);
     }
 
@@ -363,33 +365,33 @@ class DataController extends Controller
         // Define validation rules
         $rules = [
             'fields' => 'required|array',
-            'fields.profile_id' => 'integer',
+            'fields.profile_id' => 'nullable|integer',
             'fields.lname' => 'required|string|max:255',
             'fields.fname' => 'required|string|max:255',
-            'fields.mname' => 'string|max:255',
-            'fields.suffix' => 'string|max:10',
+            'fields.mname' => 'nullable|string|max:255',
+            'fields.suffix' => 'nullable|string|max:10',
             'fields.sex' => 'required|string|max:10',
             'fields.dob' => 'required|date',
             'fields.age' => 'required|integer|min:0|max:150',
             'fields.civil_status' => 'required|string|max:20',
             'fields.religion' => 'required|string|max:50',
-            'fields.other_religion' => 'string|max:50',
+            'fields.other_religion' => 'nullable|string|max:50',
             'fields.contact' => 'required|string|max:20',
             'fields.province_id' => 'required|integer',
             'fields.municipal_id' => 'required|integer',
             'fields.barangay_id' => 'required|integer',
-            'fields.street' => 'string|max:255',
-            'fields.purok' => 'string|max:255',
-            'fields.sitio' => 'string|max:255',
-            'fields.phic_id' => 'string|max:20',
-            'fields.pwd_id' => 'string|max:20',
+            'fields.street' => 'nullable|string|max:255',
+            'fields.purok' => 'nullable|string|max:255',
+            'fields.sitio' => 'nullable|string|max:255',
+            'fields.phic_id' => 'nullable|string|max:20',
+            'fields.pwd_id' => 'nullable|string|max:20',
             'fields.citizenship' => 'required|string|max:50',
-            'fields.other_citizenship' => 'string|max:50',
+            'fields.other_citizenship' => 'nullable|string|max:50',
             'fields.indigenous_person' => 'required|string|max:8',
             'fields.employment_status' => 'required|string|max:50',
             'fields.facility_id_updated' => 'required|integer',
             'fields.encoded_by' => 'required|integer',
-            'fields.offline_entry' => 'boolean',
+            'fields.offline_entry' => 'required|boolean',
         ];
 
         // Validate the request
@@ -439,12 +441,9 @@ class DataController extends Controller
             ], 200);
         } catch (Exception $e) {
             // Log the exception for debugging
-            \Log::error('RiskProfile saving failed: ' . $e->getMessage());
-
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
-
 
     public function addRiskForm(Request $request)
     {
@@ -461,8 +460,7 @@ class DataController extends Controller
         // Define validation rules
         $rules = [
             'fields' => 'required|array',
-            'fields.risk_profile_id' => 'integer',
-
+            'fields.risk_profile_id' => 'required|integer',
             // ar
             'fields.ar_chest_pain' => 'required|string|max:8',
             'fields.ar_difficulty_breathing' => 'required|string|max:8',
@@ -477,26 +475,23 @@ class DataController extends Controller
             'fields.ar_agitated_behavior' => 'required|string|max:8',
             'fields.ar_eye_injury' => 'required|string|max:8',
             'fields.ar_severe_injuries' => 'required|string|max:8',
-            'fields.ar_refer_physician_name' => 'string|max:255',
-            'fields.ar_refer_reason' => 'string|max:255',
-            'fields.ar_refer_facility' => 'string|max:255',
 
             // pmh
             'fields.pmh_hypertension' => 'required|string|max:8',
             'fields.pmh_heart_disease' => 'required|string|max:8',
             'fields.pmh_diabetes' => 'required|string|max:8',
-            'fields.pmh_specify_diabetes' => 'string|max:255',
+            'fields.pmh_specify_diabetes' => 'nullable|string|max:255',
             'fields.pmh_cancer' => 'required|string|max:8',
-            'fields.pmh_specify_cancer' => 'string|max:255',
+            'fields.pmh_specify_cancer' => 'nullable|string|max:255',
             'fields.pmh_copd' => 'required|string|max:8',
             'fields.pmh_asthma' => 'required|string|max:8',
             'fields.pmh_allergies' => 'required|string|max:8',
-            'fields.pmh_specify_allergies' => 'string|max:255',
+            'fields.pmh_specify_allergies' => 'nullable|string|max:255',
             'fields.pmh_mn_and_s_disorder' => 'required|string|max:8',
-            'fields.pmh_specify_mn_and_s_disorder' => 'string|max:255',
+            'fields.pmh_specify_mn_and_s_disorder' => 'nullable|string|max:255',
             'fields.pmh_vision_problems' => 'required|string|max:8',
             'fields.pmh_previous_surgical' => 'required|string|max:8',
-            'fields.pmh_specify_previous_surgical' => 'string|max:255',
+            'fields.pmh_specify_previous_surgical' => 'nullable|string|max:255',
             'fields.pmh_thyroid_disorders' => 'required|string|max:8',
             'fields.pmh_kidney_disorders' => 'required|string|max:8',
 
@@ -529,31 +524,31 @@ class DataController extends Controller
             'fields.rs_diastolic_t1' => 'required|numeric',
             'fields.rs_systolic_t2' => 'required|numeric',
             'fields.rs_diastolic_t2' => 'required|numeric',
-            'fields.rs_blood_sugar_fbs' => 'numeric',
-            'fields.rs_blood_sugar_rbs' => 'numeric',
-            'fields.rs_blood_sugar_date_taken' => 'date',
-            'fields.rs_blood_sugar_symptoms' => 'string|max:255',
-            'fields.rs_lipid_cholesterol' => 'numeric',
-            'fields.rs_lipid_hdl' => 'numeric',
-            'fields.rs_lipid_ldl' => 'numeric',
-            'fields.rs_lipid_vldl' => 'numeric',
-            'fields.rs_lipid_triglyceride' => 'numeric',
-            'fields.rs_lipid_date_taken' => 'date',
-            'fields.rs_urine_protein' => 'numeric',
-            'fields.rs_urine_protein_date_taken' => 'date',
-            'fields.rs_urine_ketones' => 'numeric',
-            'fields.rs_urine_ketones_date_taken' => 'date',
-            'fields.rs_chronic_respiratory_disease' => 'string|max:255',
-            'fields.rs_if_yes_any_symptoms' => 'string|max:255',
+            'fields.rs_blood_sugar_fbs' => 'nullable|numeric',
+            'fields.rs_blood_sugar_rbs' => 'nullable|numeric',
+            'fields.rs_blood_sugar_date_taken' => 'nullable|date',
+            'fields.rs_blood_sugar_symptoms' => 'nullable|string|max:255',
+            'fields.rs_lipid_cholesterol' => 'nullable|numeric',
+            'fields.rs_lipid_hdl' => 'nullable|numeric',
+            'fields.rs_lipid_ldl' => 'nullable|numeric',
+            'fields.rs_lipid_vldl' => 'nullable|numeric',
+            'fields.rs_lipid_triglyceride' => 'nullable|numeric',
+            'fields.rs_lipid_date_taken' => 'nullable|date',
+            'fields.rs_urine_protein' => 'nullable|numeric',
+            'fields.rs_urine_protein_date_taken' => 'nullable|date',
+            'fields.rs_urine_ketones' => 'nullable|numeric',
+            'fields.rs_urine_ketones_date_taken' => 'nullable|date',
+            'fields.rs_chronic_respiratory_disease' => 'nullable|string|max:255',
+            'fields.rs_if_yes_any_symptoms' => 'nullable|string|max:255',
 
             // mngm
-            'fields.mngm_med_hypertension' => 'string|max:8',
-            'fields.mngm_med_hypertension_specify' => 'string|max:255',
-            'fields.mngm_med_diabetes' => 'string|max:8',
-            'fields.mngm_med_diabetes_options' => 'string|max:50',
-            'fields.mngm_med_diabetes_specify' => 'string|max:255',
-            'fields.mngm_date_follow_up' => 'date',
-            'fields.mngm_remarks' => 'string|max:255',
+            'fields.mngm_med_hypertension' => 'nullable|string|max:8',
+            'fields.mngm_med_hypertension_specify' => 'nullable|string|max:255',
+            'fields.mngm_med_diabetes' => 'nullable|string|max:8',
+            'fields.mngm_med_diabetes_options' => 'nullable|string|max:50',
+            'fields.mngm_med_diabetes_specify' => 'nullable|string|max:255',
+            'fields.mngm_date_follow_up' => 'nullable|date',
+            'fields.mngm_remarks' => 'nullable|string|max:255',
 
             // offline entry field
             'fields.offline_entry' => 'required|boolean',
@@ -568,7 +563,7 @@ class DataController extends Controller
 
         try {
             // Check for duplicate risk_profile_id
-            $existingRiskForm = RiskAssessmentForm::where('risk_profile_id', $fields['risk_profile_id'])->first();
+            $existingRiskForm = RiskAssessmentForm::where('risk_profile_id', '=', $fields['risk_profile_id'])->first();
 
             if ($existingRiskForm) {
                 return response()->json(['error' => 'Duplicate risk_profile_id detected. Please recheck.'], 409);
@@ -588,13 +583,9 @@ class DataController extends Controller
 
             return response()->json(['message' => 'Entry successfully saved.'], 200);
         } catch (Exception $e) {
-            // Log the error for debugging
-            \Log::error('Error saving RiskFormAssessment: ' . $e->getMessage(), ['trace' => $e->getTrace()]);
-
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
-
 
     // update risk profile
     public function updateRiskProfile(Request $request)
@@ -612,33 +603,34 @@ class DataController extends Controller
         // Define validation rules
         $rules = [
             'fields' => 'required|array',
-            'fields.profile_id' => 'integer',
+            'fields.id' => 'nullable|integer',
+            'fields.profile_id' => 'nullable|integer',
             'fields.lname' => 'required|string|max:255',
             'fields.fname' => 'required|string|max:255',
-            'fields.mname' => 'string|max:255',
-            'fields.suffix' => 'string|max:10',
-            'fields.sex' => 'required|string|max:1',
+            'fields.mname' => 'nullable|string|max:255',
+            'fields.suffix' => 'nullable|string|max:10',
+            'fields.sex' => 'required|string|max:10',
             'fields.dob' => 'required|date',
             'fields.age' => 'required|integer|min:0|max:150',
             'fields.civil_status' => 'required|string|max:20',
             'fields.religion' => 'required|string|max:50',
-            'fields.other_religion' => 'string|max:50',
+            'fields.other_religion' => 'nullable|string|max:50',
             'fields.contact' => 'required|string|max:20',
             'fields.province_id' => 'required|integer',
             'fields.municipal_id' => 'required|integer',
             'fields.barangay_id' => 'required|integer',
-            'fields.street' => 'string|max:255',
-            'fields.purok' => 'string|max:255',
-            'fields.sitio' => 'string|max:255',
-            'fields.phic_id' => 'string|max:20',
-            'fields.pwd_id' => 'string|max:20',
+            'fields.street' => 'nullable|string|max:255',
+            'fields.purok' => 'nullable|string|max:255',
+            'fields.sitio' => 'nullable|string|max:255',
+            'fields.phic_id' => 'nullable|string|max:20',
+            'fields.pwd_id' => 'nullable|string|max:20',
             'fields.citizenship' => 'required|string|max:50',
-            'fields.other_citizenship' => 'string|max:50',
+            'fields.other_citizenship' => 'nullable|string|max:50',
             'fields.indigenous_person' => 'required|string|max:8',
             'fields.employment_status' => 'required|string|max:50',
             'fields.facility_id_updated' => 'required|integer',
             'fields.encoded_by' => 'required|integer',
-            'fields.offline_entry' => 'boolean',
+            'fields.offline_entry' => 'required|boolean',
         ];
 
         // Validate the request
@@ -649,7 +641,7 @@ class DataController extends Controller
         }
 
         // Find the existing RiskProfile
-        $riskprofile = RiskProfile::find($fields['profile_id']);
+        $riskprofile = RiskProfile::where('id', "=", $fields['id'])->first();
 
         if (!$riskprofile) {
             return response()->json(['error' => 'Profile not found.'], 404);
@@ -661,6 +653,7 @@ class DataController extends Controller
 
             return response()->json(['message' => 'Profile successfully updated.'], 200);
         } catch (Exception $e) {
+            Log::error('Error deleting risk form: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json(['error' => 'Something went wrong. Please try again later'], 500);
         }
     }
@@ -680,7 +673,8 @@ class DataController extends Controller
 
         // Define validation rules
         $rules = [
-            'fields.risk_profile_id' => 'integer',
+            'fields' => 'required|array',
+            'fields.risk_profile_id' => 'required|integer',
             // ar
             'fields.ar_chest_pain' => 'required|string|max:8',
             'fields.ar_difficulty_breathing' => 'required|string|max:8',
@@ -695,26 +689,23 @@ class DataController extends Controller
             'fields.ar_agitated_behavior' => 'required|string|max:8',
             'fields.ar_eye_injury' => 'required|string|max:8',
             'fields.ar_severe_injuries' => 'required|string|max:8',
-            'fields.ar_refer_physician_name' => 'string|max:255',
-            'fields.ar_refer_reason' => 'string|max:255',
-            'fields.ar_refer_facility' => 'string|max:255',
 
             // pmh
             'fields.pmh_hypertension' => 'required|string|max:8',
             'fields.pmh_heart_disease' => 'required|string|max:8',
             'fields.pmh_diabetes' => 'required|string|max:8',
-            'fields.pmh_specify_diabetes' => 'string|max:255',
+            'fields.pmh_specify_diabetes' => 'nullable|string|max:255',
             'fields.pmh_cancer' => 'required|string|max:8',
-            'fields.pmh_specify_cancer' => 'string|max:255',
+            'fields.pmh_specify_cancer' => 'nullable|string|max:255',
             'fields.pmh_copd' => 'required|string|max:8',
             'fields.pmh_asthma' => 'required|string|max:8',
             'fields.pmh_allergies' => 'required|string|max:8',
-            'fields.pmh_specify_allergies' => 'string|max:255',
+            'fields.pmh_specify_allergies' => 'nullable|string|max:255',
             'fields.pmh_mn_and_s_disorder' => 'required|string|max:8',
-            'fields.pmh_specify_mn_and_s_disorder' => 'string|max:255',
+            'fields.pmh_specify_mn_and_s_disorder' => 'nullable|string|max:255',
             'fields.pmh_vision_problems' => 'required|string|max:8',
             'fields.pmh_previous_surgical' => 'required|string|max:8',
-            'fields.pmh_specify_previous_surgical' => 'string|max:255',
+            'fields.pmh_specify_previous_surgical' => 'nullable|string|max:255',
             'fields.pmh_thyroid_disorders' => 'required|string|max:8',
             'fields.pmh_kidney_disorders' => 'required|string|max:8',
 
@@ -747,34 +738,34 @@ class DataController extends Controller
             'fields.rs_diastolic_t1' => 'required|numeric',
             'fields.rs_systolic_t2' => 'required|numeric',
             'fields.rs_diastolic_t2' => 'required|numeric',
-            'fields.rs_blood_sugar_fbs' => 'required|numeric',
-            'fields.rs_blood_sugar_rbs' => 'required|numeric',
-            'fields.rs_blood_sugar_date_taken' => 'required|date',
-            'fields.rs_blood_sugar_symptoms' => 'required|string|max:255',
-            'fields.rs_lipid_cholesterol' => 'required|numeric',
-            'fields.rs_lipid_hdl' => 'required|numeric',
-            'fields.rs_lipid_ldl' => 'required|numeric',
-            'fields.rs_lipid_vldl' => 'required|numeric',
-            'fields.rs_lipid_triglyceride' => 'required|numeric',
-            'fields.rs_lipid_date_taken' => 'required|date',
-            'fields.rs_urine_protein' => 'required|numeric',
-            'fields.rs_urine_protein_date_taken' => 'date',
-            'fields.rs_urine_ketones' => 'required|numeric',
-            'fields.rs_urine_ketones_date_taken' => 'date',
-            'fields.rs_chronic_respiratory_disease' => 'required|string|max:255',
-            'fields.rs_if_yes_any_symptoms' => 'required|string|max:255',
+            'fields.rs_blood_sugar_fbs' => 'nullable|numeric',
+            'fields.rs_blood_sugar_rbs' => 'nullable|numeric',
+            'fields.rs_blood_sugar_date_taken' => 'nullable|date',
+            'fields.rs_blood_sugar_symptoms' => 'nullable|string|max:255',
+            'fields.rs_lipid_cholesterol' => 'nullable|numeric',
+            'fields.rs_lipid_hdl' => 'nullable|numeric',
+            'fields.rs_lipid_ldl' => 'nullable|numeric',
+            'fields.rs_lipid_vldl' => 'nullable|numeric',
+            'fields.rs_lipid_triglyceride' => 'nullable|numeric',
+            'fields.rs_lipid_date_taken' => 'nullable|date',
+            'fields.rs_urine_protein' => 'nullable|numeric',
+            'fields.rs_urine_protein_date_taken' => 'nullable|date',
+            'fields.rs_urine_ketones' => 'nullable|numeric',
+            'fields.rs_urine_ketones_date_taken' => 'nullable|date',
+            'fields.rs_chronic_respiratory_disease' => 'nullable|string|max:255',
+            'fields.rs_if_yes_any_symptoms' => 'nullable|string|max:255',
 
-            //mngm
-            'fields.mngm_med_hypertension' => 'required|string|max:8',
-            'fields.mngm_med_hypertension_specify' => 'string|max:255',
-            'fields.mngm_med_diabetes' => 'required|string|max:8',
-            'fields.mngm_med_diabetes_options' => 'string|max:50',
-            'fields.mngm_med_diabetes_specify' => 'string|max:255',
-            'fields.mngm_date_follow_up' => 'required|date',
-            'fields.mngm_remarks' => 'string|max:255',
+            // mngm
+            'fields.mngm_med_hypertension' => 'nullable|string|max:8',
+            'fields.mngm_med_hypertension_specify' => 'nullable|string|max:255',
+            'fields.mngm_med_diabetes' => 'nullable|string|max:8',
+            'fields.mngm_med_diabetes_options' => 'nullable|string|max:50',
+            'fields.mngm_med_diabetes_specify' => 'nullable|string|max:255',
+            'fields.mngm_date_follow_up' => 'nullable|date',
+            'fields.mngm_remarks' => 'nullable|string|max:255',
 
             // offline entry field
-            'fields.offline_entry' => 'required|boolean'
+            'fields.offline_entry' => 'required|boolean',
         ];
 
         // Validate the request
@@ -785,7 +776,7 @@ class DataController extends Controller
         }
 
         // Find the existing RiskFormAssessment
-        $riskform = RiskAssessmentForm::where('risk_profile_id', $fields['risk_profile_id'])->first();
+        $riskform = RiskAssessmentForm::where('risk_profile_id', "=", $fields['risk_profile_id'])->first();
 
         if (!$riskform) {
             return response()->json(['error' => 'Risk form not found.'], 404);
@@ -794,9 +785,9 @@ class DataController extends Controller
         try {
             // Update the RiskFormAssessment with new data
             $riskform->update($fields);
-
             return response()->json(['message' => 'Risk form successfully updated.'], 200);
         } catch (Exception $e) {
+            Log::error('Error updating risk form: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json(['error' => 'Something went wrong. Please try again later'], 500);
         }
     }
@@ -805,31 +796,26 @@ class DataController extends Controller
     public function deleteRiskProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $request->user();
 
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        if ($user['user_priv'] != 1) {
+        // Check if the user exists and has the required privileges
+        if (!$user || $user->user_priv !== 1 || $user->verified !== 1) {
             return response()->json(['error' => 'Unauthorized.'], 401);
         }
 
-        $fields = $request->input('fields');
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'fields.id' => 'required|integer',
+        ]);
 
-        $riskProfileId = $fields['risk_profile_id'];
-
-        if (!$riskProfileId) {
-            return response()->json(['error' => 'Profile ID is required.'], 400);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
         }
 
-        if (!$riskProfileId) {
-            return response()->json(['error' => 'Profile ID is required.'], 400);
-        }
+        $id = $request->input('fields.id');
 
         try {
-            $riskProfile = RiskProfile::find($riskProfileId);
+            $riskProfile = RiskProfile::where('id', "=", $id)->first();
 
             if (!$riskProfile) {
                 return response()->json(['error' => 'Risk profile not found.'], 404);
@@ -839,35 +825,37 @@ class DataController extends Controller
 
             return response()->json(['message' => 'Risk profile successfully deleted.'], 200);
         } catch (Exception $e) {
-            return response()->json(['error' => 'Something went wrong. Please try again later'], 500);
+            Log::error('Error deleting risk profile: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
 
     // delete risk form
     public function deleteRiskForm(Request $request)
     {
-        $fields = $request->input('fields');
+        $user = $request->user();
 
-        $riskProfileId = $fields['risk_profile_id'];
+        // Check if the user exists
+        if (!$user || $user->user_priv !== 1 || $user->verified !== 1) {
+            return response()->json(['error' => 'Unauthorized.'], 401);
+        }
+
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'fields.risk_profile_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        $id = $request->input('fields.risk_profile_id');
 
         // Ensure the user is authenticated via Sanctum
         $user = $request->user(); // This replaces Auth::check()
 
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        if ($user['user_priv'] != 1) {
-            return response()->json(['error' => 'Unauthorized.'], 401);
-        }
-
-        if (!$riskProfileId) {
-            return response()->json(['error' => 'Risk profile ID is required.'], 400);
-        }
-
         try {
-            $riskForm = RiskAssessmentForm::where('risk_profile_id', $riskProfileId)->first();
+            $riskForm = RiskAssessmentForm::where('risk_profile_id', '=', $id)->first();
 
             if (!$riskForm) {
                 return response()->json(['error' => 'Risk form not found.'], 404);
@@ -877,6 +865,7 @@ class DataController extends Controller
 
             return response()->json(['message' => 'Risk form successfully deleted.'], 200);
         } catch (Exception $e) {
+            Log::error('Error deleting risk form: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json(['error' => 'Something went wrong. Please try again later'], 500);
         }
     }

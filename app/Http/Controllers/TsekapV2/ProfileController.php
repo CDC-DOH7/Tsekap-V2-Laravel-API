@@ -21,7 +21,7 @@ class ProfileController extends Controller
         $user = $request->user(); // This replaces Auth::check()
 
         // Check if the user exists
-        if (!$user) {
+        if ((!$user || ($user->verified !== 1))) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -43,11 +43,12 @@ class ProfileController extends Controller
     {
         // Ensure the user is authenticated via Sanctum
         $user = $request->user();
-        if (!$user) {
+
+        if ((!$user || ($user->verified !== 1))) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-    
-            // Validate request
+
+        // Validate request
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
             'fields.family_id' => 'nullable|string',
@@ -59,50 +60,51 @@ class ProfileController extends Controller
             'fields.municipal_id' => 'nullable|integer',
             'fields.province_id' => 'nullable|integer',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 422);
         }
-    
+
         $fields = $request->input('fields');
-    
+
         if (!is_array($fields)) {
             return response()->json(['error' => 'Invalid input format.'], 400);
         }
-    
+
         // Process the job
         $job = new RetrieveProfileJob($fields);
         $result = $job->handle();
-    
+
         if ($result === 'timeout') {
             return response()->json([
                 'message' => 'Request timed out. Please try again.',
             ], 408);
         }
-    
+
         if ($result === 'Validation failed') {
             return response()->json(['error' => 'Invalid input'], 400);
         }
-    
+
         if (empty($result)) {
             return response()->json([
                 'message' => 'No profiles found. Please refine your search criteria and try again.',
             ], 404);
         }
-    
+
         return response()->json([
             'message' => 'Profiles retrieved successfully',
             'profiles' => $result,
         ], 200);
     }
-    
+
 
     public function addProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
         $user = $request->user();
 
-        if (!$user) {
+        // do not authorize update unless 1, 3, 10
+        if ((!$user || ($user->verified !== 1))) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -277,14 +279,13 @@ class ProfileController extends Controller
         }
     }
 
-
     public function updateProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
         $user = $request->user();
 
-        // Check if the user exists
-        if (!$user) {
+        // do not authorize update unless 1, 3, 10
+        if ((!$user || !in_array($user->user_priv, [1, 3, 10])) || ($user->verified !== 1)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -301,11 +302,6 @@ class ProfileController extends Controller
 
         if (!empty($fields['deceased_date'])) {
             $fields['deceased_date'] = Carbon::parse($fields['deceased_date'])->toDateString();
-        }
-
-        // Check if the user has admin privileges
-        if (!in_array($user->user_priv, [1, 3, 10])) {
-            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         // Ensure profile ID is provided
@@ -422,9 +418,9 @@ class ProfileController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // Check if the user has admin privileges
-        if ($user->user_priv != 1) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        // Check if the user has privileges, do not authorize update unless admin
+        if ((!$user || !in_array($user->user_priv, [1])) || ($user->verified !== 1)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         $profile = Profile::find($fields['id']);
