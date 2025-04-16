@@ -41,7 +41,7 @@ class DataController extends Controller
         // Validate the request
         $validator = Validator::make($request->all(), [
             'fields.filter' => 'required|string',
-            'fields.keyword' => 'string',
+            'fields.keyword' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -140,7 +140,7 @@ class DataController extends Controller
         // Validate the request
         $validator = Validator::make($request->all(), [
             'fields.filter' => 'required|string',
-            'fields.keyword' => 'string',
+            'fields.keyword' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
