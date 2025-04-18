@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -14,8 +15,8 @@ class UserController extends Controller
     {
         $queryUser = User::where('username', '=', $username)->first();
 
-        if (!$queryUser) {
-            return response()->json(['error' => 'User not found'], 404);
+        if (!$queryUser || $queryUser->verified !== 1) {
+            throw new \Exception('User not found or not verified');
         }
 
         return $queryUser;
@@ -27,13 +28,19 @@ class UserController extends Controller
         $user = $request->user();
 
         if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        $fieldsValidator = Validator::make($request->all(), [
+        try {
+            $queryUser = $this->getAuthenticatedUser($user->username);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 404);
+        }
+
+        $rules = [
             'fields' => 'required|array',
-            'fields.currentPassword' => 'required|string',
-            'fields.newPassword' => [
+            'fields.current_password' => 'required|string',
+            'fields.new_password' => [
                 'required',
                 'string',
                 'min:8',
@@ -42,28 +49,25 @@ class UserController extends Controller
                 'regex:/[0-9]/',
                 'regex:/[@$!%*?&#]/',
             ],
-        ]);
+        ];
+
+        $fieldsValidator = Validator::make($request->all(), $rules);
 
         if ($fieldsValidator->fails()) {
-            return response()->json(['errors' => $fieldsValidator->errors()->all()], 400);
+            return response()->json(['status' => 'error', 'message' => $fieldsValidator->errors()->all()], 400);
         }
 
-        $currentPassword = $fields['currentPassword'];
-        $newPassword = $fields['newPassword'];
-
-        $queryUser = $this->getAuthenticatedUser($user->username);
-        if ($queryUser instanceof \Illuminate\Http\JsonResponse) {
-            return $queryUser;
-        }
+        $currentPassword = $fields['current_password'];
+        $newPassword = $fields['new_password'];
 
         if (!Hash::check($currentPassword, $queryUser->password)) {
-            return response()->json(['error' => 'Current password is incorrect'], 400);
+            return response()->json(['status' => 'error', 'message' => 'Current password is incorrect'], 400);
         }
 
         $queryUser->password = Hash::make($newPassword);
         $queryUser->save();
 
-        return response()->json(['message' => 'Password changed successfully'], 200);
+        return response()->json(['status' => 'success', 'message' => 'Password changed successfully'], 200);
     }
 
     public function updateUserFullName(Request $request)
@@ -72,23 +76,30 @@ class UserController extends Controller
         $user = $request->user();
 
         if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        $fieldsValidator = Validator::make($request->all(), [
+        try {
+            $queryUser = $this->getAuthenticatedUser($user->username);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 404);
+        }
+
+        $rules = [
             'fields' => 'required|array',
-            'fields.fname' => 'string|max:255',
-            'fields.mname' => 'string|max:255',
-            'fields.lname' => 'string|max:255',
-        ]);
+            'fields.fname' => 'nullable|string|max:255',
+            'fields.mname' => 'nullable|string|max:255',
+            'fields.lname' => 'nullable|string|max:255',
+        ];
+
+        $fieldsValidator = Validator::make($request->all(), $rules);
 
         if ($fieldsValidator->fails()) {
-            return response()->json(['errors' => $fieldsValidator->errors()->all()], 400);
+            return response()->json(['status' => 'error', 'message' => $fieldsValidator->errors()->all()], 400);
         }
 
-        $queryUser = $this->getAuthenticatedUser($user->username);
-        if ($queryUser instanceof \Illuminate\Http\JsonResponse) {
-            return $queryUser;
+        if (!isset($fields['fname']) && !isset($fields['mname']) && !isset($fields['lname'])) {
+            return response()->json(['status' => 'error', 'message' => 'At least one of fname, mname, or lname must be provided'], 400);
         }
 
         if (isset($fields['fname'])) {
@@ -103,7 +114,7 @@ class UserController extends Controller
 
         $queryUser->save();
 
-        return response()->json(['message' => 'Names updated successfully'], 200);
+        return response()->json(['status' => 'success', 'message' => 'Names updated successfully'], 200);
     }
 
     public function updateUserContact(Request $request)
@@ -112,27 +123,30 @@ class UserController extends Controller
         $user = $request->user();
 
         if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        $fieldsValidator = Validator::make($request->all(), [
+        try {
+            $queryUser = $this->getAuthenticatedUser($user->username);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 404);
+        }
+
+        $rules = [
             'fields' => 'required|array',
             'fields.contact' => 'required|string|min:11|max:11',
-        ]);
+        ];
+
+        $fieldsValidator = Validator::make($request->all(), $rules);
 
         if ($fieldsValidator->fails()) {
-            return response()->json(['errors' => $fieldsValidator->errors()->all()], 400);
-        }
-
-        $queryUser = $this->getAuthenticatedUser($user->username);
-        if ($queryUser instanceof \Illuminate\Http\JsonResponse) {
-            return $queryUser;
+            return response()->json(['status' => 'error', 'message' => $fieldsValidator->errors()->all()], 400);
         }
 
         $queryUser->contact = $fields['contact'];
         $queryUser->save();
 
-        return response()->json(['message' => 'Contact updated successfully'], 200);
+        return response()->json(['status' => 'success', 'message' => 'Contact updated successfully'], 200);
     }
 
     public function updateUserEmail(Request $request)
@@ -141,26 +155,29 @@ class UserController extends Controller
         $user = $request->user();
 
         if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        $fieldsValidator = Validator::make($request->all(), [
+        try {
+            $queryUser = $this->getAuthenticatedUser($user->username);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 404);
+        }
+
+        $rules = [
             'fields' => 'required|array',
             'fields.email' => 'required|string|email|max:50',
-        ]);
+        ];
+
+        $fieldsValidator = Validator::make($request->all(), $rules);
 
         if ($fieldsValidator->fails()) {
-            return response()->json(['errors' => $fieldsValidator->errors()->all()], 400);
-        }
-
-        $queryUser = $this->getAuthenticatedUser($user->username);
-        if ($queryUser instanceof \Illuminate\Http\JsonResponse) {
-            return $queryUser;
+            return response()->json(['status' => 'error', 'message' => $fieldsValidator->errors()->all()], 400);
         }
 
         $queryUser->email = $fields['email'];
         $queryUser->save();
 
-        return response()->json(['message' => 'Email updated successfully'], 200);
+        return response()->json(['status' => 'success', 'message' => 'Email updated successfully'], 200);
     }
 }

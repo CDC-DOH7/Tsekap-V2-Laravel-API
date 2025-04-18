@@ -2,20 +2,31 @@
 
 namespace App\Http\Controllers\TsekapV2\Forms;
 
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class GeneralDataController extends Controller
 {
+    private function getAuthenticatedUser($username)
+    {
+        $queryUser = User::where('username', '=', $username)->first();
+
+        if (!$queryUser || $queryUser->verified !== 1) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        return $queryUser;
+    }
+
     public function retrieveAllForms(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user();
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
-        // Check if the user exists
-        if (!$user || $user->verified !== 1) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         $fields = $request->input('fields', ['filter' => null, 'keyword' => null]);
@@ -109,11 +120,10 @@ class GeneralDataController extends Controller
     public function retrieveRecentlyUploadedForms(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user();
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
-        // Check if the user exists
-        if (!$user || $user->verified !== 1) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         $fields = $request->input('fields', ['filter' => null, 'keyword' => null]);

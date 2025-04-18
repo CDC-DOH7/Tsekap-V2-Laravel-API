@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm;
 
 use Exception;
+use App\Models\User;
 use App\Models\TsekapV2\UserHealthFacility;
 use App\Models\TsekapV2\Facilities;
 use App\Models\TsekapV2\Forms\RiskAssessment\RiskAssessmentForm;
@@ -16,6 +17,28 @@ use Illuminate\Support\Facades\Log;
 
 class DataController extends Controller
 {
+    private function getAuthenticatedUser($username)
+    {
+        $queryUser = User::where('username', '=', $username)->first();
+
+        if (!$queryUser || $queryUser->verified !== 1) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        return $queryUser;
+    }
+
+    // for users with privilege of 1,3,and 10
+    private function getAuthenticatedAdmin($username)
+    {
+        $queryUser = User::where('username', '=', $username)->first();
+
+        // do not authorize update unless 1, 3, 10
+        if ((!$queryUser || !in_array($queryUser->user_priv, [1, 3, 10])) || ($queryUser->verified !== 1)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    }
+
     private function getHealthFacilityForUser($user)
     {
         $userHealthFacilityMapping = UserHealthFacility::where('user_id', $user->id)->first();
@@ -31,11 +54,10 @@ class DataController extends Controller
     public function retrievePatientRiskProfileWithoutFacility(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         // Validate the request
@@ -130,11 +152,10 @@ class DataController extends Controller
     public function retrievePatientRiskProfileByFacility(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
-        // Check if the user exists
-        if (!$user || $user->verified !== 1) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         // Validate the request
@@ -237,11 +258,10 @@ class DataController extends Controller
     public function retrievePatientRiskAssessment(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         // Validate the request using the Validator facade
@@ -352,15 +372,14 @@ class DataController extends Controller
 
     public function addRiskProfile(Request $request)
     {
-        $fields = $request->input('fields');
-
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
+
+        $fields = $request->input('fields');
 
         // Define validation rules
         $rules = [
@@ -447,15 +466,14 @@ class DataController extends Controller
 
     public function addRiskForm(Request $request)
     {
-        $fields = $request->input('fields');
-
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
+
+        $fields = $request->input('fields');
 
         // Define validation rules
         $rules = [
@@ -590,15 +608,14 @@ class DataController extends Controller
     // update risk profile
     public function updateRiskProfile(Request $request)
     {
-        $fields = $request->input('fields');
-
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
+
+        $fields = $request->input('fields');
 
         // Define validation rules
         $rules = [
@@ -661,15 +678,14 @@ class DataController extends Controller
     // update risk form
     public function updateRiskForm(Request $request)
     {
-        $fields = $request->input('fields');
-
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
+
+        $fields = $request->input('fields');
 
         // Define validation rules
         $rules = [
@@ -796,11 +812,10 @@ class DataController extends Controller
     public function deleteRiskProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user();
+        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
 
-        // Check if the user exists and has the required privileges
-        if (!$user || $user->user_priv !== 1 || $user->verified !== 1) {
-            return response()->json(['error' => 'Unauthorized.'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         // Validate the request
@@ -833,11 +848,11 @@ class DataController extends Controller
     // delete risk form
     public function deleteRiskForm(Request $request)
     {
-        $user = $request->user();
+        // Ensure the user is authenticated via Sanctum
+        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
 
-        // Check if the user exists
-        if (!$user || $user->user_priv !== 1 || $user->verified !== 1) {
-            return response()->json(['error' => 'Unauthorized.'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         // Validate the request

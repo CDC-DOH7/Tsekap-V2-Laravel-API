@@ -8,16 +8,28 @@ use App\Models\TsekapV2\UserHealthFacility;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
+    private function getAuthenticatedUser($username)
+    {
+        $queryUser = User::where('username', '=', $username)->first();
+
+        if (!$queryUser || $queryUser->user_priv !== 1 || $queryUser->verified !== 1) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
+
+        return $queryUser;
+    }
+
     public function registerUser(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $admin = $request->user();
+        $admin = $this->getAuthenticatedUser($request->user()->username);
 
-        if (!$admin || $admin->user_priv !== 1 || $admin->verified !== 1) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($admin instanceof \Illuminate\Http\JsonResponse) {
+            return $admin; // Return the unauthorized response
         }
 
         // Validate the input
@@ -31,95 +43,114 @@ class AdminController extends Controller
             'fields.facility_id' => 'required|integer',
             'fields.user_designation' => 'nullable|string|max:255',
             'fields.username' => 'required|string|max:255|unique:users,username',
-            'fields.password' => 'required|string|min:8|max:255',
+            'fields.password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*?&#]/',
+            ],
             'fields.contact' => 'required|string|max:11',
             'fields.user_priv' => 'required|integer',
             'fields.email' => 'nullable|string|max:255|email',
+            'fields.verified' => 'nullable|integer|in:0,1',
         ]);
 
-        // Trigger validation and return 422 if it fails
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
             return response()->json([
+                'status' => 'error',
                 'message' => 'Validation failed',
-                // 'errors' => $e->errors(),
+                'errors' => $e->errors(),
             ], 422);
         }
 
-        $validatedFields = $validatedFields['fields']; // Extract fields correctly
-
-        // Check if the username already exists
-        if (User::where('username', $validatedFields['username'])->exists()) {
-            return response()->json(['status' => 'error', 'message' => 'This account has already been taken.'], 400);
-        }
+        $validatedFields = $validatedFields['fields'];
 
         try {
-            // **Create and save new user**
+            // Create and save new user
             $user = User::create([
                 'fname' => $validatedFields['fname'] ?? null,
-                'mname' => $validatedFields['mname'] ?? null,
+                'mname' => $validatedFields['mname'] === null ? "" : $validatedFields['mname'],
                 'lname' => $validatedFields['lname'] ?? null,
                 'muncity' => $validatedFields['muncity'],
                 'province' => $validatedFields['province'],
                 'username' => $validatedFields['username'],
-                'password' => bcrypt($validatedFields['password']), // Encrypt password
+                'password' => bcrypt($validatedFields['password']),
                 'contact' => $validatedFields['contact'],
                 'user_priv' => $validatedFields['user_priv'],
-                'verified' => 1, // verify automatically if created by admin
+                'verified' => $validatedFields['verified'] ?? 1,
                 'email' => $validatedFields['email'] ?? null,
             ]);
 
+            if (!$user) {
+                return response()->json(['status' => 'error', 'message' => 'Failed to create user.'], 500);
+            }
+
             $userHfMapping = UserHealthFacility::create([
-                'user_id' => $user['id'] ?? null,
+                'user_id' => $user->id,
                 'facility_id' => $validatedFields['facility_id'],
                 'user_designation' => $validatedFields['user_designation'],
-                'assigned_at' => \Carbon\Carbon::now() // set current timestamp
+                'assigned_at' => now(),
             ]);
         } catch (Exception $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+            Log::error('Error registering user: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['status' => 'error', 'message' => 'An error occurred while creating the user.'], 500);
         }
 
-        $message = "Welcome to Tsekapp, " . $user['fname'] . " (" . $userHfMapping['user_designation'] . ")!";
+        $message = "Welcome to Tsekapp, " . $user->fname . " (" . $userHfMapping->user_designation . ")!";
         return response()->json(['status' => 'success', 'message' => $message], 201);
     }
 
-    // reset anyone's password
     public function resetUserPassword(Request $request)
     {
-        $admin = $request->user();
+        $admin = $this->getAuthenticatedUser($request->user()->username);
 
-        if (!$admin || $admin->user_priv !== 1 || $admin->verified !== 1) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($admin instanceof \Illuminate\Http\JsonResponse) {
+            return $admin; // Return the unauthorized response
         }
 
         // Validate the input
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
             'fields.username' => 'required|string|max:255',
-            'fields.new_password' => 'required|string|min:8|max:255'
+            'fields.new_password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*?&#]/',
+            ],
         ]);
 
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
             return response()->json([
+                'status' => 'error',
                 'message' => 'Validation failed',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         }
 
+        $validatedFields = $validatedFields['fields'];
+
         // Check if the user exists
-        $existingUser = User::where('username', $validatedFields['fields']['username'])->first();
+        $existingUser = User::where('username', '=', $validatedFields['username'])->first();
 
         if (!$existingUser) {
             return response()->json(['status' => 'error', 'message' => 'User not found.'], 404);
         }
 
         // Update the password
-        $existingUser->password = bcrypt($validatedFields['fields']['new_password']);
+        $existingUser->password = bcrypt($validatedFields['new_password']);
         $existingUser->save();
 
-        return response()->json(['message' => 'Password successfully updated for ' . $existingUser->username], 200);
+        return response()->json(['status' => 'success', 'message' => 'Password successfully updated for ' . $existingUser->username], 200);
     }
 }

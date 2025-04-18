@@ -3,30 +3,44 @@
 namespace App\Http\Controllers\TsekapV2;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 use App\Models\TsekapV2\Facilities;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class FacilityController extends Controller
 {
+    private function getAuthenticatedUser($username)
+    {
+        $queryUser = User::where('username', '=', $username)->first();
 
-    // ---- POST FUNCTIONS ----- //
+        if (!$queryUser || $queryUser->verified !== 1) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
+
+        return $queryUser;
+    }
+
+    private function getAuthenticatedAdmin($username)
+    {
+        $queryUser = User::where('username', '=', $username)->first();
+
+        // do not authorize update unless 1, 3, 10
+        if ((!$queryUser || !in_array($queryUser->user_priv, [1, 3, 10])) || ($queryUser->verified !== 1)) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
+
+        return $queryUser;
+    }
+
     // get a health facility
     public function retrieveFacilityByCode(Request $request)
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->username);
 
-        $fields = $request->input('fields');
-
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        // do not authorize update unless 1, 3, 10
-        if ((!$user || ($user->verified !== 1))) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         $rules = [
@@ -37,31 +51,36 @@ class FacilityController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
         }
 
-        $facility = Facilities::where('facility_code', "=", $fields['facility_code'])->first();
+        $fields = $request->input('fields');
 
-        return response()->json($facility);
+        try {
+            $facility = Facilities::where('facility_code', $fields['facility_code'])->first();
+
+            if (!$facility) {
+                return response()->json(['status' => 'error', 'message' => 'Facility not found'], 404);
+            }
+
+            return response()->json(['status' => 'success', 'data' => $facility], 200);
+        } catch (\Exception $e) {
+            Log::error('Error retrieving facility: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['status' => 'error', 'message' => 'An error occurred. Please try again later.'], 500);
+        }
     }
 
     // add a health facility
     public function addFacility(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
+
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
+        }
 
         $fields = $request->input('fields');
-
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        // do not authorize adding unless admin
-        if ((!$user || !in_array($user->user_priv, [1])) || ($user->verified !== 1)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
 
         $rules = [
             'fields' => 'required|array',
@@ -88,30 +107,32 @@ class FacilityController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
         }
 
-        $facility = Facilities::create($fields);
+        $fields = $request->input('fields');
 
-        return response()->json($facility, 201);
+        if (Facilities::where('facility_code', $fields['facility_code'])->exists()) {
+            return response()->json(['status' => 'error', 'message' => 'Facility with this code already exists'], 400);
+        }
+
+        try {
+            $facility = Facilities::create($fields);
+
+            return response()->json(['status' => 'success', 'message' => 'Facility added successfully', 'data' => $facility], 201);
+        } catch (\Exception $e) {
+            Log::error('Error adding facility: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['status' => 'error', 'message' => 'An error occurred. Please try again later.'], 500);
+        }
     }
 
     // update a health facility
     public function updateFacility(Request $request)
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $this->getAuthenticatedAdmin($request->user()->username);
 
-        $fields = $request->input('fields');
-
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        // do not authorize update unless 1, 3, 10
-        if ((!$user || !in_array($user->user_priv, [1])) || ($user->verified !== 1)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         $rules = [
@@ -138,31 +159,34 @@ class FacilityController extends Controller
 
         $validator = Validator::make($request->all(), $rules);
 
-        $facility = Facilities::where('facility_code', "=", $fields['facility_code'])->first();
-
-        if (!$facility) {
-            return response()->json(['message' => 'Facilities not found'], 404);
-        }
-
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
         }
 
-        $facility->update($fields);
+        $fields = $request->input('fields');
 
-        return response()->json($facility);
+        try {
+            $facility = Facilities::where('facility_code', $fields['facility_code'])->first();
+
+            if (!$facility) {
+                return response()->json(['status' => 'error', 'message' => 'Facility not found'], 404);
+            }
+
+            $facility->update($fields);
+
+            return response()->json(['status' => 'success', 'message' => 'Facility updated successfully', 'data' => $facility], 200);
+        } catch (\Exception $e) {
+            Log::error('Error updating facility: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['status' => 'error', 'message' => 'An error occurred. Please try again later.'], 500);
+        }
     }
 
     public function deleteFacility(Request $request)
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $this->getAuthenticatedAdmin($request->user()->username);
 
-        $fields = $request->input('fields');
-
-        // do not authorize deletion unless 1, 3, 10
-        if ((!$user || !in_array($user->user_priv, [1])) || ($user->verified !== 1)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         $rules = [
@@ -170,21 +194,27 @@ class FacilityController extends Controller
             'fields.facility_code' => 'required|string|max:100',
         ];
 
-        // Validate request input
         $validator = Validator::make($request->all(), $rules);
 
-        $facility = Facilities::where('facility_code', "=", $fields['facility_code'])->first();
-
-        if (!$facility) {
-            return response()->json(['message' => 'Facility not found'], 404);
-        }
-
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
         }
 
-        $facility->delete();
+        $fields = $request->input('fields');
 
-        return response()->json(['message' => 'Facility deleted successfully']);
+        try {
+            $facility = Facilities::where('facility_code', $fields['facility_code'])->first();
+
+            if (!$facility) {
+                return response()->json(['status' => 'error', 'message' => 'Facility not found'], 404);
+            }
+
+            $facility->delete();
+
+            return response()->json(['status' => 'success', 'message' => 'Facility deleted successfully'], 200);
+        } catch (\Exception $e) {
+            Log::error('Error deleting facility: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['status' => 'error', 'message' => 'An error occurred. Please try again later.'], 500);
+        }
     }
 }

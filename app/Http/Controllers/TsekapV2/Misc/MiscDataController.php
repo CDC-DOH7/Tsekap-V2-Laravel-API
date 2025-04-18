@@ -11,12 +11,23 @@ use App\Models\TsekapV2\Facilities;
 use App\Models\TsekapV2\Muncity;
 use App\Models\TsekapV2\Province;
 use App\Models\TsekapV2\Barangay;
+use Illuminate\Support\Facades\Validator;
+use Exception;
 
 class MiscDataController extends Controller
 {
     // get facilities
     public function getAllFacility(Request $request)
     {
+        $validator = Validator::make($request->query(), [
+            'province_id' => 'nullable|integer',
+            'muncity_id' => 'nullable|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
+        }
+
         $province = $request->query('province_id');
         $municipality = $request->query('muncity_id');
 
@@ -49,104 +60,190 @@ class MiscDataController extends Controller
             $query->where('muncity', "=", $municipality);
         }
 
-        // Log the query for debugging
-        Log::info('Facilities Query:', [
-            'query' => $query->toSql(),
-            'bindings' => $query->getBindings(),
-        ]);
-
-        $facilities = $query->get();
-
-        return response()->json($facilities);
+        try {
+            $facilities = $query->get();
+            return response()->json($facilities);
+        } catch (Exception $e) {
+            Log::error('Error retrieving facilities.' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'An error occurred while retrieving facilities.'], 500);
+        }
     }
 
     public function getFacilitiesInCurrentMuncity(Request $request)
     {
-        $muncityId = $request->query('muncity_id');
+        $validator = Validator::make($request->query(), [
+            'muncity_id' => 'required|integer',
+        ]);
 
-        $facilities = Facilities::where('muncity_id', '=', $muncityId)
-            ->select('id', 'facility_code', 'name')
-            ->get();
-        return response()->json($facilities);
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
+        }
+
+        try {
+            $muncityId = $request->query('muncity_id');
+            $facilities = Facilities::where('muncity_id', '=', $muncityId)
+                ->select('id', 'facility_code', 'name')
+                ->get();
+            return response()->json($facilities);
+        } catch (Exception $e) {
+            Log::error('Error retrieving facilities current muncity.' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Error retrieving facilities in current muncity.'], 500);
+        }
     }
 
     // get all provinces 
     public function getProvinces()
     {
-        $provinces = Province::select('id', 'description')->get();
-        return response()->json($provinces);
+        try {
+            $provinces = Province::select('id', 'description')->get();
+            return response()->json($provinces);
+        } catch (Exception $e) {
+            Log::error('Error in retrieving provinces.' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Error in retrieving provinces.'], 500);
+        }
     }
 
     // get muncity/city by provinces
     public function getMuncities(Request $request)
     {
-        $provinceId = $request->query('province_id');
+        $validator = Validator::make($request->query(), [
+            'province_id' => 'required|integer',
+        ]);
 
-        $muncity = Muncity::where('province_id', '=', $provinceId)
-            ->select('id', 'province_id', 'description')
-            ->get();
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
+        }
 
-        return response()->json($muncity);
+        try {
+            $provinceId = $request->query('province_id');
+            $muncity = Muncity::where('province_id', '=', $provinceId)
+                ->select('id', 'province_id', 'description')
+                ->get();
+
+            return response()->json($muncity);
+        } catch (Exception $e) {
+            Log::error('Error in retrieving muncities.' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Error in retrieving muncities.'], 500);
+        }
     }
 
     // get barangay by muncity/cities
     public function getBarangays(Request $request)
     {
-        $muncityId = $request->query('muncity_id');
+        $validator = Validator::make($request->query(), [
+            'muncity_id' => 'required|integer',
+        ]);
 
-        $barangay = Barangay::where('muncity_id', '=', $muncityId)
-            ->select('id', 'muncity_id', 'description')
-            ->get();
-        return response()->json($barangay);
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
+        }
+
+        try {
+            $muncityId = $request->query('muncity_id');
+            $barangay = Barangay::where('muncity_id', '=', $muncityId)
+                ->select('id', 'muncity_id', 'description')
+                ->get();
+
+            return response()->json($barangay);
+        } catch (Exception $e) {
+            Log::error('Error in retrieving barangays.' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Error in retrieving barangays.'], 500);
+        }
     }
 
     // get province by Id 
     public function getProvinceById(Request $request)
     {
+        $validator = Validator::make($request->query(), [
+            'province_id' => 'required|integer',
+        ]);
 
-        $provinceId = $request->query('province_id');
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
+        }
 
-        $province = Muncity::where('id', '=', $provinceId)
-            ->select('id', 'description')
-            ->get();
+        try {
+            $provinceId = $request->query('province_id');
+            $province = Muncity::where('id', '=', $provinceId)
+                ->select('id', 'description')
+                ->get();
 
-        return response()->json($province);
+            return response()->json($province);
+        } catch (Exception $e) {
+            Log::error('Error in retrieving province.' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Error in retrieving province.'], 500);
+        }
     }
 
     // get muncity/city by Id
     public function getMuncityById(Request $request)
     {
-        $muncityId = $request->query('muncity_id');
+        $validator = Validator::make($request->query(), [
+            'muncity_id' => 'required|integer',
+        ]);
 
-        $muncity = Muncity::where('id', '=', $muncityId)
-            ->select('id', 'description')
-            ->get();
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
+        }
 
-        return response()->json($muncity);
+        try {
+            $muncityId = $request->query('muncity_id');
+            $muncity = Muncity::where('id', '=', $muncityId)
+                ->select('id', 'description')
+                ->get();
+
+            return response()->json($muncity);
+        } catch (Exception $e) {
+            Log::error('Error in retrieving muncity.' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Error in retrieving muncity.'], 500);
+        }
     }
 
     // get barangay by Id
     public function getBarangayById(Request $request)
     {
-        $barangayId = $request->query('barangay_id');
+        $validator = Validator::make($request->query(), [
+            'barangay_id' => 'required|integer',
+        ]);
 
-        $barangay = Barangay::where('id', '=', $barangayId)
-            ->select('id', 'description')
-            ->get();
-        return response()->json($barangay);
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
+        }
+
+        try {
+            $barangayId = $request->query('barangay_id');
+            $barangay = Barangay::where('id', '=', $barangayId)
+                ->select('id', 'description')
+                ->get();
+
+            return response()->json($barangay);
+        } catch (Exception $e) {
+            Log::error('Error in retrieving barangay.' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Error in retrieving barangay.'], 500);
+        }
     }
 
     // get all religion
     public function getAllReligions()
     {
-        $religions = Religion::select('id', 'name')->get();
-        return response()->json($religions);
+        try {
+            $religions = Religion::select('id', 'name')->get();
+            return response()->json($religions);
+        } catch (Exception $e) {
+            Log::error('Error in retrieving religions.' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Error in retrieving religions.'], 500);
+        }
     }
 
     // get all religion
     public function getAllCitizenships()
     {
-        $citizenships = Citizenship::select('id', 'name')->get();
-        return response()->json($citizenships);
+        try {
+            $citizenships = Citizenship::select('id', 'name')->get();
+            return response()->json($citizenships);
+        } catch (Exception $e) {
+            Log::error('Error in retrieving citizenships.' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Error in retrieving citizenships.'], 500);
+        }
     }
 }
