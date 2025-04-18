@@ -58,7 +58,7 @@ class AdminController extends Controller
             // **Create and save new user**
             $user = User::create([
                 'fname' => $validatedFields['fname'] ?? null,
-                'mname' => $validatedFields['mname'] ?? null,
+                'mname' => $validatedFields['mname'] === null ? "" : $validatedFields['mname'],
                 'lname' => $validatedFields['lname'] ?? null,
                 'muncity' => $validatedFields['muncity'],
                 'province' => $validatedFields['province'],
