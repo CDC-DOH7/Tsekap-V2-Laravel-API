@@ -89,6 +89,13 @@ class MiscDataController extends Controller
         return response()->json($muncity);
     }
 
+    // get all muncities
+    public function getAllMuncities(Request $request)
+    {
+        $muncities = Muncity::select('id', 'province_id', 'description')->get();
+        return response()->json($muncities);
+    }
+
     // get barangay by muncity/cities
     public function getBarangays(Request $request)
     {
@@ -98,6 +105,13 @@ class MiscDataController extends Controller
             ->select('id', 'muncity_id', 'description')
             ->get();
         return response()->json($barangay);
+    }
+
+    // get all barangays
+    public function getAllBarangays(Request $request)
+    {
+        $barangays = Barangay::select('id', 'muncity_id', 'description')->get();
+        return response()->json($barangays);
     }
 
     // get province by Id 
