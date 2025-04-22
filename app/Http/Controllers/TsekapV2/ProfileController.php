@@ -10,6 +10,7 @@ use App\Jobs\RetrieveProfileJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 
 class ProfileController extends Controller
@@ -275,6 +276,7 @@ class ProfileController extends Controller
                 'profile' => $profile
             ], 201);
         } catch (Exception $e) {
+            Log::error($e->getMessage());
             return response()->json(['error' => 'Error creating profile: ' . $e->getMessage()], 500);
         }
     }
@@ -398,9 +400,9 @@ class ProfileController extends Controller
         try {
             // Only update with validated fields
             $profile->update($fields);
-
             return response()->json(['message' => 'Profile updated successfully', 'profile' => $profile], 200);
         } catch (Exception $e) {
+            Log::error($e->getMessage());
             return response()->json(['error' => 'An error occurred', 'message' => $e->getMessage()], 500);
         }
     }

@@ -35,6 +35,10 @@ Route::prefix('v2')->group(function () {
         Route::get('/get-barangay-by-id', [MiscDataController::class, 'getBarangayById'])->name('api-v2-get-barangay-by-id');
     });
 
+    Route::prefix('facility')->group(function () {
+        Route::post('/add-user-facility', [UserHealthFacilityController::class, 'addUserHealthFacility'])->name('api-v2-add-user-facility');
+    });
+
     // Protected Routes (Requires Authentication)
     Route::middleware('auth:sanctum')->group(function () {
         // Admin Routes
@@ -62,7 +66,6 @@ Route::prefix('v2')->group(function () {
             Route::post('/add-facility', [FacilityController::class, 'addFacility'])->name('api-v2-add-facility');
             Route::post('/update-facility', [FacilityController::class, 'updateFacility'])->name('api-v2-update-facility');
             Route::post('/delete-facility', [FacilityController::class, 'deleteFacility'])->name('api-v2-delete-facility');
-            Route::post('/add-user-facility', [UserHealthFacilityController::class, 'addUserHealthFacility'])->name('api-v2-add-user-facility');
         });
 
         // Profile Routes

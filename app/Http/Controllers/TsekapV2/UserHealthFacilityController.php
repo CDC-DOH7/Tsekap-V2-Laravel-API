@@ -48,14 +48,6 @@ class UserHealthFacilityController extends Controller
     {
         $fields = $request->input('fields');
 
-        // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
-
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
         // Check if the fields array is provided
         if (!$fields) {
             return response()->json(['error' => 'Invalid input: fields are required'], 400);
@@ -83,7 +75,6 @@ class UserHealthFacilityController extends Controller
         }
 
         $userHealthFacility = UserHealthFacility::create($fields);
-
         return response()->json($userHealthFacility, 201);
     }
 

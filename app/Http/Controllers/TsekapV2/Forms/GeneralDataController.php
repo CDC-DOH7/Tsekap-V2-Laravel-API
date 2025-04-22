@@ -18,10 +18,12 @@ class GeneralDataController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $fields = $request->input('fields', ['filter' => null, 'keyword' => null]);
+        $fields = $request->input('fields', ['filter' => null, 'keyword' => null, 'start_date' => null, 'end_date' => null]);
 
         $filter = $fields['filter'] ?? null;
         $keyword = $fields['keyword'] ?? null;
+        $startDate = $fields['start_date'] ?? null;
+        $endDate = $fields['end_date'] ?? null;
 
         // Define the profiles to query
         $profileTypes = [
@@ -98,6 +100,15 @@ class GeneralDataController extends Controller
                         }
                     }
                 });
+            }
+
+            // Apply date range filter
+            if ($startDate && $endDate) {
+                $query->whereBetween("{$config['table']}.created_at", [$startDate, $endDate]);
+            } elseif ($startDate) {
+                $query->whereDate("{$config['table']}.created_at", '>=', $startDate);
+            } elseif ($endDate) {
+                $query->whereDate("{$config['table']}.created_at", '<=', $endDate);
             }
 
             // Paginate and collect results

@@ -8,6 +8,7 @@ use App\Models\TsekapV2\UserHealthFacility;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -41,6 +42,7 @@ class AdminController extends Controller
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
+            Log::error($e->getMessage());
             return response()->json([
                 'message' => 'Validation failed',
                 // 'errors' => $e->errors(),
@@ -77,6 +79,7 @@ class AdminController extends Controller
                 'assigned_at' => \Carbon\Carbon::now() // set current timestamp
             ]);
         } catch (Exception $e) {
+            Log::error($e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
 
@@ -103,6 +106,7 @@ class AdminController extends Controller
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
+            Log::error($e->getMessage());
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $e->errors()

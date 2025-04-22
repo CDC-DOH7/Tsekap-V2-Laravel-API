@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -37,6 +38,7 @@ class AuthController extends Controller
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
+            Log::error($e->getMessage());
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $e->errors(),
@@ -73,6 +75,7 @@ class AuthController extends Controller
                 'assigned_at' => \Carbon\Carbon::now() // set current timestamp
             ]);
         } catch (\Exception $e) {
+            Log::error('' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
 
@@ -96,6 +99,7 @@ class AuthController extends Controller
         try {
             $validatedFields = $fieldsValidator->validate();
         } catch (ValidationException $e) {
+            Log::error('' . $e->getMessage());
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $e->errors(),
