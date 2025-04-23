@@ -16,6 +16,7 @@ class FacilityController extends Controller
         $queryUser = User::where('username', '=', $username)->first();
 
         if (!$queryUser || $queryUser->verified !== 1) {
+            Log::error('Denied access for: ' + $queryUser->id);
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
@@ -38,7 +39,6 @@ class FacilityController extends Controller
     public function retrieveFacilityByCode(Request $request)
     {
         $user = $this->getAuthenticatedUser($request->user()->username);
-
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -75,7 +75,6 @@ class FacilityController extends Controller
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
-
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -130,7 +129,6 @@ class FacilityController extends Controller
     public function updateFacility(Request $request)
     {
         $user = $this->getAuthenticatedAdmin($request->user()->username);
-
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -184,7 +182,6 @@ class FacilityController extends Controller
     public function deleteFacility(Request $request)
     {
         $user = $this->getAuthenticatedAdmin($request->user()->username);
-
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }

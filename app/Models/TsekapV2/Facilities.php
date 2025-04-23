@@ -28,5 +28,9 @@ class Facilities extends Model
         'hospital_type',
         'tricity_id',
         'referral_used',
+
+        // metadata/timestamps
+        'created_at',
+        'updated_at',
     ];
 }

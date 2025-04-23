@@ -15,6 +15,10 @@ class ProfilingTargetModel extends Model
         "profiling_description",
         "facility_id",
         "male_population",
-        "female_population"
+        "female_population",
+
+        // metadata/timestamps
+        "created_at",
+        "updated_at"
     ];
 }

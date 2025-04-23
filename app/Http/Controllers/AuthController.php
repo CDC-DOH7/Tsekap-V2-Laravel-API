@@ -9,7 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Exception;
 
 class AuthController extends Controller
 {
@@ -37,6 +39,7 @@ class AuthController extends Controller
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
+            Log::error('Validation error in AuthController (function: selfRegisterUser)' . $e->getMessage());
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $e->errors(),
@@ -72,7 +75,8 @@ class AuthController extends Controller
                 'user_designation' => $validatedFields['user_designation'],
                 'assigned_at' => \Carbon\Carbon::now() // set current timestamp
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
+            Log::error("Failure in user self-registration: " . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
 
@@ -96,6 +100,7 @@ class AuthController extends Controller
         try {
             $validatedFields = $fieldsValidator->validate();
         } catch (ValidationException $e) {
+            Log::error('Validation error in AuthController (function: login)' . $e->getMessage());
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $e->errors(),

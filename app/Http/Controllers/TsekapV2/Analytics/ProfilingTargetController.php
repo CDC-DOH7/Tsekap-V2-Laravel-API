@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\TsekapV2\Analytics\ProfilingTargetModel;
 use Exception;
@@ -51,6 +52,7 @@ class ProfilingTargetController extends Controller
 
         // do not authorize update unless 1, 3, 10
         if ((!$queryUser || !in_array($queryUser->user_priv, [1, 3, 10])) || ($queryUser->verified !== 1)) {
+            Log::error('Denied access to (ProfilingTargetController) for: ' + $queryUser->id);
             return response()->json(['error' => 'Unauthorized'], 401);
         }
     }
@@ -79,6 +81,7 @@ class ProfilingTargetController extends Controller
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
+            Log::error('Validation error in the creation of a profiling target: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Validation failed'
             ], 422);
@@ -99,6 +102,7 @@ class ProfilingTargetController extends Controller
                 'female_population' => $validatedFields["fields.female_population"],
             ]);
         } catch (Exception $e) {
+            Log::error('Error in creation of a profiling target: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
 
@@ -167,6 +171,7 @@ class ProfilingTargetController extends Controller
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
+            Log::error('Validation error in deleting profiling target: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Validation failed'
             ], 422);
@@ -181,6 +186,7 @@ class ProfilingTargetController extends Controller
                 'female_population' => $validatedFields['female_population'],
             ]);
         } catch (Exception $e) {
+            Log::error('Error in updating a profiling target: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
 
@@ -210,6 +216,7 @@ class ProfilingTargetController extends Controller
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
+            Log::error('Validation error in deleting profiling target: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Validation failed'
             ], 422);
@@ -219,6 +226,7 @@ class ProfilingTargetController extends Controller
             $profilingTarget = ProfilingTargetModel::findOrFail($validatedFields['fields']['id']);
             $profilingTarget->delete();
         } catch (Exception $e) {
+            Log::error('Error in a deletion of a profiling target: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
 

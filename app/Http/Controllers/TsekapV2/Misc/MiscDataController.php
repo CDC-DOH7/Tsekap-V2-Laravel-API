@@ -40,7 +40,8 @@ class MiscDataController extends Controller
             'muncity',
             'province',
 
-            // redacted fields:
+            // --- redacted/optional fields ---
+
             // 'address',
             // 'latitude',
             // 'longitude',
@@ -69,6 +70,7 @@ class MiscDataController extends Controller
         }
     }
 
+    // get all facilities in current muncity
     public function getFacilitiesInCurrentMuncity(Request $request)
     {
         $validator = Validator::make($request->query(), [
@@ -127,6 +129,13 @@ class MiscDataController extends Controller
         }
     }
 
+    // get all muncities
+    public function getAllMuncities(Request $request)
+    {
+        $muncities = Muncity::select('id', 'province_id', 'description')->get();
+        return response()->json($muncities);
+    }
+
     // get barangay by muncity/cities
     public function getBarangays(Request $request)
     {
@@ -149,6 +158,13 @@ class MiscDataController extends Controller
             Log::error('Error in retrieving barangays.' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => 'Error in retrieving barangays.'], 500);
         }
+    }
+
+    // get all barangays
+    public function getAllBarangays(Request $request)
+    {
+        $barangays = Barangay::select('id', 'muncity_id', 'description')->get();
+        return response()->json($barangays);
     }
 
     // get province by Id 

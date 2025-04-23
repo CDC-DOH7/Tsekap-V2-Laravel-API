@@ -20,6 +20,7 @@ class ProfileController extends Controller
         $queryUser = User::where('username', '=', $username)->first();
 
         if (!$queryUser || $queryUser->verified !== 1) {
+            Log::error('Denied access for: ' + $queryUser->id);
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
@@ -32,6 +33,7 @@ class ProfileController extends Controller
         $queryUser = User::where('username', '=', $username)->first();
 
         if ((!$queryUser || !in_array($queryUser->user_priv, [1, 3, 10])) || ($queryUser->verified !== 1)) {
+            Log::error('Denied administrative access for: ' + $queryUser->id);
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
@@ -43,7 +45,6 @@ class ProfileController extends Controller
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
-
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -66,7 +67,6 @@ class ProfileController extends Controller
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
-
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -125,7 +125,6 @@ class ProfileController extends Controller
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
-
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -264,6 +263,8 @@ class ProfileController extends Controller
 
         // Check for duplicate unique ID
         if (Profile::where('unique_id', '=', $profileData['unique_id'])->exists()) {
+            Log::notice('Attempted duplicate entry for record: ' + $profileData['fname'] + ' ' + $profileData['lname']);
+            Log::notice('Duplicate unique ID: ' + $profileData['unique_id']);
             return response()->json(['status' => 'error', 'message' => 'Profile with this unique ID already exists'], 400);
         }
 
@@ -302,8 +303,6 @@ class ProfileController extends Controller
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->username);
-
-        // do not authorize update unless 1, 3, 10
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -414,13 +413,13 @@ class ProfileController extends Controller
         ]);
 
         if ($validator->fails()) {
+            Log::error("Validation error in ProfileController (function: updateProfile)");
             return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
         }
 
         try {
             // Only update with validated fields
             $profile->update($fields);
-
             return response()->json(['status' => 'success', 'message' => 'Profile updated successfully.', 'profile' => $profile], 200);
         } catch (Exception $e) {
             Log::error('Error in updating profile: ' . $e->getMessage(), ['exception' => $e]);
@@ -433,7 +432,6 @@ class ProfileController extends Controller
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->username);
-
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -446,6 +444,7 @@ class ProfileController extends Controller
         ]);
 
         if ($validator->fails()) {
+            Log::error("Validation error in ProfileController (function: deleteProfile)");
             return response()->json(['error' => 'Invalid inputs.', 'messages' => $validator->errors()], 422);
         }
 
@@ -457,7 +456,6 @@ class ProfileController extends Controller
             }
 
             $profile->delete();
-
             return response()->json(['status' => 'success', 'message' => 'Deleted profile.'], 200);
         } catch (Exception $e) {
             Log::error('Error deleting profile: ' . $e->getMessage(), ['exception' => $e]);

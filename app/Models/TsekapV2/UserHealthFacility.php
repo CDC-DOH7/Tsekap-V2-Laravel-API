@@ -7,13 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class UserHealthFacility extends Model
 {
     protected $table = "user_health_facility";
+    // public $timestamps = true;
 
     protected $fillable = [
         'user_id',
         'facility_id',
         'user_designation',
-        'assigned_at'
-    ];
+        'assigned_at',
 
-    public $timestamps = false;
+        // metadata/timestamps
+        'updated_at',
+        'created_at'
+    ];
 }

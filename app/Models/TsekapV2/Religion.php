@@ -8,4 +8,11 @@ class Religion extends Model
 {
     protected $connection = 'mysql';
     protected $table = 'religions';
+
+    protected $fillable = [
+
+        // metadata/timestamps
+        'updated_at',
+        'created_at'
+    ];
 }
