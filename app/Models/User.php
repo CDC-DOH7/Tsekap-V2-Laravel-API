@@ -30,7 +30,11 @@ class User extends Authenticatable
         'verified',
         'password',
         'contact',
-        'user_priv'
+        'user_priv',
+
+        // metadata/timestamps
+        'updated_at',
+        'created_at'
     ];
 
     /**

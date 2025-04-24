@@ -8,4 +8,8 @@ class Citizenship extends Model
 {
     protected $connection = 'mysql';
     protected $table = 'citizenships';
+    protected $fillable = [
+        'created_at',
+        'updated_at'
+    ];
 }

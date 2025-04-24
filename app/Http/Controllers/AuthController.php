@@ -9,8 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Exception;
 
 class AuthController extends Controller
 {
@@ -38,7 +39,7 @@ class AuthController extends Controller
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
-            Log::error($e->getMessage());
+            Log::error('Validation error in AuthController (function: selfRegisterUser)' . $e->getMessage());
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $e->errors(),
@@ -74,8 +75,8 @@ class AuthController extends Controller
                 'user_designation' => $validatedFields['user_designation'],
                 'assigned_at' => \Carbon\Carbon::now() // set current timestamp
             ]);
-        } catch (\Exception $e) {
-            Log::error('' . $e->getMessage());
+        } catch (Exception $e) {
+            Log::error("Failure in user self-registration: " . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
 
@@ -99,7 +100,7 @@ class AuthController extends Controller
         try {
             $validatedFields = $fieldsValidator->validate();
         } catch (ValidationException $e) {
-            Log::error('' . $e->getMessage());
+            Log::error('Validation error in AuthController (function: login)' . $e->getMessage());
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $e->errors(),
@@ -117,6 +118,8 @@ class AuthController extends Controller
             'province.description as province_name',
             'user_health_facility.facility_id',
             'facilities.name as facility_name',
+            'facilities.province as facility_province_id',
+            'facilities.muncity as facility_muncity_id',
             'user_health_facility.user_designation as user_designation'
         )
             ->where('username', '=', $validatedFields['user'])
@@ -156,6 +159,8 @@ class AuthController extends Controller
                     'facility' => $user->facility_id ? [
                         'id' => $user->facility_id,
                         'name' => $user->facility_name,
+                        'province_id' => $user->facility_province_id,
+                        'muncity_id' => $user->facility_muncity_id
                     ] : null,
                     'token' => $token, // Return Bearer token
                 ],

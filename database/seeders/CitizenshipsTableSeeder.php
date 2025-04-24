@@ -209,8 +209,8 @@ class CitizenshipsTableSeeder extends Seeder
             Citizenship::firstOrCreate(
                 ['name' => $citizenship],
                 [
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'created_at' => \Carbon\Carbon::now(),
+                    'updated_at' => \Carbon\Carbon::now(),
                 ]
             );
         }

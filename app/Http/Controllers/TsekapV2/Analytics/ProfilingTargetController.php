@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
+use App\Models\User;
 use App\Models\TsekapV2\Analytics\ProfilingTargetModel;
 use Exception;
 
@@ -44,16 +46,27 @@ class ProfilingTargetController extends Controller
         return response()->json(['unique_id' => $uniqueId]);
     }
 
-    public function createProfilingTarget(Request $request)
+    private function getAuthenticatedAdmin($username)
     {
-        $fields = $request->input('fields');
+        $queryUser = User::where('username', '=', $username)->first();
 
-        // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
-
-        if ((!$user || !in_array($user->user_priv, [1, 3, 10])) || ($user->verified !== 1)) {
+        // do not authorize update unless 1, 3, 10
+        if ((!$queryUser || !in_array($queryUser->user_priv, [1, 3, 10])) || ($queryUser->verified !== 1)) {
+            Log::error('Denied access to (ProfilingTargetController) for: ' + $queryUser->id);
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+    }
+
+    public function createProfilingTarget(Request $request)
+    {
+        // Ensure the user is authenticated via Sanctum
+        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
+
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
+        }
+
+        $fields = $request->input('fields');
 
         if (!$fields) {
             return response()->json(['error' => 'Invalid input: fields are required', 422]);
@@ -68,6 +81,7 @@ class ProfilingTargetController extends Controller
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
+            Log::error('Validation error in the creation of a profiling target: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Validation failed'
             ], 422);
@@ -83,11 +97,12 @@ class ProfilingTargetController extends Controller
         try {
             $profilingTarget = ProfilingTargetModel::create([
                 'unique_id' => $generatedUniqueId,
-                'facility_id' => $user->facility_id,
+                'facility_id' => $request->user()->facility_id,
                 'male_population' => $validatedFields["fields.male_population"],
                 'female_population' => $validatedFields["fields.female_population"],
             ]);
         } catch (Exception $e) {
+            Log::error('Error in creation of a profiling target: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
 
@@ -97,13 +112,14 @@ class ProfilingTargetController extends Controller
 
     public function retrieveProfilingTarget(Request $request)
     {
-        $user = $request->user();
+        // Ensure the user is authenticated via Sanctum
+        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
 
-        if ((!$user || !in_array($user->user_priv, [1, 3, 10])) || ($user->verified !== 1)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
-        $profilingTarget = ProfilingTargetModel::where('facility_id', $user->facility_id)->get();
+        $profilingTarget = ProfilingTargetModel::where('facility_id', $request->user()->facility_id)->get();
 
         if ($profilingTarget->isEmpty()) {
             return response()->json(['status' => 'error', 'message' => 'No profiling target found.'], 404);
@@ -114,10 +130,11 @@ class ProfilingTargetController extends Controller
 
     public function retrieveProfilingTargetById(Request $request)
     {
-        $user = $request->user();
+        // Ensure the user is authenticated via Sanctum
+        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
 
-        if ((!$user || !in_array($user->user_priv, [1, 3, 10])) || ($user->verified !== 1)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         $profilingTarget = ProfilingTargetModel::where('id', $request->input('fields.id'))->first();
@@ -131,14 +148,14 @@ class ProfilingTargetController extends Controller
 
     public function updateProfilingTarget(Request $request)
     {
-        $fields = $request->input('fields');
-
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
 
-        if ((!$user || !in_array($user->user_priv, [1, 3, 10])) || ($user->verified !== 1)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
+
+        $fields = $request->input('fields');
 
         if (!$fields) {
             return response()->json(['error' => 'Invalid input: fields are required'], 422);
@@ -154,6 +171,7 @@ class ProfilingTargetController extends Controller
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
+            Log::error('Validation error in deleting profiling target: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Validation failed'
             ], 422);
@@ -168,11 +186,51 @@ class ProfilingTargetController extends Controller
                 'female_population' => $validatedFields['female_population'],
             ]);
         } catch (Exception $e) {
+            Log::error('Error in updating a profiling target: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
 
         $message = "Profiling target: " . $profilingTarget->id . " updated successfully";
         return response()->json(['status' => 'success', 'message' => $message], 200);
     }
-    public function deleteProfilingTarget(Request $request) {}
+
+    public function deleteProfilingTarget(Request $request)
+    {
+        // Ensure the user is authenticated via Sanctum
+        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
+
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
+        }
+
+        $fields = $request->input('fields');
+
+        if (!$fields || !isset($fields['id'])) {
+            return response()->json(['error' => 'Invalid input: ID is required'], 422);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'fields.id' => 'required|integer|exists:profiling_targets,id',
+        ]);
+
+        try {
+            $validatedFields = $validator->validate();
+        } catch (ValidationException $e) {
+            Log::error('Validation error in deleting profiling target: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Validation failed'
+            ], 422);
+        }
+
+        try {
+            $profilingTarget = ProfilingTargetModel::findOrFail($validatedFields['fields']['id']);
+            $profilingTarget->delete();
+        } catch (Exception $e) {
+            Log::error('Error in a deletion of a profiling target: ' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+
+        $message = "Profiling target: " . $validatedFields['fields']['id'] . " deleted successfully";
+        return response()->json(['status' => 'success', 'message' => $message], 200);
+    }
 }

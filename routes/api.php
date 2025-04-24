@@ -20,8 +20,6 @@ Route::prefix('v2')->group(function () {
     Route::prefix('misc')->group(function () {
         Route::get('/get-all-facility', [MiscDataController::class, 'getAllFacility'])->name('api-v2-get-all-facility');
         Route::get('/get-provinces', [MiscDataController::class, 'getProvinces'])->name('api-v2-get-all-provinces');
-        Route::get('/get-all-muncities', [MiscDataController::class, 'getAllMuncities'])->name('api-v2-get-all-muncities');
-        Route::get('/get-all-barangays', [MiscDataController::class, 'getAllBarangays'])->name('api-v2-get-all-barangays');
         Route::get('/get-muncities', [MiscDataController::class, 'getMuncities'])->name('api-v2-get-muncity');
         Route::get('/get-barangays', [MiscDataController::class, 'getBarangays'])->name('api-v2-get-barangay');
 
@@ -45,8 +43,10 @@ Route::prefix('v2')->group(function () {
         Route::prefix('admin')->group(function () {
             Route::post('/reset-user-password', [AdminController::class, 'resetUserPassword'])->name('api-v2-reset-user-password');
             Route::post('/register-user', [AdminController::class, 'registerUser'])->name('api-v2-admin-register-user');
+
+            // additional routes for verifying users
             Route::post('/verify-user', [AdminController::class, 'verifyUser'])->name('api-v2-admin-verify-user');
-            Route::get('/list-users', [AdminController::class, 'listFilteredUsers'])->name('api-v2-admin-list-users');
+            Route::get('/list-users', [AdminController::class, 'listUnverifiedUsers'])->name('api-v2-admin-list-unverified-users');
         });
 
         // User Routes
@@ -87,9 +87,17 @@ Route::prefix('v2')->group(function () {
 
             // Forms - Risk Assessment Routes
             Route::prefix('/risk-assessment')->group(function () {
-                Route::post('/retrieve-patient-risk-assessment', [DataController::class, 'retrievePatientRiskAssessment'])->name('api-v2-retrieve-patient-risk-assessment');
-                Route::post('/retrieve-patient-risk-profile-by-facility', [DataController::class, 'retrievePatientRiskProfileByFacility'])->name('api-v2-retrieve-patient-risk-profile-by-facility');
-                Route::post('/retrieve-patient-risk-profile', [DataController::class, 'retrievePatientRiskProfileWithoutFacility'])->name('api-v2-retrieve-patient-risk-profile-without-facility');
+
+                // ---- Previously POST Statements ---- //
+                // Route::post('/retrieve-patient-risk-assessment', [DataController::class, 'retrievePatientRiskAssessment'])->name('api-v2-retrieve-patient-risk-assessment');
+                // Route::post('/retrieve-patient-risk-profile-by-facility', [DataController::class, 'retrievePatientRiskProfileByFacility'])->name('api-v2-retrieve-patient-risk-profile-by-facility');
+                // Route::post('/retrieve-patient-risk-profile', [DataController::class, 'retrievePatientRiskProfileWithoutFacility'])->name('api-v2-retrieve-patient-risk-profile-without-facility');
+
+                // ---- Converted to GET Statements ---- //
+                Route::get('/retrieve-patient-risk-assessment', [DataController::class, 'retrievePatientRiskAssessment'])->name('api-v2-retrieve-patient-risk-assessment');
+                Route::get('/retrieve-patient-risk-profile-by-facility', [DataController::class, 'retrievePatientRiskProfileByFacility'])->name('api-v2-retrieve-patient-risk-profile-by-facility');
+                Route::get('/retrieve-patient-risk-profile', [DataController::class, 'retrievePatientRiskProfileWithoutFacility'])->name('api-v2-retrieve-patient-risk-profile-without-facility');
+
                 Route::post('/add-risk-profile', [DataController::class, 'addRiskProfile'])->name('api-v2-add-risk-profile');
                 Route::post('/add-risk-form', [DataController::class, 'addRiskForm'])->name('api-v2-add-risk-form');
                 Route::post('/update-risk-profile', [DataController::class, 'updateRiskProfile'])->name('api-v2-update-risk-profile');

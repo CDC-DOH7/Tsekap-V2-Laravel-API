@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm;
 
 use Exception;
+use App\Models\User;
 use App\Models\TsekapV2\UserHealthFacility;
 use App\Models\TsekapV2\Facilities;
 use App\Models\TsekapV2\Forms\RiskAssessment\RiskAssessmentForm;
@@ -16,6 +17,30 @@ use Illuminate\Support\Facades\Log;
 
 class DataController extends Controller
 {
+    private function getAuthenticatedUser($username)
+    {
+        $queryUser = User::where('username', '=', $username)->first();
+
+        if (!$queryUser || $queryUser->verified !== 1) {
+            Log::error('Denied access to (Risk Assessment, DataController) for: ' + $queryUser->id);
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        return $queryUser;
+    }
+
+    // for users with privilege of 1,3,and 10
+    private function getAuthenticatedAdmin($username)
+    {
+        $queryUser = User::where('username', '=', $username)->first();
+
+        // do not authorize update unless 1, 3, 10
+        if ((!$queryUser || !in_array($queryUser->user_priv, [1, 3, 10])) || ($queryUser->verified !== 1)) {
+            Log::error('Denied administrative access to (Risk Assessment, DataController) for: ' + $queryUser->id);
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    }
+
     private function getHealthFacilityForUser($user)
     {
         $userHealthFacilityMapping = UserHealthFacility::where('user_id', $user->id)->first();
@@ -28,30 +53,125 @@ class DataController extends Controller
     }
 
     // retrieval without facility
+
+    // ---- !!! ACTUAL WORKING FUNCTION !!! ----// 
+    // public function retrievePatientRiskProfileWithoutFacility(Request $request)
+    // {
+    //     // Ensure the user is authenticated via Sanctum
+    //     $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+
+    //     if ($user instanceof \Illuminate\Http\JsonResponse) {
+    //         return $user;
+    //     }
+
+    //     // Validate the request
+    //     $validator = Validator::make($request->all(), [
+    //         'fields.filter' => 'required|string',
+    //         'fields.keyword' => 'nullable|string|max:255',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json(['error' => 'Invalid input'], 400);
+    //     }
+
+    //     $fields = $request->input('fields', []);
+
+    //     $filter = isset($fields['filter']) ? $fields['filter'] : null;
+    //     $keyword = isset($fields['keyword']) ? $fields['keyword'] : null;
+
+    //     // Base query for risk profiles
+    //     $query = RiskProfile::select(
+    //         'risk_profile.id',
+    //         'risk_profile.fname',
+    //         'risk_profile.mname',
+    //         'risk_profile.lname',
+    //         'risk_profile.dob',
+    //         'risk_profile.sex',
+    //         'risk_profile.age',
+    //         'risk_profile.religion',
+    //         'risk_profile.other_religion',
+    //         'risk_profile.citizenship',
+    //         'risk_profile.other_citizenship',
+    //         'risk_profile.indigenous_person',
+    //         'risk_profile.employment_status',
+    //         'risk_profile.contact',
+    //         'risk_profile.civil_status',
+    //         'risk_profile.barangay_id',
+    //         'risk_profile.municipal_id',
+    //         'risk_profile.province_id',
+    //         'risk_profile.street',
+    //         'risk_profile.purok',
+    //         'risk_profile.sitio',
+    //         'risk_profile.phic_id',
+    //         'risk_profile.pwd_id',
+    //         'risk_profile.facility_id_updated',
+    //         'risk_profile.offline_entry',
+    //         'risk_profile.encoded_by',
+    //         'risk_profile.created_at',
+    //         'risk_profile.updated_at',
+    //         'muncity.description as municipal_name',
+    //         'province.description as province_name'
+    //     )
+    //         ->join('muncity', 'risk_profile.municipal_id', '=', 'muncity.id')
+    //         ->join('province', 'risk_profile.province_id', '=', 'province.id');
+
+    //     // Apply user privilege filters
+    //     if ($user->user_priv === 3) {
+    //         $query->where('risk_profile.province_id', $user->province);
+    //     }
+
+    //     // Apply keyword filter
+    //     if ($keyword) {
+    //         $query->where(function ($q) use ($filter, $keyword) {
+    //             $columns = [
+    //                 'facility_id_updated' => 'risk_profile.facility_id_updated',
+    //                 'fname' => 'risk_profile.fname',
+    //                 'lname' => 'risk_profile.lname',
+    //                 'dob' => 'risk_profile.dob'
+    //             ];
+
+    //             if ($filter === 'dob') {
+    //                 // Parse keyword as date
+    //                 $parsedDate = date('Y-m-d', strtotime($keyword));
+    //                 $q->where($columns['dob'], $parsedDate);
+    //             } elseif (isset($columns[$filter])) {
+    //                 $q->where($columns[$filter], 'like', "%$keyword%");
+    //             } else {
+    //                 $q->where('risk_profile.fname', 'like', "%$keyword%")
+    //                     ->orWhere('risk_profile.lname', 'like', "%$keyword%")
+    //                     ->orWhere('risk_profile.dob', 'like', "%$keyword%")
+    //                     ->orWhere('risk_profile.facility_id_updated', '=', $keyword);
+    //             }
+    //         });
+    //     }
+
+    //     // Paginate and return results
+    //     $results = $query->simplePaginate(30);
+
+    //     return response()->json($results, 200);
+    // }
+
+    //---- !!! EXPERIMENTAL FUNCTION !!! ----//
     public function retrievePatientRiskProfileWithoutFacility(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
-
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         // Validate the request
         $validator = Validator::make($request->all(), [
-            'fields.filter' => 'required|string',
-            'fields.keyword' => 'nullable|string|max:255',
+            'filter' => 'required|string',
+            'keyword' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => 'Invalid input'], 400);
         }
 
-        $fields = $request->input('fields', []);
-
-        $filter = isset($fields['filter']) ? $fields['filter'] : null;
-        $keyword = isset($fields['keyword']) ? $fields['keyword'] : null;
+        $filter = $request->query('filter');
+        $keyword = $request->query('keyword');
 
         // Base query for risk profiles
         $query = RiskProfile::select(
@@ -121,36 +241,30 @@ class DataController extends Controller
 
         // Paginate and return results
         $results = $query->simplePaginate(30);
-
         return response()->json($results, 200);
     }
 
-
-    // retrieval with facility
+    // retrieval by facility using GET parameters
     public function retrievePatientRiskProfileByFacility(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
-
-        // Check if the user exists
-        if (!$user || $user->verified !== 1) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         // Validate the request
         $validator = Validator::make($request->all(), [
-            'fields.filter' => 'required|string',
-            'fields.keyword' => 'nullable|string|max:255',
+            'filter' => 'required|string',
+            'keyword' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => 'Invalid input'], 400);
         }
 
-        $fields = $request->input('fields', []);
-
-        $filter = isset($fields['filter']) ? $fields['filter'] : null;
-        $keyword = isset($fields['keyword']) ? $fields['keyword'] : null;
+        $filter = $request->query('filter');
+        $keyword = $request->query('keyword');
 
         // Retrieve the facility for the user
         $facility = $this->getHealthFacilityForUser($user);
@@ -194,7 +308,6 @@ class DataController extends Controller
         )
             ->join('muncity', 'risk_profile.municipal_id', '=', 'muncity.id')
             ->join('province', 'risk_profile.province_id', '=', 'province.id');
-        // ->join('profile_other_details', 'risk_profile.id', '=', 'profile_other_details.user_id');
 
         // Apply user privilege filters
         if ($user->user_priv === 3) {
@@ -230,32 +343,27 @@ class DataController extends Controller
 
         // Paginate and return results
         $results = $query->simplePaginate(30);
-
         return response()->json($results, 200);
     }
 
     public function retrievePatientRiskAssessment(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
-
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         // Validate the request using the Validator facade
         $validator = Validator::make($request->all(), [
-            'fields' => 'required|array',
-            'fields.profile_id' => 'required|numeric',
+            'profile_id' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => 'Invalid input'], 400);
         }
 
-        $fields = $request->input('fields');
-        $id = $fields['profile_id'];
+        $id = $request->query('profile_id');
 
         // Building the query
         $query = RiskAssessmentForm::select(
@@ -352,15 +460,13 @@ class DataController extends Controller
 
     public function addRiskProfile(Request $request)
     {
-        $fields = $request->input('fields');
-
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
-
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
+
+        $fields = $request->input('fields');
 
         // Define validation rules
         $rules = [
@@ -440,22 +546,20 @@ class DataController extends Controller
                 'id' => $riskProfile->id
             ], 200);
         } catch (Exception $e) {
-            // Log the exception for debugging
+            Log::error('An error has occurred in adding of risk profile: ' + $e->getMessage());
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
 
     public function addRiskForm(Request $request)
     {
-        $fields = $request->input('fields');
-
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
-
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
+
+        $fields = $request->input('fields');
 
         // Define validation rules
         $rules = [
@@ -566,7 +670,7 @@ class DataController extends Controller
             $existingRiskForm = RiskAssessmentForm::where('risk_profile_id', '=', $fields['risk_profile_id'])->first();
 
             if ($existingRiskForm) {
-                return response()->json(['error' => 'Duplicate risk_profile_id detected. Please recheck.'], 409);
+                return response()->json(['error' => 'Record with the same duplicate risk_profile_id found. Please recheck.'], 409);
             }
 
             $riskform = new RiskAssessmentForm();
@@ -580,9 +684,9 @@ class DataController extends Controller
 
             // Save the data
             $riskform->save();
-
             return response()->json(['message' => 'Entry successfully saved.'], 200);
         } catch (Exception $e) {
+            Log::error('An error has occurred in adding of risk form: ' + $e->getMessage());
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
@@ -590,15 +694,13 @@ class DataController extends Controller
     // update risk profile
     public function updateRiskProfile(Request $request)
     {
-        $fields = $request->input('fields');
-
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
-
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
+
+        $fields = $request->input('fields');
 
         // Define validation rules
         $rules = [
@@ -650,7 +752,6 @@ class DataController extends Controller
         try {
             // Update the RiskProfile with new data
             $riskprofile->update($fields);
-
             return response()->json(['message' => 'Profile successfully updated.'], 200);
         } catch (Exception $e) {
             Log::error('Error deleting risk form: ' . $e->getMessage(), ['exception' => $e]);
@@ -661,15 +762,13 @@ class DataController extends Controller
     // update risk form
     public function updateRiskForm(Request $request)
     {
-        $fields = $request->input('fields');
-
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
-
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
+
+        $fields = $request->input('fields');
 
         // Define validation rules
         $rules = [
@@ -796,11 +895,9 @@ class DataController extends Controller
     public function deleteRiskProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user();
-
-        // Check if the user exists and has the required privileges
-        if (!$user || $user->user_priv !== 1 || $user->verified !== 1) {
-            return response()->json(['error' => 'Unauthorized.'], 401);
+        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         // Validate the request
@@ -822,10 +919,9 @@ class DataController extends Controller
             }
 
             $riskProfile->delete();
-
             return response()->json(['message' => 'Risk profile successfully deleted.'], 200);
         } catch (Exception $e) {
-            Log::error('Error deleting risk profile: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error deleting risk profile: ' . $e->getMessage());
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
@@ -833,11 +929,10 @@ class DataController extends Controller
     // delete risk form
     public function deleteRiskForm(Request $request)
     {
-        $user = $request->user();
-
-        // Check if the user exists
-        if (!$user || $user->user_priv !== 1 || $user->verified !== 1) {
-            return response()->json(['error' => 'Unauthorized.'], 401);
+        // Ensure the user is authenticated via Sanctum
+        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()x
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         // Validate the request
@@ -862,7 +957,6 @@ class DataController extends Controller
             }
 
             $riskForm->delete();
-
             return response()->json(['message' => 'Risk form successfully deleted.'], 200);
         } catch (Exception $e) {
             Log::error('Error deleting risk form: ' . $e->getMessage(), ['exception' => $e]);

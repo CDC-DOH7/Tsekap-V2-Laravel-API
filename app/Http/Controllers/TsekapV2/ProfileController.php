@@ -9,21 +9,44 @@ use App\Models\TsekapV2\ProfileOtherDetails;
 use App\Jobs\RetrieveProfileJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User; // Import the User model
+use Illuminate\Support\Facades\Log; // Import the Log facade
 use Exception;
-use Illuminate\Support\Facades\Log;
-
 
 class ProfileController extends Controller
 {
+    private function getAuthenticatedUser($username)
+    {
+        $queryUser = User::where('username', '=', $username)->first();
+
+        if (!$queryUser || $queryUser->verified !== 1) {
+            Log::error('Denied access for: ' + $queryUser->id);
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
+
+        return $queryUser;
+    }
+
+    // for users with privilege of 1,3,and 10
+    private function getAuthenticatedAdmin($username)
+    {
+        $queryUser = User::where('username', '=', $username)->first();
+
+        if ((!$queryUser || !in_array($queryUser->user_priv, [1, 3, 10])) || ($queryUser->verified !== 1)) {
+            Log::error('Denied administrative access for: ' + $queryUser->id);
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
+
+        return $queryUser;
+    }
+
     // generator functions 
     private function generateFamilyId(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
-
-        // Check if the user exists
-        if ((!$user || ($user->verified !== 1))) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         // get formatted time to be used as metadata
@@ -43,10 +66,9 @@ class ProfileController extends Controller
     public function retrieveProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user();
-
-        if ((!$user || ($user->verified !== 1))) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         // Validate request
@@ -102,16 +124,13 @@ class ProfileController extends Controller
     public function addProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user();
-
-        // do not authorize update unless 1, 3, 10
-        if ((!$user || ($user->verified !== 1))) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
-            'fields.unique_id' => 'sometimes|string|max:255|nullable',
             'fields.lname' => 'required|string|max:255',
             'fields.fname' => 'required|string|max:255',
             'fields.mname' => 'sometimes|string|max:255|nullable',
@@ -203,7 +222,7 @@ class ProfileController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
         }
 
         // Extract Profile fields
@@ -242,14 +261,16 @@ class ProfileController extends Controller
             );
         }
 
+        // Check for duplicate unique ID
+        if (Profile::where('unique_id', '=', $profileData['unique_id'])->exists()) {
+            Log::notice('Attempted duplicate entry for record: ' + $profileData['fname'] + ' ' + $profileData['lname']);
+            Log::notice('Duplicate unique ID: ' + $profileData['unique_id']);
+            return response()->json(['status' => 'error', 'message' => 'Profile with this unique ID already exists'], 400);
+        }
+
         // Generate family ID if head of the family
         if (isset($profileData['head']) && strtolower($profileData['head']) === "yes") {
             $profileData['familyID'] = $this->generateFamilyId($request);
-        }
-
-        // Check for duplicate unique ID
-        if (Profile::where('unique_id', $profileData['unique_id'])->exists()) {
-            return response()->json(['message' => 'Profile with this unique ID already exists'], 400);
         }
 
         try {
@@ -271,24 +292,19 @@ class ProfileController extends Controller
                 ProfileOtherDetails::create($profileOtherDetailsData);
             }
 
-            return response()->json([
-                'message' => 'Profile added successfully',
-                'profile' => $profile
-            ], 201);
+            return response()->json(['status' => 'success', 'message' => 'Profile added successfully', 'data' => $profile], 201);
         } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return response()->json(['error' => 'Error creating profile: ' . $e->getMessage()], 500);
+            Log::error('Error adding profile: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['status' => 'error', 'message' => 'Error adding profile: ' . $e->getMessage()], 500);
         }
     }
 
     public function updateProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user();
-
-        // do not authorize update unless 1, 3, 10
-        if ((!$user || !in_array($user->user_priv, [1, 3, 10])) || ($user->verified !== 1)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $user = $this->getAuthenticatedAdmin($request->user()->username);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
         $fields = $request->input('fields', []);
@@ -309,13 +325,13 @@ class ProfileController extends Controller
         // Ensure profile ID is provided
         $profileId = $fields['id'] ?? null;
         if (!$profileId) {
-            return response()->json(['message' => 'Profile ID is required'], 400);
+            return response()->json(['status' => 'error', 'message' => 'Profile ID is required'], 400);
         }
 
         // Check if profile exists
         $profile = Profile::find($profileId);
         if (!$profile) {
-            return response()->json(['message' => 'Profile not found'], 404);
+            return response()->json(['status' => 'error', 'message' => 'Profile not found'], 404);
         }
 
         // Validate fields
@@ -336,6 +352,9 @@ class ProfileController extends Controller
             'fields.barangay_id' => 'sometimes|integer',
             'fields.muncity_id' => 'sometimes|integer',
             'fields.province_id' => 'sometimes|integer',
+            'fields.purok_name' => 'sometimes|string|max:255|nullable',
+            'fields.sitio_name' => 'sometimes|string|max:255|nullable',
+            'fields.street_name' => 'sometimes|string|max:255|nullable',
             'fields.income' => 'sometimes|integer',
             'fields.unmet' => 'sometimes|integer',
             'fields.water' => 'sometimes|integer',
@@ -394,40 +413,53 @@ class ProfileController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['error' => 'Invalid inputs.', 'messages' => $validator->errors()], 422);
+            Log::error("Validation error in ProfileController (function: updateProfile)");
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
         }
 
         try {
             // Only update with validated fields
             $profile->update($fields);
-            return response()->json(['message' => 'Profile updated successfully', 'profile' => $profile], 200);
+            return response()->json(['status' => 'success', 'message' => 'Profile updated successfully.', 'profile' => $profile], 200);
         } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred', 'message' => $e->getMessage()], 500);
+            Log::error('Error in updating profile: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['status' => 'error', 'message' => 'Error in updating profile.'], 500);
         }
     }
 
     // delete profile
     public function deleteProfile(Request $request)
     {
+        // Ensure the user is authenticated via Sanctum
+        $user = $this->getAuthenticatedAdmin($request->user()->username);
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
+        }
+
         $fields = $request->input('fields');
 
-        // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
+        // Validate fields
+        $validator = Validator::make($fields, [
+            'id' => 'required|integer|exists:profiles,id',
+        ]);
 
-        // Check if the user exists
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($validator->fails()) {
+            Log::error("Validation error in ProfileController (function: deleteProfile)");
+            return response()->json(['error' => 'Invalid inputs.', 'messages' => $validator->errors()], 422);
         }
 
-        // Check if the user has privileges, do not authorize update unless admin
-        if ((!$user || !in_array($user->user_priv, [1])) || ($user->verified !== 1)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        try {
+            $profile = Profile::find($fields['id']);
+
+            if (!$profile) {
+                return response()->json(['status' => 'error', 'message' => 'Profile not found'], 404);
+            }
+
+            $profile->delete();
+            return response()->json(['status' => 'success', 'message' => 'Deleted profile.'], 200);
+        } catch (Exception $e) {
+            Log::error('Error deleting profile: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['status' => 'error', 'message' => 'Error deleting profile.'], 500);
         }
-
-        $profile = Profile::find($fields['id']);
-        $profile->delete();
-
-        return response()->json(['message' => 'Deleted profile.'], 200);
     }
 }

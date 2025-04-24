@@ -51,16 +51,15 @@ class ReligionsTableSeeder extends Seeder
             'Native American Religions',
             'Others'
         ];
-        
+
         foreach ($religions as $religion) {
             Religion::firstOrCreate(
                 ['name' => $religion],
                 [
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'created_at' => \Carbon\Carbon::now(),
+                    'updated_at' => \Carbon\Carbon::now(),
                 ]
             );
         }
-        
     }
 }

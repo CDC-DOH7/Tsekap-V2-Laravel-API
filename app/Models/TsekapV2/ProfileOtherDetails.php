@@ -13,6 +13,10 @@ class ProfileOtherDetails extends Model
         'profile_id',
         'purok_name',
         'sitio_name',
-        'street_name'
+        'street_name',
+
+        // metadata/timestamps
+        'updated_at',
+        'created_at'
     ];
 }

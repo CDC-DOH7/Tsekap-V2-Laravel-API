@@ -2,28 +2,41 @@
 
 namespace App\Http\Controllers\TsekapV2\Forms;
 
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class GeneralDataController extends Controller
 {
+    private function getAuthenticatedUser($username)
+    {
+        $queryUser = User::where('username', '=', $username)->first();
+
+        if (!$queryUser || $queryUser->verified !== 1) {
+            Log::error('Denied access for: ' + $queryUser->id);
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        return $queryUser;
+    }
+
     public function retrieveAllForms(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user();
-
-        // Check if the user exists
-        if (!$user || $user->verified !== 1) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $user = $this->getAuthenticatedUser($request->query('username')); // Use query parameter for GET request
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
-        $fields = $request->input('fields', ['filter' => null, 'keyword' => null, 'start_date' => null, 'end_date' => null]);
+        $fields = [
+            'filter' => $request->query('filter', null),
+            'keyword' => $request->query('keyword', null)
+        ];
 
-        $filter = $fields['filter'] ?? null;
-        $keyword = $fields['keyword'] ?? null;
-        $startDate = $fields['start_date'] ?? null;
-        $endDate = $fields['end_date'] ?? null;
+        $filter = $fields['filter'];
+        $keyword = $fields['keyword'];
 
         // Define the profiles to query
         $profileTypes = [
@@ -120,17 +133,18 @@ class GeneralDataController extends Controller
     public function retrieveRecentlyUploadedForms(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $request->user();
-
-        // Check if the user exists
-        if (!$user || $user->verified !== 1) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $user = $this->getAuthenticatedUser($request->query('username')); // Use query parameter for GET request
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
         }
 
-        $fields = $request->input('fields', ['filter' => null, 'keyword' => null]);
+        $fields = [
+            'filter' => $request->query('filter', null),
+            'keyword' => $request->query('keyword', null)
+        ];
 
-        $filter = $fields['filter'] ?? null;
-        $keyword = $fields['keyword'] ?? null;
+        $filter = $fields['filter'];
+        $keyword = $fields['keyword'];
 
         // Define the profiles to query
         $profileTypes = [
