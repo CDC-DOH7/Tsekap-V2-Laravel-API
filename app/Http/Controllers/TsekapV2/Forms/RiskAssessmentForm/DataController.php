@@ -615,7 +615,7 @@ class DataController extends Controller
             // rf
             'fields.rf_tobacco_use' => 'required|string|max:255',
             'fields.rf_alcohol_intake' => 'required|string|max:8',
-            'fields.rf_alcohol_binge_drinker' => 'required|string|max:8',
+            'fields.rf_alcohol_binge_drinker' => 'nullable|string|max:8',
             'fields.rf_physical_activity' => 'required|string|max:8',
             'fields.rf_nutrition_dietary' => 'required|string|max:8',
             'fields.rf_weight' => 'required|numeric',
@@ -626,8 +626,8 @@ class DataController extends Controller
             // rs
             'fields.rs_systolic_t1' => 'required|numeric',
             'fields.rs_diastolic_t1' => 'required|numeric',
-            'fields.rs_systolic_t2' => 'required|numeric',
-            'fields.rs_diastolic_t2' => 'required|numeric',
+            'fields.rs_systolic_t2' => 'nullable|numeric',
+            'fields.rs_diastolic_t2' => 'nullable|numeric',
             'fields.rs_blood_sugar_fbs' => 'nullable|numeric',
             'fields.rs_blood_sugar_rbs' => 'nullable|numeric',
             'fields.rs_blood_sugar_date_taken' => 'nullable|date',
