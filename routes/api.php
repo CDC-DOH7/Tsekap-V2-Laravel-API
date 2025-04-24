@@ -45,6 +45,8 @@ Route::prefix('v2')->group(function () {
         Route::prefix('admin')->group(function () {
             Route::post('/reset-user-password', [AdminController::class, 'resetUserPassword'])->name('api-v2-reset-user-password');
             Route::post('/register-user', [AdminController::class, 'registerUser'])->name('api-v2-admin-register-user');
+            Route::post('/verify-user', [AdminController::class, 'verifyUser'])->name('api-v2-admin-verify-user');
+            Route::get('/list-users', [AdminController::class, 'listFilteredUsers'])->name('api-v2-admin-list-users');
         });
 
         // User Routes
@@ -54,6 +56,7 @@ Route::prefix('v2')->group(function () {
             Route::post('/update-name', [UserController::class, 'updateUserFullName'])->name('api-v2-update-name');
             Route::post('/update-contact', [UserController::class, 'updateUserContact'])->name('api-v2-update-contact');
             Route::post('/update-email', [UserController::class, 'updateUserEmail'])->name('api-v2-update-email');
+            Route::post('/create-remarks', [UserController::class, 'storeUserRemarks'])->name('api-v2-create-remarks');
 
             // two logouts for different functions
             Route::post('/logout', [AuthController::class, 'logout'])->name('api-v2-logout');

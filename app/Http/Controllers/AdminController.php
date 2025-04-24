@@ -126,4 +126,63 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'Password successfully updated for ' . $existingUser->username], 200);
     }
+    
+    // verify user
+    public function verifyUser(Request $request)
+    {
+        $admin = $request->user();
+
+        if (!$admin || $admin->user_priv !== 1 || $admin->verified !== 1) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Validate the input
+        $validator = Validator::make($request->all(), [
+            'fields.user_id' => 'required|integer',
+        ]);
+
+        try {
+            $validatedFields = $validator->validate();
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        }
+
+        // Check if the user exists
+        $existingUser = User::where('id', $validatedFields['fields']['user_id'])->first();
+
+        if (!$existingUser) {
+            return response()->json(['status' => 'error', 'message' => 'User not found.'], 404);
+        }
+
+        // Update the verified bool
+        $existingUser->verified = true;
+        $existingUser->save();
+
+        return response()->json(['message' => 'User verified: ' . $existingUser->username], 200);
+    }
+
+    public function listFilteredUsers(Request $request)
+    {
+        $admin = $request->user();
+
+        // Check if the requester is an authorized admin
+        if (!$admin || $admin->user_priv !== 1 || $admin->verified !== 1) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Query the users
+        $users = User::where('id', '>=', 4454)
+                    ->where('verified', 0)
+                    ->select('id', 'fname', 'mname', 'lname', 'username', 'user_priv')
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+
+        return response()->json([
+            'message' => 'Filtered user list retrieved successfully.',
+            'users' => $users,
+        ], 200);
+    }
 }

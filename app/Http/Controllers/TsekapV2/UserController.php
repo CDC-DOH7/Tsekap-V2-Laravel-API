@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\TsekapV2;
 
 use App\Models\User;
+use App\Models\MobileRemarks;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -162,5 +163,42 @@ class UserController extends Controller
         $queryUser->save();
 
         return response()->json(['message' => 'Email updated successfully'], 200);
+    }
+
+    public function storeUserRemarks(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // ✅ Validate request
+        $fieldsValidator = Validator::make($request->all(), [
+            'fields' => 'required|array',
+            'fields.user_id' => 'required|integer',
+            'fields.remarks' => 'required|string',
+        ]);
+
+        if ($fieldsValidator->fails()) {
+            return response()->json(['errors' => $fieldsValidator->errors()->all()], 400);
+        }
+
+        // ✅ Get validated data
+        $validated = $fieldsValidator->validated();
+        $fields = $validated['fields'];
+
+        // ✅ Create the remark
+        $remarks = MobileRemarks::create([
+            'user_id' => $fields['user_id'],
+            'remarks' => $fields['remarks'],
+            'created_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Remarks saved successfully.',
+            'data' => $remarks,
+        ], 201);
     }
 }
