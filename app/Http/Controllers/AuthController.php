@@ -118,6 +118,8 @@ class AuthController extends Controller
             'province.description as province_name',
             'user_health_facility.facility_id',
             'facilities.name as facility_name',
+            'facilities.province as facility_province_id',
+            'facilities.muncity as facility_muncity_id',
             'user_health_facility.user_designation as user_designation'
         )
             ->where('username', '=', $validatedFields['user'])
@@ -157,6 +159,8 @@ class AuthController extends Controller
                     'facility' => $user->facility_id ? [
                         'id' => $user->facility_id,
                         'name' => $user->facility_name,
+                        'province_id' => $user->facility_province_id,
+                        'muncity_id' => $user->facility_muncity_id
                     ] : null,
                     'token' => $token, // Return Bearer token
                 ],
