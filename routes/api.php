@@ -44,7 +44,7 @@ Route::prefix('v2')->group(function () {
 
             // additional routes for verifying users
             Route::post('/verify-user', [AdminController::class, 'verifyUser'])->name('api-v2-admin-verify-user');
-            Route::get('/list-unverified-users', [AdminController::class, 'listUnverifiedUsers'])->name('api-v2-admin-list-unverified-users');
+            Route::get('/list-users', [AdminController::class, 'listUnverifiedUsers'])->name('api-v2-admin-list-unverified-users');
         });
 
         // User Routes
