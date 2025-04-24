@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mobile_remarks', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // auto-incrementing primary key
+            $table->unsignedInteger('user_id')->nullable()->index();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->text('remarks'); // text field for the remarks
             $table->timestamps();
         });
     }

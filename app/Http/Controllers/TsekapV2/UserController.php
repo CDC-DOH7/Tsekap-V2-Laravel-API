@@ -204,10 +204,9 @@ class UserController extends Controller
         $user = $request->user();
 
         if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        // ✅ Validate request
         $fieldsValidator = Validator::make($request->all(), [
             'fields' => 'required|array',
             'fields.user_id' => 'required|integer',
@@ -215,24 +214,26 @@ class UserController extends Controller
         ]);
 
         if ($fieldsValidator->fails()) {
-            return response()->json(['errors' => $fieldsValidator->errors()->all()], 400);
+            return response()->json(['status' => 'error', 'message' => $fieldsValidator->errors()->all()], 400);
         }
 
-        // ✅ Get validated data
-        $validated = $fieldsValidator->validated();
-        $fields = $validated['fields'];
+        try {
+            $fields = $fieldsValidator->validated()['fields'];
 
-        // ✅ Create the remark
-        $remarks = MobileRemarks::create([
-            'user_id' => $fields['user_id'],
-            'remarks' => $fields['remarks'],
-            'created_at' => now(),
-        ]);
+            $remarks = MobileRemarks::create([
+                'user_id' => $fields['user_id'],
+                'remarks' => $fields['remarks'],
+                'created_at' => now(),
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Remarks saved successfully.',
-            'data' => $remarks,
-        ], 201);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Remarks saved successfully.',
+                'data' => $remarks,
+            ], 201);
+        } catch (Exception $e) {
+            Log::error("Failed to save remarks: " . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Failed to save remarks'], 500);
+        }
     }
 }
