@@ -81,8 +81,8 @@ Route::prefix('v2')->group(function () {
 
         Route::prefix('forms')->group(function () {
             Route::prefix('/general')->group(function () {
-                Route::post('/retrieve-all-forms', [GeneralDataController::class, 'retrieveAllForms'])->name('api-v2-retrieve-all-forms');
-                Route::post('/retrieve-recently-uploaded-forms', [GeneralDataController::class, 'retrieveRecentlyUploadedForms'])->name('api-v2-retrieve-recently-uploaded-formsg');
+                Route::get('/retrieve-all-forms', [GeneralDataController::class, 'retrieveAllForms'])->name('api-v2-retrieve-all-forms');
+                Route::get('/retrieve-recently-uploaded-forms', [GeneralDataController::class, 'retrieveRecentlyUploadedForms'])->name('api-v2-retrieve-recently-uploaded-formsg');
             });
 
             // Forms - Risk Assessment Routes

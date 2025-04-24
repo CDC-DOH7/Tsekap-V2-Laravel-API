@@ -136,13 +136,6 @@ class MiscDataController extends Controller
         return response()->json($muncities);
     }
 
-    // get all muncities
-    public function getAllMuncities(Request $request)
-    {
-        $muncities = Muncity::select('id', 'province_id', 'description')->get();
-        return response()->json($muncities);
-    }
-
     // get barangay by muncity/cities
     public function getBarangays(Request $request)
     {
@@ -165,13 +158,6 @@ class MiscDataController extends Controller
             Log::error('Error in retrieving barangays.' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => 'Error in retrieving barangays.'], 500);
         }
-    }
-
-    // get all barangays
-    public function getAllBarangays(Request $request)
-    {
-        $barangays = Barangay::select('id', 'muncity_id', 'description')->get();
-        return response()->json($barangays);
     }
 
     // get all barangays

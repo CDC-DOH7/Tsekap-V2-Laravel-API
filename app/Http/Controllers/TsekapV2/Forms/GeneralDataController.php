@@ -15,7 +15,7 @@ class GeneralDataController extends Controller
         $queryUser = User::where('username', '=', $username)->first();
 
         if (!$queryUser || $queryUser->verified !== 1) {
-            Log::error('Denied access for: ' + $queryUser->id);
+            Log::error('Denied access for: ' . $username);
             return response()->json(['error' => 'User not found'], 404);
         }
 
@@ -32,11 +32,15 @@ class GeneralDataController extends Controller
 
         $fields = [
             'filter' => $request->query('filter', null),
-            'keyword' => $request->query('keyword', null)
+            'keyword' => $request->query('keyword', null),
+            'start_date' => $request->query('start_date', null),
+            'end_date' => $request->query('end_date', null),
         ];
 
         $filter = $fields['filter'];
         $keyword = $fields['keyword'];
+        $startDate = $fields['start_date'];
+        $endDate = $fields['end_date'];
 
         // Define the profiles to query
         $profileTypes = [
@@ -76,8 +80,6 @@ class GeneralDataController extends Controller
                     'province.description as province_name'
                 ]
             ],
-
-            // Add other profile types here if needed
         ];
 
         $results = [];
@@ -140,11 +142,12 @@ class GeneralDataController extends Controller
 
         $fields = [
             'filter' => $request->query('filter', null),
-            'keyword' => $request->query('keyword', null)
+            'keyword' => $request->query('keyword', null),
         ];
 
         $filter = $fields['filter'];
         $keyword = $fields['keyword'];
+        $today = now()->startOfDay();
 
         // Define the profiles to query
         $profileTypes = [
@@ -184,12 +187,9 @@ class GeneralDataController extends Controller
                     'province.description as province_name'
                 ]
             ],
-
-            // Add other profile types here if needed
         ];
 
         $results = [];
-        $today = now()->startOfDay();
 
         foreach ($profileTypes as $profileType => $config) {
             $query = DB::table($config['table'])->select(
