@@ -147,7 +147,7 @@ class ProfileController extends Controller
             'fields.deceased_date' => 'sometimes|date|nullable',
 
             // Contact & Family Information
-            'fields.familyID' => 'sometimes|string|max:255|nullable',
+            'fields.familyID' => 'nullable|string|max:255|nullable',
             'fields.head' => 'sometimes|string|max:100|nullable',
             'fields.relation' => 'sometimes|string|max:255|nullable',
 
@@ -238,7 +238,7 @@ class ProfileController extends Controller
         $profileData['nhtsID'] = isset($profileData['nhtsID']) && $profileData['nhtsID'] !== '' ? $profileData['nhtsID'] : ' ';
         $profileData['unmet'] = isset($profileData['unmet']) && $profileData['unmet'] !== '' ? $profileData['unmet'] : 0;
 
-        $profileData['pregnant'] = isset($profileData['pregnant']) && $profileData['pregnant'] !== '' ? $profileData['pregnant'] : '1970-01-01 00:00:00';
+        $profileData['pregnant'] = isset($profileData['pregnant']) && $profileData['pregnant'] !== '' ? $profileData['pregnant'] : '';
         $profileData['nhts'] = isset($profileData['nhts']) && $profileData['nhts'] !== '' ? $profileData['nhts'] : ' ';
         $profileData['four_ps'] = isset($profileData['four_ps']) && $profileData['four_ps'] !== '' ? $profileData['four_ps'] : ' ';
         $profileData['member_others'] = isset($profileData['member_others']) && $profileData['member_others'] !== '' ? $profileData['member_others'] : ' ';
@@ -246,6 +246,8 @@ class ProfileController extends Controller
         $profileData['household_num'] = isset($profileData['household_num']) && $profileData['household_num'] !== '' ? $profileData['household_num'] : ' ';
         $profileData['philhealth_categ'] = isset($profileData['philhealth_categ']) && $profileData['philhealth_categ'] !== '' ? $profileData['philhealth_categ'] : ' ';
         $profileData['fourps_num'] = isset($profileData['fourps_num']) && $profileData['fourps_num'] !== '' ? $profileData['fourps_num'] : ' ';
+        $profileData['fam_plan_method'] = isset($profileData['fam_plan_method']) && $profileData['fam_plan_method'] !== '' ? $profileData['fam_plan_method'] : ' ';
+        $profileData['fam_plan_status'] = isset($profileData['fam_plan_status']) && $profileData['fam_plan_status'] !== '' ? $profileData['fam_plan_status'] : ' ';
         $profileData['fam_plan_other_method'] = isset($profileData['fam_plan_other_method']) && $profileData['fam_plan_other_method'] !== '' ? $profileData['fam_plan_other_method'] : ' ';
         $profileData['fam_plan_other_status'] = isset($profileData['fam_plan_other_status']) && $profileData['fam_plan_other_status'] !== '' ? $profileData['fam_plan_other_status'] : ' ';
         $profileData['other_med_history'] = isset($profileData['other_med_history']) && $profileData['other_med_history'] !== '' ? $profileData['other_med_history'] : ' ';
@@ -269,7 +271,7 @@ class ProfileController extends Controller
         }
 
         // Generate family ID if head of the family
-        if (isset($profileData['head']) && strtolower($profileData['head']) === "yes") {
+        if (isset($profileData['head']) && strtolower($profileData['head']) === "head") {
             $profileData['familyID'] = $this->generateFamilyId($request);
         }
 

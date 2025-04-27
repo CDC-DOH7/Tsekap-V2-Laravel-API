@@ -515,10 +515,10 @@ class DataController extends Controller
         }
 
         // Check for duplicates
-        $existingRiskProfile = RiskProfile::where('fname', $fields['fname'])
-            ->where('lname', $fields['lname'])
-            ->where('dob', $fields['dob'])
-            ->where('facility_id_updated', $fields['facility_id_updated']);
+        $existingRiskProfile = RiskProfile::where('fname', "=", $fields['fname'])
+            ->where('lname', "=", $fields['lname'])
+            ->where('dob', "=", $fields['dob'])
+            ->where('facility_id_updated', "=", $fields['facility_id_updated']);
 
         if (!empty($fields['mname'])) {
             $existingRiskProfile->where('mname', $fields['mname']);

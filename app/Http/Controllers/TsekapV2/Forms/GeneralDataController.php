@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class GeneralDataController extends Controller
 {
@@ -25,7 +26,7 @@ class GeneralDataController extends Controller
     public function retrieveAllForms(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->query('username')); // Use query parameter for GET request
+        $user = $this->getAuthenticatedUser($request->user()->username); // Use query parameter for GET request
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -41,6 +42,14 @@ class GeneralDataController extends Controller
         $keyword = $fields['keyword'];
         $startDate = $fields['start_date'];
         $endDate = $fields['end_date'];
+
+        // Parse dates from MM-DD-YYYY to YYYY-MM-DD
+        if ($startDate) {
+            $startDate = Carbon::createFromFormat('m-d-Y', $startDate)->format('Y-m-d');
+        }
+        if ($endDate) {
+            $endDate = Carbon::createFromFormat('m-d-Y', $endDate)->format('Y-m-d');
+        }
 
         // Define the profiles to query
         $profileTypes = [
@@ -119,11 +128,11 @@ class GeneralDataController extends Controller
 
             // Apply date range filter
             if ($startDate && $endDate) {
-                $query->whereBetween("{$config['table']}.created_at", [$startDate, $endDate]);
+                $query->whereBetween("{$config['table']}.created_at", ["$startDate 00:00:00", "$endDate 23:59:59"]);
             } elseif ($startDate) {
-                $query->whereDate("{$config['table']}.created_at", '>=', $startDate);
+                $query->whereDate("{$config['table']}.created_at", '>=', "$startDate 00:00:00");
             } elseif ($endDate) {
-                $query->whereDate("{$config['table']}.created_at", '<=', $endDate);
+                $query->whereDate("{$config['table']}.created_at", '<=', "$endDate 23:59:59");
             }
 
             // Paginate and collect results
@@ -135,7 +144,7 @@ class GeneralDataController extends Controller
     public function retrieveRecentlyUploadedForms(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->query('username')); // Use query parameter for GET request
+        $user = $this->getAuthenticatedUser($request->user()->username); // Use query parameter for GET request
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
