@@ -10,6 +10,7 @@ use App\Http\Controllers\TsekapV2\ProfileController;
 use App\Http\Controllers\TsekapV2\UserHealthFacilityController;
 use App\Http\Controllers\TsekapV2\Forms\GeneralDataController;
 use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController;
+use App\Http\Controllers\TsekapV2\SessionController;
 
 Route::prefix('v2')->group(function () {
     // Non-authenticated Routes
@@ -18,10 +19,13 @@ Route::prefix('v2')->group(function () {
 
     // Misc Routes
     Route::prefix('misc')->group(function () {
+        // For Addresses and Facilities
         Route::get('/get-all-facility', [MiscDataController::class, 'getAllFacility'])->name('api-v2-get-all-facility');
         Route::get('/get-provinces', [MiscDataController::class, 'getProvinces'])->name('api-v2-get-all-provinces');
         Route::get('/get-muncities', [MiscDataController::class, 'getMuncities'])->name('api-v2-get-muncity');
         Route::get('/get-barangays', [MiscDataController::class, 'getBarangays'])->name('api-v2-get-barangay');
+        Route::get('/get-all-muncities', [MiscDataController::class, 'getAllMuncities'])->name('api-v2-get-all-muncities');
+        Route::get('/get-all-barangays', [MiscDataController::class, 'getAllBarangays'])->name('api-v2-get-all-barangays');
 
         // Citizenships and Religions
         Route::get('/get-all-citizenships', [MiscDataController::class, 'getAllCitizenships'])->name('api-v2-get-all-citizenships');
@@ -47,6 +51,11 @@ Route::prefix('v2')->group(function () {
             // additional routes for verifying users
             Route::post('/verify-user', [AdminController::class, 'verifyUser'])->name('api-v2-admin-verify-user');
             Route::get('/list-users', [AdminController::class, 'listUnverifiedUsers'])->name('api-v2-admin-list-unverified-users');
+        });
+
+        // session validator
+        Route::prefix('session')->group(function () {
+            Route::get('/validate', [SessionController::class, 'validate'])->name('api-v2-session-validate');
         });
 
         // User Routes
