@@ -17,8 +17,8 @@ class RiskProfile extends Model
     protected $table = 'risk_profile';
     protected $guarded = array();
 
-       // Attributes
-       protected $fillable = [
+    // Attributes
+    protected $fillable = [
         'id',
         'profile_id',
         'lname',
@@ -28,6 +28,7 @@ class RiskProfile extends Model
         'sex',
         'dob',
         'age',
+        'age_bracket_id',
         'civil_status',
         'religion',
         'other_religion',
