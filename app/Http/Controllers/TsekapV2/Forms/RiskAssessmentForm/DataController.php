@@ -461,7 +461,7 @@ class DataController extends Controller
     public function addRiskProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->username);
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -479,7 +479,6 @@ class DataController extends Controller
             'fields.sex' => 'required|string|max:10',
             'fields.dob' => 'required|date',
             'fields.age' => 'required|integer|min:0|max:150',
-            'fields.age_bracket_id' => 'nullable|integer',
             'fields.civil_status' => 'required|string|max:20',
             'fields.religion' => 'required|string|max:50',
             'fields.other_religion' => 'nullable|string|max:50',
@@ -503,23 +502,20 @@ class DataController extends Controller
 
         // Validate the request
         $validator = Validator::make($request->all(), $rules);
-
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 422);
         }
 
-        // Offline entry check
-        if (empty($fields['offline_entry']) || $fields['offline_entry'] == false) {
-            if (!empty($fields['profile_id'])) {
-                return response()->json(['error' => 'Malformed parameter. Please recheck request.'], 403);
-            }
+        // Check for malformed parameters
+        if (empty($fields['offline_entry']) && !empty($fields['profile_id'])) {
+            return response()->json(['error' => 'Malformed parameter. Please recheck request.'], 403);
         }
 
         // Check for duplicates
-        $existingRiskProfile = RiskProfile::where('fname', "=", $fields['fname'])
-            ->where('lname', "=", $fields['lname'])
-            ->where('dob', "=", $fields['dob'])
-            ->where('facility_id_updated', "=", $fields['facility_id_updated']);
+        $existingRiskProfile = RiskProfile::where('fname', $fields['fname'])
+            ->where('lname', $fields['lname'])
+            ->where('dob', $fields['dob'])
+            ->where('facility_id_updated', $fields['facility_id_updated']);
 
         if (!empty($fields['mname'])) {
             $existingRiskProfile->where('mname', $fields['mname']);
@@ -531,76 +527,43 @@ class DataController extends Controller
             $existingRiskProfile->where('profile_id', $fields['profile_id']);
         }
 
-        // Determine the age_bracket_id based on the age
-        switch (true) {
-            case ($fields['age'] >= 0 && $fields['age'] <= 0.0164): // 0-6 days
-                $fields['age_bracket_id'] = 1; // Infant
-                break;
-            case ($fields['age'] > 0.0164 && $fields['age'] <= 0.0767): // 7-28 days
-                $fields['age_bracket_id'] = 2; // Infant
-                break;
-            case ($fields['age'] > 0.0767 && $fields['age'] <= 0.9167): // 29 days-11 months
-                $fields['age_bracket_id'] = 3; // Infant
-                break;
-            case ($fields['age'] >= 1 && $fields['age'] <= 4): // 1-4 years old
-                $fields['age_bracket_id'] = 4; // Preschool Age Children
-                break;
-            case ($fields['age'] >= 5 && $fields['age'] <= 9): // 5-9 years old
-                $fields['age_bracket_id'] = 5; // School Age Children
-                break;
-            case ($fields['age'] >= 10 && $fields['age'] <= 14): // 10-14 years old
-                $fields['age_bracket_id'] = 6; // Adolescent
-                break;
-            case ($fields['age'] >= 15 && $fields['age'] <= 19): // 15-19 years old
-                $fields['age_bracket_id'] = 7; // Adult
-                break;
-            case ($fields['age'] >= 20 && $fields['age'] <= 24): // 20-24 years old
-                $fields['age_bracket_id'] = 8; // Adult
-                break;
-            case ($fields['age'] >= 25 && $fields['age'] <= 29): // 25-29 years old
-                $fields['age_bracket_id'] = 9; // Adult
-                break;
-            case ($fields['age'] >= 30 && $fields['age'] <= 34): // 30-34 years old
-                $fields['age_bracket_id'] = 10; // Adult
-                break;
-            case ($fields['age'] >= 35 && $fields['age'] <= 39): // 35-39 years old
-                $fields['age_bracket_id'] = 11; // Adult
-                break;
-            case ($fields['age'] >= 40 && $fields['age'] <= 44): // 40-44 years old
-                $fields['age_bracket_id'] = 12; // Adult
-                break;
-            case ($fields['age'] >= 45 && $fields['age'] <= 49): // 45-49 years old
-                $fields['age_bracket_id'] = 13; // Adult
-                break;
-            case ($fields['age'] >= 50 && $fields['age'] <= 54): // 50-54 years old
-                $fields['age_bracket_id'] = 14; // Adult
-                break;
-            case ($fields['age'] >= 55 && $fields['age'] <= 59): // 55-59 years old
-                $fields['age_bracket_id'] = 15; // Adult
-                break;
-            case ($fields['age'] >= 60 && $fields['age'] <= 64): // 60-64 years old
-                $fields['age_bracket_id'] = 16; // Senior Citizen
-                break;
-            case ($fields['age'] >= 65 && $fields['age'] <= 69): // 65-69 years old
-                $fields['age_bracket_id'] = 17; // Senior Citizen
-                break;
-            case ($fields['age'] >= 70): // 70 years and above
-                $fields['age_bracket_id'] = 18; // Senior Citizen
-                break;
-            default:
-                $fields['age_bracket_id'] = null; // Undefined
-        }
-
-        if (!empty($fields['age_bracket_id'])) {
+        if (!empty($fields['suffix'])) {
             $existingRiskProfile->where('suffix', $fields['suffix']);
         } else {
             $existingRiskProfile->whereNull('suffix');
         }
 
-        $existingRiskProfile = $existingRiskProfile->first();
-
-        if ($existingRiskProfile) {
+        if ($existingRiskProfile->exists()) {
             return response()->json(['error' => 'Duplicate in entered data. Please recheck.'], 409);
+        }
+
+        // Determine the age_bracket_id based on the age
+        $ageBrackets = [
+            [0, 0.0164, 1],
+            [0.0165, 0.0767, 2],
+            [0.0768, 0.9167, 3],
+            [1, 4, 4],
+            [5, 9, 5],
+            [10, 14, 6],
+            [15, 19, 7],
+            [20, 24, 8],
+            [25, 29, 9],
+            [30, 34, 10],
+            [35, 39, 11],
+            [40, 44, 12],
+            [45, 49, 13],
+            [50, 54, 14],
+            [55, 59, 15],
+            [60, 64, 16],
+            [65, 69, 17],
+            [70, PHP_INT_MAX, 18]
+        ];
+
+        foreach ($ageBrackets as [$min, $max, $id]) {
+            if ($fields['age'] >= $min && $fields['age'] <= $max) {
+                $fields['age_bracket_id'] = $id;
+                break;
+            }
         }
 
         // Save the record
@@ -613,7 +576,7 @@ class DataController extends Controller
                 'id' => $riskProfile->id
             ], 200);
         } catch (Exception $e) {
-            Log::error('An error has occurred in adding of risk profile: ' + $e->getMessage());
+            Log::error('An error occurred while adding a risk profile: ' . $e->getMessage());
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
