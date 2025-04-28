@@ -18,7 +18,7 @@ class UserController extends Controller
         $queryUser = User::where('username', '=', $username)->first();
 
         if (!$queryUser || $queryUser->verified !== 1) {
-            Log::error('Denied access for: ' + $queryUser->id);
+            Log::error('Denied access for: ' . " " . $queryUser->id);
             throw new Exception('User not found or not verified');
         }
 

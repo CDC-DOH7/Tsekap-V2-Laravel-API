@@ -20,7 +20,7 @@ class ProfileController extends Controller
         $queryUser = User::where('username', '=', $username)->first();
 
         if (!$queryUser || $queryUser->verified !== 1) {
-            Log::error('Denied access for: ' + $queryUser->id);
+            Log::error('Denied access for: ' . " " . $queryUser->id);
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 

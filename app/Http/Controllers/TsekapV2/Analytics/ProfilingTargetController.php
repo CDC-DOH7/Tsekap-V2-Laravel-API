@@ -52,7 +52,7 @@ class ProfilingTargetController extends Controller
 
         // do not authorize update unless 1, 3, 10
         if ((!$queryUser || !in_array($queryUser->user_priv, [1, 3, 10])) || ($queryUser->verified !== 1)) {
-            Log::error('Denied access to (ProfilingTargetController) for: ' + $queryUser->id);
+            Log::error('Denied access to (ProfilingTargetController) for: ' . " " . $queryUser->id);
             return response()->json(['error' => 'Unauthorized'], 401);
         }
     }

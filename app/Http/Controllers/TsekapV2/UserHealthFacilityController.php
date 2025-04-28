@@ -17,7 +17,7 @@ class UserHealthFacilityController extends Controller
         $queryUser = User::where('username', '=', $username)->first();
 
         if (!$queryUser) {
-            Log::error('Denied access for: ' + $queryUser->id);
+            Log::error('Denied access for: ' . " " . $queryUser->id);
             return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
         }
 

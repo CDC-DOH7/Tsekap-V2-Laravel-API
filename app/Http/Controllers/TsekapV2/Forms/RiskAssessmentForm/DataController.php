@@ -22,7 +22,7 @@ class DataController extends Controller
         $queryUser = User::where('username', '=', $username)->first();
 
         if (!$queryUser || $queryUser->verified !== 1) {
-            Log::error('Denied access to (Risk Assessment, DataController) for: ' + $queryUser->id);
+            Log::error('Denied access to (Risk Assessment, DataController) for:' . " " . $queryUser->id);
             return response()->json(['error' => 'User not found'], 404);
         }
 
@@ -479,6 +479,7 @@ class DataController extends Controller
             'fields.sex' => 'required|string|max:10',
             'fields.dob' => 'required|date',
             'fields.age' => 'required|integer|min:0|max:150',
+            'fields.age_bracket_id' => 'nullable|integer',
             'fields.civil_status' => 'required|string|max:20',
             'fields.religion' => 'required|string|max:50',
             'fields.other_religion' => 'nullable|string|max:50',
