@@ -179,6 +179,7 @@ class DataController extends Controller
             'risk_profile.fname',
             'risk_profile.mname',
             'risk_profile.lname',
+            'risk_profile.suffix', // redacted previously
             'risk_profile.dob',
             'risk_profile.sex',
             'risk_profile.age',
@@ -279,6 +280,7 @@ class DataController extends Controller
             'risk_profile.fname',
             'risk_profile.mname',
             'risk_profile.lname',
+            'risk_profile.suffix', // redacted previously
             'risk_profile.dob',
             'risk_profile.sex',
             'risk_profile.age',
