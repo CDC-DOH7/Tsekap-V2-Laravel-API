@@ -238,7 +238,7 @@ class ProfileController extends Controller
         $profileData['nhtsID'] = isset($profileData['nhtsID']) && $profileData['nhtsID'] !== '' ? $profileData['nhtsID'] : ' ';
         $profileData['unmet'] = isset($profileData['unmet']) && $profileData['unmet'] !== '' ? $profileData['unmet'] : 0;
 
-        $profileData['pregnant'] = isset($profileData['pregnant']) && $profileData['pregnant'] !== '' ? $profileData['pregnant'] : '';
+        $profileData['pregnant'] = isset($profileData['pregnant']) && $profileData['pregnant'] !== '' ? $profileData['pregnant'] : null;
         $profileData['nhts'] = isset($profileData['nhts']) && $profileData['nhts'] !== '' ? $profileData['nhts'] : ' ';
         $profileData['four_ps'] = isset($profileData['four_ps']) && $profileData['four_ps'] !== '' ? $profileData['four_ps'] : ' ';
         $profileData['member_others'] = isset($profileData['member_others']) && $profileData['member_others'] !== '' ? $profileData['member_others'] : ' ';
