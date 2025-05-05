@@ -81,12 +81,14 @@ class GeneralDataController extends Controller
                     'updated_at'
                 ],
                 'joins' => [
+                    ['users', 'risk_profile.encoded_by', '=', 'users.id'],
                     ['muncity', 'risk_profile.municipal_id', '=', 'muncity.id'],
                     ['province', 'risk_profile.province_id', '=', 'province.id']
                 ],
                 'additional_columns' => [
                     'muncity.description as municipal_name',
-                    'province.description as province_name'
+                    'province.description as province_name',
+                    DB::row('CONCAT(users.fname, " ", users.mname, " ", users.lname) as encoder')
                 ]
             ],
         ];
