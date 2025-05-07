@@ -38,12 +38,14 @@ class GeneralDataController extends Controller
                 'keyword' => $request->query('keyword', null),
                 'start_date' => $request->query('start_date', null),
                 'end_date' => $request->query('end_date', null),
+                'form_type' => $request->query('type', null)
             ];
 
             $filter = $fields['filter'];
             $keyword = $fields['keyword'];
             $startDate = $fields['start_date'];
             $endDate = $fields['end_date'];
+            $formType = $fields['form_type'];
 
             // Parse dates from MM-DD-YYYY to YYYY-MM-DD
             if ($startDate) {
@@ -59,6 +61,7 @@ class GeneralDataController extends Controller
                     'table' => 'risk_profile',
                     'columns' => [
                         'id',
+                        'profile_id',
                         'fname',
                         'mname',
                         'lname',
@@ -98,6 +101,11 @@ class GeneralDataController extends Controller
             $results = [];
 
             foreach ($profileTypes as $profileType => $config) {
+                // Skip profiles that don't match the form_type if specified
+                if ($formType && $formType !== $profileType) {
+                    continue;
+                }
+
                 $query = DB::table($config['table'])->select(
                     array_merge(
                         array_map(fn($col) => "{$config['table']}.{$col}", $config['columns']),
@@ -142,6 +150,7 @@ class GeneralDataController extends Controller
                 // Paginate and collect results
                 $results[$profileType] = $query->simplePaginate(30);
             }
+
             return response()->json($results, 200);
         } catch (Exception $e) {
             Log::error('Error retrieving all forms: ' . $e->getMessage(), ['exception' => $e]);
@@ -173,6 +182,7 @@ class GeneralDataController extends Controller
                     'table' => 'risk_profile',
                     'columns' => [
                         'id',
+                        'profile_id',
                         'fname',
                         'mname',
                         'lname',
