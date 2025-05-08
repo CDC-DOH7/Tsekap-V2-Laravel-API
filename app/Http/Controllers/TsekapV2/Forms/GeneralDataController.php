@@ -80,6 +80,8 @@ class GeneralDataController extends Controller
                         'municipal_id',
                         'province_id',
                         'facility_id_updated',
+                        'phic_id',
+                        'pwd_id',
                         'offline_entry',
                         'encoded_by',
                         'created_at',
@@ -202,6 +204,8 @@ class GeneralDataController extends Controller
                         'province_id',
                         'facility_id_updated',
                         'offline_entry',
+                        'pwd_id',
+                        'phic_id',
                         'encoded_by',
                         'created_at',
                         'updated_at'
