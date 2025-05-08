@@ -38,7 +38,7 @@ class GeneralDataController extends Controller
                 'keyword' => $request->query('keyword', null),
                 'start_date' => $request->query('start_date', null),
                 'end_date' => $request->query('end_date', null),
-                'form_type' => $request->query('type', null)
+                'form_type' => $request->query('form_type', null)
             ];
 
             $filter = $fields['filter'];
@@ -102,7 +102,7 @@ class GeneralDataController extends Controller
 
             foreach ($profileTypes as $profileType => $config) {
                 // Skip profiles that don't match the form_type if specified
-                if ($formType && $formType !== $profileType) {
+                if ($formType && $formType !== $profileType && $formType !== 'all') {
                     continue;
                 }
 
@@ -128,17 +128,17 @@ class GeneralDataController extends Controller
                     $query->where(function ($q) use ($filter, $keyword, $config) {
                         $columns = array_combine($config['columns'], $config['columns']);
 
-                        if ($filter && isset($columns[$filter])) {
-                            $q->where("{$config['table']}.{$filter}", 'like', "%$keyword%");
-                        } else {
+                        if ($filter === 'all') {
                             foreach ($columns as $column) {
                                 $q->orWhere("{$config['table']}.{$column}", 'like', "%$keyword%");
                             }
+                        } elseif ($filter && isset($columns[$filter])) {
+                            $q->where("{$config['table']}.{$filter}", 'like', "%$keyword%");
                         }
                     });
                 }
 
-                // Apply date range filter
+                // Apply date range filter only if both start_date and end_date are provided
                 if ($startDate && $endDate) {
                     $query->whereBetween("{$config['table']}.created_at", ["$startDate 00:00:00", "$endDate 23:59:59"]);
                 } elseif ($startDate) {
