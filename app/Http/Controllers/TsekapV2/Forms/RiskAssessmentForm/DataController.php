@@ -219,6 +219,7 @@ class DataController extends Controller
         if ($keyword) {
             $query->where(function ($q) use ($filter, $keyword) {
                 $columns = [
+                    'id' => 'risk_profile.id', // included for filtering of ID also
                     'facility_id_updated' => 'risk_profile.facility_id_updated',
                     'fname' => 'risk_profile.fname',
                     'lname' => 'risk_profile.lname',
@@ -235,6 +236,7 @@ class DataController extends Controller
                     $q->where('risk_profile.fname', 'like', "%$keyword%")
                         ->orWhere('risk_profile.lname', 'like', "%$keyword%")
                         ->orWhere('risk_profile.dob', 'like', "%$keyword%")
+                        ->orWhere('risk_profile.id', '=', $keyword) // included for filtering of ID also
                         ->orWhere('risk_profile.facility_id_updated', '=', $keyword);
                 }
             });
