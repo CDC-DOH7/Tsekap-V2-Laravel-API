@@ -62,6 +62,7 @@ class AuthController extends Controller
                 'muncity' => $validatedFields['muncity_id'],
                 'province' => $validatedFields['province_id'],
                 'username' => $validatedFields['username'],
+                // 'facility_id' => $validatedFields['facility_id'] ?? null,
                 'password' => bcrypt($validatedFields['password']), // Encrypt password
                 'contact' => $validatedFields['contact'],
                 'user_priv' => $validatedFields['user_priv'],

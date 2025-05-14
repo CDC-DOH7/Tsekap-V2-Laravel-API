@@ -31,6 +31,7 @@ class User extends Authenticatable
         'password',
         'contact',
         'user_priv',
+        'email',
 
         // metadata/timestamps
         'updated_at',
