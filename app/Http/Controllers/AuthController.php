@@ -32,7 +32,7 @@ class AuthController extends Controller
             'fields.password' => 'required|string|min:8|max:255',
             'fields.contact' => 'required|string|max:11',
             'fields.user_priv' => 'required|integer',
-            'fields.email' => 'nullable|string|max:255|email',
+            'fields.email' => 'sometimes|nullable|string|max:255|email',
         ]);
 
         // Trigger validation and return 422 if it fails
@@ -62,11 +62,12 @@ class AuthController extends Controller
                 'muncity' => $validatedFields['muncity_id'],
                 'province' => $validatedFields['province_id'],
                 'username' => $validatedFields['username'],
+                // 'facility_id' => $validatedFields['facility_id'] ?? null,
                 'password' => bcrypt($validatedFields['password']), // Encrypt password
                 'contact' => $validatedFields['contact'],
                 'user_priv' => $validatedFields['user_priv'],
                 'verified' => 0, // make this field zero because it is self-registered and still needs to be verified
-                'email' => $validatedFields['email'] ?? null,
+                'email' => !empty($validatedFields['email']) ? $validatedFields['email'] : null,
             ]);
 
             $userHfMapping = UserHealthFacility::create([
