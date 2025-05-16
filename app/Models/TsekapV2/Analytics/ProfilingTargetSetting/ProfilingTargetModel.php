@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\TsekapV2\Analytics;
+namespace App\Models\TsekapV2\Analytics\ProfilingTargetSetting;
 
 use Illuminate\Database\Eloquent\Model;
 

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
-use App\Models\TsekapV2\Analytics\ProfilingTargetModel;
+use App\Models\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTargetModel;
 use Exception;
 
 class ProfilingTargetController extends Controller

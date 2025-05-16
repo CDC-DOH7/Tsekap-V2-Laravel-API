@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfilingTargetController;
 use App\Http\Controllers\TsekapV2\UserController;
 use App\Http\Controllers\TsekapV2\Misc\MiscDataController;
 use App\Http\Controllers\TsekapV2\FacilityController;
@@ -245,6 +246,15 @@ Route::prefix('v2')->group(function () {
             Route::post('/add-profile', [ProfileController::class, 'addProfile'])->name('api-v2-add-profile');
             Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('api-v2-update-profile');
             Route::post('/delete-profile', [ProfileController::class, 'deleteProfile'])->name('api-v2-delete-profile');
+        });
+
+        // Targets
+        Route::prefix('target')->group(function () {
+            Route::get('/create-profiling-target', [ProfilingTargetController::class, 'createProfilingTarget']);
+            Route::get('/retrieve-profiling-target', [ProfilingTargetController::class, 'retrieveProfilingTarget']);
+            Route::post('/retrieve-profiling-target-by-id', [ProfilingTargetController::class, 'retrieveProfilingTargetById']);
+            Route::post('/update-profiling-target', [ProfilingTargetController::class, 'updateProfilingTarget']);
+            Route::post('/delete-profiling-target', [ProfilingTargetController::class, 'deleteProfilingTarget']);
         });
 
         Route::prefix('forms')->group(function () {
