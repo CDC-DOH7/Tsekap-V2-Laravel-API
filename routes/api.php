@@ -3,7 +3,6 @@
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProfilingTargetController;
 use App\Http\Controllers\TsekapV2\UserController;
 use App\Http\Controllers\TsekapV2\Misc\MiscDataController;
 use App\Http\Controllers\TsekapV2\FacilityController;
@@ -13,6 +12,7 @@ use App\Http\Controllers\TsekapV2\Forms\GeneralDataController;
 use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\AnalyticsDataController;
 use App\Http\Controllers\TsekapV2\SessionController;
+use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTargetController;
 
 Route::prefix('v2')->group(function () {
     // Non-authenticated Routes

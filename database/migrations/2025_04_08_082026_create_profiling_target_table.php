@@ -14,16 +14,14 @@ return new class extends Migration
         if (!Schema::hasTable('profiling_target')) {
             Schema::create('profiling_target', function (Blueprint $table) {
                 $table->id();
-                $table->string('unique_id')->unique(); // Unique name for the profiling target
-                $table->string('profiling_description');
-                $table->unsignedInteger('facility_id'); // Foreign key for facilities table
+                $table->unsignedInteger('barangay_id'); // Foreign key for facilities table
                 $table->unsignedInteger('male_population')->nullable();
                 $table->unsignedInteger('female_population')->nullable();
                 $table->unsignedInteger('male_target')->nullable();
                 $table->unsignedInteger('female_target')->nullable();
                 $table->timestamps();
 
-                $table->foreign('facility_id')->references('id')->on('facilities')->onDelete('cascade');
+                $table->foreign('barangay_id')->references('id')->on('barangay')->onDelete('cascade');
             });
         } else {
             throw new \Exception("The 'profiling_target' table does not exist.");

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -97,7 +98,6 @@ class ProfilingTargetController extends Controller
         try {
             $profilingTarget = ProfilingTargetModel::create([
                 'unique_id' => $generatedUniqueId,
-                'facility_id' => $request->user()->facility_id,
                 'male_population' => $validatedFields["fields.male_population"],
                 'female_population' => $validatedFields["fields.female_population"],
             ]);
