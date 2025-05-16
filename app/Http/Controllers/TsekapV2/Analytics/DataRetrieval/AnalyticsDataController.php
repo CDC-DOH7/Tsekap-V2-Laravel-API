@@ -283,7 +283,7 @@ class AnalyticsDataController extends Controller
 
     // ================== 8. TOBACCO SUMMARY FUNCTIONS (/tobacco_summary) ==================
     // Controller Count: 4
-    public function getTobaccoSummaryRfQuery(Request $request)
+    public function getTobaccoSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -366,7 +366,7 @@ class AnalyticsDataController extends Controller
 
     // ================== 9. ALCOHOL INTAKE SUMMARY FUNCTIONS (/alcohol_intake_summary) ==================
     // Controller Count: 4
-    public function getAlcoholIntakeSummaryRfQuery(Request $request)
+    public function getAlcoholIntakeSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -453,7 +453,7 @@ class AnalyticsDataController extends Controller
 
     // ================== 10. PHYSICAL ACTIVITY SUMMARY FUNCTIONS (/physical_activity_summary) ==================
     // Controller Count: 4
-    public function getPhysicalActivitySummaryRfQuery(Request $request)
+    public function getPhysicalActivitySummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -541,7 +541,7 @@ class AnalyticsDataController extends Controller
 
     // ================== 11. NUTRITION SUMMARY FUNCTIONS (/nutrition_summary) ==================
     // Controller Count: 4
-    public function getNutritionSummaryRfQuery(Request $request)
+    public function getNutritionSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -628,7 +628,7 @@ class AnalyticsDataController extends Controller
 
     // ================== 12. PREV MED HISTORY SUMMARY FUNCTIONS (/prev_med_history_summary) ==================
     // Controller Count: 4
-    public function getPrevMedHistorySummaryQuery(Request $request)
+    public function getPrevMedHistorySummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -727,7 +727,7 @@ class AnalyticsDataController extends Controller
 
     // ================== 13. FAMILY HISTORY SUMMARY FUNCTIONS (/family_history_summary) ==================
     // Controller Count: 4
-    public function getFamilyHistorySummary(Request $request)
+    public function getFamilyHistorySummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -824,7 +824,7 @@ class AnalyticsDataController extends Controller
 
     // ================== 14. BP1 SUMMARY FUNCTIONS (/bp1_summary) ==================
     // Controller Count: 4
-    public function getBp1Summary(Request $request)
+    public function getBp1SummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -912,7 +912,7 @@ class AnalyticsDataController extends Controller
 
     // ================== 15. HYPERTENSION/BP2 SUMMARY FUNCTIONS (/hypertension_summary) ==================
     // Controller Count: 4
-    public function getBp2Summary(Request $request)
+    public function getBp2SummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -1087,7 +1087,7 @@ class AnalyticsDataController extends Controller
 
     // ================== 17. HYPERCHOLESTEROLEMIA SUMMARY FUNCTIONS (/hypercholesterolemia_summary) ==================
     // Controller Count: 4
-    public function getHypercholesterolemiaSummary(Request $request)
+    public function getHypercholesterolemiaSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -1176,7 +1176,7 @@ class AnalyticsDataController extends Controller
 
     // ================== 18. RESPIRATORY SUMMARY FUNCTIONS (/respiratory_summary) ==================
     // Controller Count: 4
-    public function getRespiratorySummary(Request $request)
+    public function getRespiratorySummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -1263,7 +1263,7 @@ class AnalyticsDataController extends Controller
 
     // ================== 19. PROBABLE SUMMARY FUNCTIONS (/probable_summary) ==================
     // Controller Count: 4
-    public function getProbableSummary(Request $request)
+    public function getProbableSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
