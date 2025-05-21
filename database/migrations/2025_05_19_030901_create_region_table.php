@@ -14,8 +14,8 @@ return new class extends Migration
     {
         try {
             Schema::create('region', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('country_id')->index();
+                $table->increments('id');
+                $table->unsignedInteger('country_id')->index();
                 $table->string('region_code', 15)->unique();
                 $table->string('region_name', 255)->unique();
                 $table->timestamps();

@@ -17,9 +17,9 @@ return new class extends Migration
                 // profile metadata
                 $table->increments('id');
                 $table->unsignedInteger('profile_id')->nullable();
-                $table->unsignedInteger('facility_id_updated')->nullable();
+                $table->unsignedInteger('facility_id_updated');
                 $table->unsignedInteger('encoded_by')->index();
-                $table->tinyInteger('offline_entry')->nullable()->default(0);
+                $table->tinyInteger('offline_entry')->default(0);
 
                 // profile and personal information
                 $table->string('prefix', 15)->nullable();
@@ -29,11 +29,13 @@ return new class extends Migration
                 $table->string('suffix', 15)->nullable();
                 $table->string('sex', 10);
                 $table->date('dob');
-                $table->string('birth_place', 255)->nullable();
+                $table->unsignedInteger('age');
+                $table->unsignedInteger('age_bracket_id');
+                $table->text('birth_place')->nullable();
                 $table->string('civil_status', 20);
                 $table->string('educational_attainment', 50);
                 $table->string('employment_status', 50);
-                $table->string('occupation', 255);
+                $table->string('occupation', 255)->nullable();
                 $table->string('religion', 50)->nullable();
                 $table->string('other_religion', 255)->nullable();
                 $table->string('indigenous', 50)->nullable();
@@ -44,8 +46,8 @@ return new class extends Migration
                 $table->date('mother_dob');
 
                 // location fields with foreign keys
-                $table->unsignedBigInteger('country_id');
-                $table->unsignedBigInteger('region_id');
+                $table->unsignedInteger('country_id');
+                $table->unsignedInteger('region_id');
                 $table->unsignedInteger('province_id');
                 $table->unsignedInteger('muncity_id');
                 $table->unsignedInteger('barangay_id');

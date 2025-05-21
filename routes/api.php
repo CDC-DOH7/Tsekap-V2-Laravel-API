@@ -9,7 +9,10 @@ use App\Http\Controllers\TsekapV2\FacilityController;
 use App\Http\Controllers\TsekapV2\ProfileController;
 use App\Http\Controllers\TsekapV2\UserHealthFacilityController;
 use App\Http\Controllers\TsekapV2\Forms\GeneralDataController;
-use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController;
+
+// Data Controllers
+use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController as PhilpenRiskDataController;
+use App\Http\Controllers\TsekapV2\Forms\PchRiskAssessmentForm\DataController as PchRiskDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\AnalyticsDataController;
 use App\Http\Controllers\TsekapV2\SessionController;
 use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTargetController;
@@ -264,22 +267,33 @@ Route::prefix('v2')->group(function () {
             });
 
             // Forms - Risk Assessment Routes
-            Route::prefix('/risk-assessment')->group(function () {                // ---- Previously POST Statements ---- //
-                // Route::post('/retrieve-patient-risk-assessment', [DataController::class, 'retrievePatientRiskAssessment'])->name('api-v2-retrieve-patient-risk-assessment');
-                // Route::post('/retrieve-patient-risk-profile-by-facility', [DataController::class, 'retrievePatientRiskProfileByFacility'])->name('api-v2-retrieve-patient-risk-profile-by-facility');
-                // Route::post('/retrieve-patient-risk-profile', [DataController::class, 'retrievePatientRiskProfileWithoutFacility'])->name('api-v2-retrieve-patient-risk-profile-without-facility');
-
+            Route::prefix('/risk-assessment')->group(function () {
                 // ---- Converted to GET Statements ---- //
-                Route::get('/retrieve-patient-risk-assessment', [DataController::class, 'retrievePatientRiskAssessment'])->name('api-v2-retrieve-patient-risk-assessment');
-                Route::get('/retrieve-patient-risk-profile-by-facility', [DataController::class, 'retrievePatientRiskProfileByFacility'])->name('api-v2-retrieve-patient-risk-profile-by-facility');
-                Route::get('/retrieve-patient-risk-profile', [DataController::class, 'retrievePatientRiskProfileWithoutFacility'])->name('api-v2-retrieve-patient-risk-profile-without-facility');
+                Route::get('/retrieve-patient-risk-assessment', [PhilpenRiskDataController::class, 'retrievePatientRiskAssessment'])->name('api-v2-retrieve-patient-risk-assessment');
+                Route::get('/retrieve-patient-risk-profile-by-facility', [PhilpenRiskDataController::class, 'retrievePatientRiskProfileByFacility'])->name('api-v2-retrieve-patient-risk-profile-by-facility');
+                Route::get('/retrieve-patient-risk-profile', [PhilpenRiskDataController::class, 'retrievePatientRiskProfileWithoutFacility'])->name('api-v2-retrieve-patient-risk-profile-without-facility');
 
-                Route::post('/add-risk-profile', [DataController::class, 'addRiskProfile'])->name('api-v2-add-risk-profile');
-                Route::post('/add-risk-form', [DataController::class, 'addRiskForm'])->name('api-v2-add-risk-form');
-                Route::post('/update-risk-profile', [DataController::class, 'updateRiskProfile'])->name('api-v2-update-risk-profile');
-                Route::post('/update-risk-form', [DataController::class, 'updateRiskForm'])->name('api-v2-update-risk-form');
-                Route::post('/delete-risk-profile', [DataController::class, 'deleteRiskProfile'])->name('api-v2-delete-risk-profile');
-                Route::post('/delete-risk-form', [DataController::class, 'deleteRiskForm'])->name('api-v2-delete-risk-form');
+                Route::post('/add-risk-profile', [PhilpenRiskDataController::class, 'addRiskProfile'])->name('api-v2-add-risk-profile');
+                Route::post('/add-risk-form', [PhilpenRiskDataController::class, 'addRiskForm'])->name('api-v2-add-risk-form');
+                Route::post('/update-risk-profile', [PhilpenRiskDataController::class, 'updateRiskProfile'])->name('api-v2-update-risk-profile');
+                Route::post('/update-risk-form', [PhilpenRiskDataController::class, 'updateRiskForm'])->name('api-v2-update-risk-form');
+                Route::post('/delete-risk-profile', [PhilpenRiskDataController::class, 'deleteRiskProfile'])->name('api-v2-delete-risk-profile');
+                Route::post('/delete-risk-form', [PhilpenRiskDataController::class, 'deleteRiskForm'])->name('api-v2-delete-risk-form');
+            });
+
+            // Forms - General PCH Risk Assessment Routes
+            Route::prefix('/pch-risk-assessment')->group(function () {
+                // ---- Converted to GET Statements ---- //
+                Route::get('/pch-retrieve-patient-risk-assessment', [PchRiskDataController::class, 'retrievePchRiskAssessmentForm'])->name('api-v2-retrieve-pch-risk-assessment');
+                Route::get('/pch-retrieve-patient-risk-profile-by-facility', [PchRiskDataController::class, 'retrievePchRiskProfileByFacility'])->name('api-v2-retrieve-pch-risk-profile-by-facility');
+                Route::get('/pch-retrieve-patient-risk-profile', [PchRiskDataController::class, 'retrievePchRiskProfileWithoutFacility'])->name('api-v2-retrieve-pch-risk-profile-without-facility');
+
+                Route::post('/pch-add-risk-profile', [PchRiskDataController::class, 'addPchRiskProfile'])->name('api-v2-add-pch-risk-profile');
+                Route::post('/pch-add-risk-form', [PchRiskDataController::class, 'addPchRiskForm'])->name('api-v2-add-pch-risk-form');
+                Route::post('/pch-update-risk-profile', [PchRiskDataController::class, 'updatePchRiskProfile'])->name('api-v2-update-pch-risk-profile');
+                Route::post('/pch-update-risk-form', [PchRiskDataController::class, 'updatePchRiskForm'])->name('api-v2-update-pch-risk-form');
+                Route::post('/pch-delete-risk-profile', [PchRiskDataController::class, 'deletePchRiskProfile'])->name('api-v2-delete-pch-risk-profile');
+                Route::post('/pch-delete-risk-form', [PchRiskDataController::class, 'deletePchRiskForm'])->name('api-v2-delete-pch-risk-form');
             });
         });
     });
