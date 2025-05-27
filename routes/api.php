@@ -15,7 +15,9 @@ use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController as Phi
 use App\Http\Controllers\TsekapV2\Forms\PchRiskAssessmentForm\DataController as PchRiskDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\AnalyticsDataController;
 use App\Http\Controllers\TsekapV2\SessionController;
+
 use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTargetController;
+use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTotalPopulationController;
 
 Route::prefix('v2')->group(function () {
     // Non-authenticated Routes
@@ -60,6 +62,26 @@ Route::prefix('v2')->group(function () {
 
         // Analytics Routes
         Route::prefix('analytics')->group(function () {
+            // ---- Analytics Endpoints for Profiling Target Setting ----
+
+            // Targets
+            Route::prefix('target')->group(function () {
+                Route::post('/create-profiling-target', [ProfilingTargetController::class, 'createProfilingTarget'])->name('api-v2-create-profiling-target');
+                Route::get('/retrieve-profiling-target', [ProfilingTargetController::class, 'retrieveProfilingTarget'])->name('api-v2-retrieve-profiling-target');
+                Route::get('/retrieve-profiling-target-values', [ProfilingTargetController::class, 'retrieveProfilingTargetValues'])->name('api-v2-retrieve-profiling-target-values');
+                Route::post('/update-profiling-target', [ProfilingTargetController::class, 'updateProfilingTarget'])->name('api-v2-update-profiling-target');
+                Route::post('/delete-profiling-target', [ProfilingTargetController::class, 'deleteProfilingTarget'])->name('api-v2-delete-profiling-target');
+            });
+
+            // Population
+            Route::prefix('population')->group(function () {
+                Route::post('/create-total-profiling-population', [ProfilingTotalPopulationController::class, 'createProfilingTotalPopulation'])->name('api-v2-create-profiling-total-population');
+                Route::get('/retrieve-total-profiling-population', [ProfilingTotalPopulationController::class, 'retrieveProfilingTotalPopulation'])->name('api-v2-retrieve-profiling-total-population');
+                Route::get('/retrieve-total-profiling-population-values', [ProfilingTotalPopulationController::class, 'retrieveProfilingTotalPopulationValues'])->name('api-v2-retrieve-total-profiling-population-values');
+                Route::post('/update-total-profiling-population', [ProfilingTotalPopulationController::class, 'updateProfilingTotalPopulation'])->name('api-v2-update-profiling-total-population');
+                Route::post('/delete-total-profiling-population', [ProfilingTotalPopulationController::class, 'deleteProfilingTotalPopulation'])->name('api-v2-delete-profiling-total-population');
+            });
+
             // endpoint : /patient_summary
             Route::get('/get-patient-summary', [AnalyticsDataController::class, 'getPatientSummary'])->name('api-v2-analytics-get-patient-summary');
 
@@ -249,15 +271,6 @@ Route::prefix('v2')->group(function () {
             Route::post('/add-profile', [ProfileController::class, 'addProfile'])->name('api-v2-add-profile');
             Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('api-v2-update-profile');
             Route::post('/delete-profile', [ProfileController::class, 'deleteProfile'])->name('api-v2-delete-profile');
-        });
-
-        // Targets
-        Route::prefix('target')->group(function () {
-            Route::get('/create-profiling-target', [ProfilingTargetController::class, 'createProfilingTarget']);
-            Route::get('/retrieve-profiling-target', [ProfilingTargetController::class, 'retrieveProfilingTarget']);
-            Route::post('/retrieve-profiling-target-by-id', [ProfilingTargetController::class, 'retrieveProfilingTargetById']);
-            Route::post('/update-profiling-target', [ProfilingTargetController::class, 'updateProfilingTarget']);
-            Route::post('/delete-profiling-target', [ProfilingTargetController::class, 'deleteProfilingTarget']);
         });
 
         Route::prefix('forms')->group(function () {

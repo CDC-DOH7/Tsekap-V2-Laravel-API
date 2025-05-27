@@ -17,7 +17,7 @@ return new class extends Migration
                 $table->increments('id');
                 $table->unsignedInteger('pch_profile_id')->index();
                 $table->string('nature_of_visit');
-                $table->date('nature_of_visit_duration');
+                $table->string('nature_of_visit_duration', 50);
                 $table->string('type_of_consultation');
 
                 $table->unsignedInteger('vit_bp_systolic');

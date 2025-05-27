@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
-use App\Models\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTargetModel;
+use App\Models\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTotalPopulationModel;
 use Exception;
 
-class ProfilingTargetController extends Controller
+class ProfilingTotalPopulationController extends Controller
 {
     private function getAuthenticatedAdmin($username)
     {
@@ -24,7 +24,7 @@ class ProfilingTargetController extends Controller
         }
     }
 
-    public function createProfilingTarget(Request $request)
+    public function createProfilingTotalPopulation(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
@@ -41,15 +41,14 @@ class ProfilingTargetController extends Controller
 
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
-            'fields.barangay_id' => 'required|integer',
-            'fields.male_population' => 'required|integer',
-            'fields.female_population' => 'required|integer'
+            'fields.muncity_id' => 'required|integer',
+            'fields.total_population' => 'required|integer',
         ]);
 
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
-            Log::error('Validation error in the creation of a profiling target: ' . $e->getMessage());
+            Log::error('Validation error in the creation of a profiling population: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Validation failed'
             ], 422);
@@ -57,26 +56,25 @@ class ProfilingTargetController extends Controller
 
         $validatedFields = $validatedFields['fields'];
 
-        if (ProfilingTargetModel::where('barangay_id', "=", $validatedFields['barangay_id'])->exists()) {
+        if (ProfilingTotalPopulationModel::where('muncity_id', "=", $validatedFields['muncity_id'])->exists()) {
             return response()->json(['status' => 'error', 'message' => 'Mapping already exists.'], 400);
         }
 
         try {
-            $profilingTarget = ProfilingTargetModel::create([
-                'barangay_id' => $validatedFields["barangay_id"],
-                'male_population' => $validatedFields["male_population"],
-                'female_population' => $validatedFields["female_population"],
+            $profilingTotalPopulation = ProfilingTotalPopulationModel::create([
+                'muncity_id' => $validatedFields["muncity_id"],
+                'total_population' => $validatedFields["total_population"],
             ]);
         } catch (Exception $e) {
             Log::error('Error in creation of a profiling target: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
 
-        $message = "Profiling target: {$profilingTarget->id} created successfully";
+        $message = "Profiling total population: {$profilingTotalPopulation->id} created successfully";
         return response()->json(['status' => 'success', 'message' => $message], 200);
     }
 
-    public function retrieveProfilingTarget(Request $request)
+    public function retrieveProfilingTotalPopulation(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
@@ -86,7 +84,7 @@ class ProfilingTargetController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'barangay_id' => 'required|integer',
+            'muncity_id' => 'required|integer',
         ]);
 
         try {
@@ -97,19 +95,19 @@ class ProfilingTargetController extends Controller
                 'message' => 'Validation failed'
             ], 422);
         }
-        // $validatedFields = $validatedFields['fields'];
-        $barangayId = $validatedFields['barangay_id'];
 
-        $profilingTarget = ProfilingTargetModel::where('barangay_id', "=", $barangayId)->get();
+        $muncityId = $validatedFields['muncity_id'];
 
-        if ($profilingTarget->isEmpty()) {
-            return response()->json(['status' => 'error', 'message' => 'No profiling target found.'], 404);
+        $profilingTotalPopulation = ProfilingTotalPopulationModel::where('muncity_id', "=", $muncityId)->get();
+
+        if ($profilingTotalPopulation->isEmpty()) {
+            return response()->json(['status' => 'error', 'message' => 'No profiling population found.'], 404);
         }
 
-        return response()->json(['status' => 'success', 'data' => $profilingTarget], 200);
+        return response()->json(['status' => 'success', 'data' => $profilingTotalPopulation], 200);
     }
 
-    public function retrieveProfilingTargetValues(Request $request)
+    public function retrieveProfilingTotalPopulationValues(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
@@ -119,38 +117,37 @@ class ProfilingTargetController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'barangay_id' => 'required|integer',
+            'muncity_id' => 'required|integer',
         ]);
 
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
-            Log::error('Validation error in retrieving profiling target: ' . $e->getMessage());
+            Log::error('Validation error in retrieving profiling population: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Validation failed'
             ], 422);
         }
 
-        $barangayId = $validatedFields['barangay_id'];
+        $muncityId = $validatedFields['muncity_id'];
 
-        $profilingTarget = ProfilingTargetModel::where('barangay_id', "=", $barangayId)->first();
+        $profilingTotalPopulation = ProfilingTotalPopulationModel::where('muncity_id', "=", $muncityId)->first();
 
-        if (!$profilingTarget) {
-            return response()->json(['status' => 'error', 'message' => 'No profiling target found.'], 404);
+        if (!$profilingTotalPopulation) {
+            return response()->json(['status' => 'error', 'message' => 'No profiling population found.'], 404);
         }
 
         // Return only the values
         return response()->json([
             'status' => 'success',
             'data' => [
-                'barangay_id' => $profilingTarget->barangay_id,
-                'male_population' => $profilingTarget->male_population,
-                'female_population' => $profilingTarget->female_population,
+                'muncity_id' => $profilingTotalPopulation->muncity_id,
+                'total_population' => $profilingTotalPopulation->total_population,
             ]
         ], 200);
     }
 
-    public function updateProfilingTarget(Request $request)
+    public function updateProfilingTotalPopulation(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
@@ -167,9 +164,8 @@ class ProfilingTargetController extends Controller
 
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
-            'fields.barangay_id' => 'required|integer',
-            'fields.male_population' => 'required|integer',
-            'fields.female_population' => 'required|integer'
+            'fields.muncity_id' => 'required|integer',
+            'fields.total_population' => 'required|integer',
         ]);
 
         try {
@@ -183,28 +179,27 @@ class ProfilingTargetController extends Controller
 
         $validatedFields = $validatedFields['fields'];
 
-        $profilingTarget = ProfilingTargetModel::where('barangay_id', "=", $validatedFields['barangay_id'])->first();
+        $profilingTotalPopulation = ProfilingTotalPopulationModel::where('muncity_id', "=", $validatedFields['muncity_id'])->first();
 
-        if (!$profilingTarget) {
-            Log::error('Mapping does not exist for barangay_id: ' . $validatedFields['barangay_id']);
+        if (!$profilingTotalPopulation) {
+            Log::error('Mapping does not exist for muncity_id: ' . $validatedFields['muncity_id']);
             return response()->json(['status' => 'error', 'message' => 'Mapping does not exist.'], 400);
         }
 
         try {
-            $profilingTarget->update([
-                'male_population' => $validatedFields['male_population'],
-                'female_population' => $validatedFields['female_population'],
+            $profilingTotalPopulation->update([
+                'total_population' => $validatedFields['total_population'],
             ]);
         } catch (Exception $e) {
-            Log::error('Error in updating a profiling target: ' . $e->getMessage());
+            Log::error('Error in updating a profiling total population: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
 
-        $message = "Profiling target: {$profilingTarget->id} updated successfully";
+        $message = "Profiling total population: {$profilingTotalPopulation->id} updated successfully";
         return response()->json(['status' => 'success', 'message' => $message], 200);
     }
 
-    public function deleteProfilingTarget(Request $request)
+    public function deleteProfilingTotalPopulation(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->username);
@@ -221,13 +216,13 @@ class ProfilingTargetController extends Controller
 
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
-            'fields.barangay_id' => 'required|integer',
+            'fields.muncity_id' => 'required|integer',
         ]);
 
         try {
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
-            Log::error('Validation error in attempt to delete the profiling target: ' . $e->getMessage());
+            Log::error('Validation error in attempt to delete the profiling total population: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Validation failed'
             ], 422);
@@ -235,21 +230,21 @@ class ProfilingTargetController extends Controller
 
         $validatedFields = $validatedFields['fields'];
 
-        $profilingTarget = ProfilingTargetModel::where('barangay_id', "=", $validatedFields['barangay_id'])->first();
+        $profilingTotalPopulation = ProfilingTotalPopulationModel::where('muncity_id', "=", $validatedFields['muncity_id'])->first();
 
-        if (!$profilingTarget) {
-            Log::error('Mapping does not exist for barangay_id: ' . $validatedFields['barangay_id']);
+        if (!$profilingTotalPopulation) {
+            Log::error('Mapping does not exist for muncity_id: ' . $validatedFields['muncity_id']);
             return response()->json(['status' => 'error', 'message' => 'Mapping does not exist.'], 400);
         }
 
         try {
-            $profilingTarget->delete();
+            $profilingTotalPopulation->delete();
         } catch (Exception $e) {
-            Log::error('Error in deleting a profiling target: ' . $e->getMessage());
+            Log::error('Error in deleting a profiling total population: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
 
-        $message = "Profiling target: {$profilingTarget->id} deleted successfully";
+        $message = "Profiling population: {$$profilingTotalPopulation->id} deleted successfully";
         return response()->json(['status' => 'success', 'message' => $message], 200);
     }
 }

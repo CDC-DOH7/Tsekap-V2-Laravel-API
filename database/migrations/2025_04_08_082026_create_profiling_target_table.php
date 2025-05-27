@@ -13,7 +13,7 @@ return new class extends Migration
     {
         if (!Schema::hasTable('profiling_target')) {
             Schema::create('profiling_target', function (Blueprint $table) {
-                $table->id();
+                $table->increments('id');
                 $table->unsignedInteger('barangay_id'); // Foreign key for facilities table
                 $table->unsignedInteger('male_population')->nullable();
                 $table->unsignedInteger('female_population')->nullable();
