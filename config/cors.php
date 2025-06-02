@@ -25,8 +25,7 @@ return [
         'http://localhost:8080',
 
         // adjust for production
-        'https://example.com',
-        'https://admin.example.com',
+        "https://tsekap-analytics-554334748588.asia-east1.run.app"
     ],
 
     'allowed_origins_patterns' => [],
