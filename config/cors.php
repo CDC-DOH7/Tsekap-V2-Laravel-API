@@ -20,13 +20,14 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        env('FRONTEND_URL', 'http://localhost:3000'),
-        'http://localhost:5173',
-        'http://localhost:8080',
+        // env('FRONTEND_URL', 'http://localhost:3000'),
+        // 'http://localhost:5173',
+        // 'http://localhost:8080',
 
         // adjust for production
         "https://tsekap-analytics-554334748588.asia-east1.run.app", //analytics
-        "https://tsekap-v2-firebase-deployment.web.app/" // firebase react FE
+        "https://tsekap-v2-firebase-deployment.web.app", // firebase react FE
+        "https://199.36.158.100"
     ],
 
     'allowed_origins_patterns' => [],
