@@ -25,7 +25,8 @@ return [
         'http://localhost:8080',
 
         // adjust for production
-        "https://tsekap-analytics-554334748588.asia-east1.run.app"
+        "https://tsekap-analytics-554334748588.asia-east1.run.app", //analytics
+        "https://tsekap-v2-firebase-deployment.web.app/" // firebase react FE
     ],
 
     'allowed_origins_patterns' => [],
