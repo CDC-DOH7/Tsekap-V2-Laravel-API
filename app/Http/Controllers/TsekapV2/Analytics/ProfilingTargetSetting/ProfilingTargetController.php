@@ -24,6 +24,18 @@ class ProfilingTargetController extends Controller
         }
     }
 
+    private function getAuthenticatedUser($username)
+    {
+        $queryUser = User::where('username', '=', $username)->first();
+
+        if (!$queryUser || $queryUser->verified !== 1) {
+            Log::error('Denied access for: ' . " " . $queryUser->id);
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
+
+        return $queryUser;
+    }
+
     public function createProfilingTarget(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
@@ -79,7 +91,7 @@ class ProfilingTargetController extends Controller
     public function retrieveProfilingTarget(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
@@ -112,7 +124,7 @@ class ProfilingTargetController extends Controller
     public function retrieveProfilingTargetValues(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;

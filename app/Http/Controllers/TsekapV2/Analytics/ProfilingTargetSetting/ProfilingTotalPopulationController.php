@@ -24,6 +24,18 @@ class ProfilingTotalPopulationController extends Controller
         }
     }
 
+    private function getAuthenticatedUser($username)
+    {
+        $queryUser = User::where('username', '=', $username)->first();
+
+        if (!$queryUser || $queryUser->verified !== 1) {
+            Log::error('Denied access for: ' . " " . $queryUser->id);
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
+
+        return $queryUser;
+    }
+
     public function createProfilingTotalPopulation(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
@@ -77,7 +89,7 @@ class ProfilingTotalPopulationController extends Controller
     public function retrieveProfilingTotalPopulation(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
@@ -110,7 +122,7 @@ class ProfilingTotalPopulationController extends Controller
     public function retrieveProfilingTotalPopulationValues(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
