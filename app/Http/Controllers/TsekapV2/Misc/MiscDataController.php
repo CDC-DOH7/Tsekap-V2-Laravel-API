@@ -123,11 +123,26 @@ class MiscDataController extends Controller
         }
     }
 
-    // get all provinces 
-    public function getProvinces()
+    // get all provinces, optionally filtered by region_id
+    public function getProvinces(Request $request)
     {
+        // optional field
+        $validator = Validator::make($request->query(), [
+            'region_id' => 'sometimes|nullable|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
+        }
+
         try {
-            $provinces = Province::select('id', 'description')->get();
+            $query = Province::select('id', 'description');
+
+            if ($request->has('region_id')) {
+                $query->where('region_id', $request->query('region_id'));
+            }
+
+            $provinces = $query->get();
             return response()->json($provinces);
         } catch (Exception $e) {
             Log::error('Error in retrieving provinces.' . $e->getMessage());
