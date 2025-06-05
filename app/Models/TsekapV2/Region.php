@@ -10,6 +10,7 @@ class Region extends Model
     protected $table = 'region';
 
     protected $fillable = [
+        'country_id',
         'region_code',
         'region_name',
 

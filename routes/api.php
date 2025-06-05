@@ -28,6 +28,8 @@ Route::prefix('v2')->group(function () {
     Route::prefix('misc')->group(function () {
         // For Addresses and Facilities
         Route::get('/get-all-facility', [MiscDataController::class, 'getAllFacility'])->name('api-v2-get-all-facility');
+        Route::get('/get-countries', [MiscDataController::class, 'getCountries'])->name('api-v2-get-countries');
+        Route::get('/get-regions', [MiscDataController::class, 'getRegions'])->name('api-v2-get-regions');
         Route::get('/get-provinces', [MiscDataController::class, 'getProvinces'])->name('api-v2-get-all-provinces');
         Route::get('/get-muncities', [MiscDataController::class, 'getMuncities'])->name('api-v2-get-muncity');
         Route::get('/get-barangays', [MiscDataController::class, 'getBarangays'])->name('api-v2-get-barangay');

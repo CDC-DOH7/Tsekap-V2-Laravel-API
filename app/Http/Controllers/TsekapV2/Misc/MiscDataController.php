@@ -11,6 +11,8 @@ use App\Models\TsekapV2\Facilities;
 use App\Models\TsekapV2\Muncity;
 use App\Models\TsekapV2\Province;
 use App\Models\TsekapV2\Barangay;
+use App\Models\TsekapV2\Country;
+use App\Models\TsekapV2\Region;
 use Illuminate\Support\Facades\Validator;
 use Exception;
 
@@ -90,6 +92,34 @@ class MiscDataController extends Controller
         } catch (Exception $e) {
             Log::error('Error retrieving facilities current muncity.' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => 'Error retrieving facilities in current muncity.'], 500);
+        }
+    }
+
+    // get all countries
+    public function getCountries()
+    {
+        try {
+            $countries = Country::select(
+                'id',
+                'country_code',
+                'country_name',
+            )->get();
+            return response()->json($countries);
+        } catch (Exception $e) {
+            Log::error('Error in retrieving countries.' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Error in retrieving countries.'], 500);
+        }
+    }
+
+    // get all regions
+    public function getRegions()
+    {
+        try {
+            $regions = Region::select('id', 'region_code', 'region_name')->get();
+            return response()->json($regions);
+        } catch (Exception $e) {
+            Log::error('Error in retrieving regions.' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Error in retrieving regions.'], 500);
         }
     }
 
