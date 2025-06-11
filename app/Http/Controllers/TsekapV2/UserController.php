@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Exception;
 
 class UserController extends Controller
@@ -197,6 +198,53 @@ class UserController extends Controller
         }
 
         return response()->json(['status' => 'success', 'message' => 'Email updated successfully'], 200);
+    }
+
+    // deactivate own account
+    public function deactivateUserAccount(Request $request)
+    {
+        $authUser = $request->user();
+
+        if (!$authUser) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
+
+        // Validate the input
+        $validator = Validator::make($request->all(), [
+            'fields.user_id' => 'required|integer',
+        ]);
+
+        try {
+            $validatedFields = $validator->validate();
+        } catch (ValidationException $e) {
+            Log::error('Validation error in UserController (function: deactivateUserAccount) ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Deactivation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        }
+
+        $userId = $validatedFields['fields']['user_id'];
+
+        // Only allow deactivation if the user_id matches the authenticated user's id
+        if ($authUser->id !== $userId) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized.'], 403);
+        }
+
+        $existingUser = User::find($userId);
+
+        if (!$existingUser) {
+            return response()->json(['status' => 'error', 'message' => 'User not found.'], 404);
+        }
+
+        // Set verified to false (unverified)
+        $existingUser->update([
+            'verified' => false,
+            'updated_at' => now(),
+        ]);
+
+        return response()->json(['status' => 'success', 'message' => 'User account deactivated.'], 200);
     }
 
     public function storeUserRemarks(Request $request)

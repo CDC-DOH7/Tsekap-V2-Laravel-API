@@ -164,7 +164,7 @@ class MiscDataController extends Controller
         try {
             $provinceId = $request->query('province_id');
             $muncity = Muncity::where('province_id', '=', $provinceId)
-                ->select('id', 'province_id', 'description')
+                ->select('id', 'province_id', 'zip_code', 'description')
                 ->get();
 
             return response()->json($muncity);

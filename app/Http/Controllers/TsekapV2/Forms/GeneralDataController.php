@@ -57,6 +57,7 @@ class GeneralDataController extends Controller
 
             // Define the profiles to query
             $profileTypes = [
+                // Risk Profiles
                 'RiskProfile' => [
                     'table' => 'risk_profile',
                     'columns' => [
@@ -91,6 +92,71 @@ class GeneralDataController extends Controller
                         ['users', 'risk_profile.encoded_by', '=', 'users.id'],
                         ['muncity', 'risk_profile.municipal_id', '=', 'muncity.id'],
                         ['province', 'risk_profile.province_id', '=', 'province.id']
+                    ],
+                    'additional_columns' => [
+                        'muncity.description as municipal_name',
+                        'province.description as province_name',
+                        DB::raw('CONCAT(users.fname, " ", users.mname, " ", users.lname) as encoder')
+                    ]
+                ],
+
+                // Primary Care Health Risk Assessment Form
+                'PchRiskProfile' => [
+                    'table' => 'pch_risk_assessment_tool_profile',
+                    'columns' => [
+                        'id',
+                        'profile_id',
+                        'facility_id_updated',
+                        'encoded_by',
+                        'offline_entry',
+                        'prefix',
+                        'lname',
+                        'fname',
+                        'mname',
+                        'suffix',
+                        'sex',
+                        'dob',
+                        'age',
+                        'age_bracket_id',
+                        'birth_place',
+                        'civil_status',
+                        'educational_attainment',
+                        'employment_status',
+                        'occupation',
+                        'religion',
+                        'other_religion',
+                        'indigenous',
+                        'blood_type',
+                        'mother_fname',
+                        'mother_mname',
+                        'mother_lname',
+                        'mother_dob',
+                        'country_id',
+                        'region_id',
+                        'province_id',
+                        'muncity_id',
+                        'barangay_id',
+                        'number_or_street_name',
+                        'zip_code',
+                        'email_address',
+                        'mobile_number',
+                        'landline_number',
+                        'family_member',
+                        'dswd_nhts_member',
+                        'four_ps_member',
+                        'facility_household_number',
+                        'family_serial_number',
+                        'philhealth_member',
+                        'philhealth_number',
+                        'philhealth_category',
+                        'pcb_eligible',
+                        'created_at',
+                        'updated_at',
+                    ],
+                    'joins' => [
+                        ['users', 'pch_risk_assessment_tool_profile.encoded_by', '=', 'users.id'],
+                        ['muncity', 'pch_risk_assessment_tool_profile.muncity_id', '=', 'muncity.id'],
+                        ['province', 'pch_risk_assessment_tool_profile.province_id', '=', 'province.id']
                     ],
                     'additional_columns' => [
                         'muncity.description as municipal_name',
@@ -217,6 +283,69 @@ class GeneralDataController extends Controller
                     'additional_columns' => [
                         'muncity.description as municipal_name',
                         'province.description as province_name'
+                    ]
+                ],
+
+                // Primary Care Health Risk Assessment Form
+                'PchRiskProfile' => [
+                    'table' => 'pch_risk_assessment_tool_profile',
+                    'columns' => [
+                        'id',
+                        'profile_id',
+                        'facility_id_updated',
+                        'encoded_by',
+                        'offline_entry',
+                        'prefix',
+                        'lname',
+                        'fname',
+                        'mname',
+                        'suffix',
+                        'sex',
+                        'dob',
+                        'age',
+                        'age_bracket_id',
+                        'birth_place',
+                        'civil_status',
+                        'educational_attainment',
+                        'employment_status',
+                        'occupation',
+                        'religion',
+                        'other_religion',
+                        'indigenous',
+                        'blood_type',
+                        'mother_fname',
+                        'mother_mname',
+                        'mother_lname',
+                        'mother_dob',
+                        'country_id',
+                        'region_id',
+                        'province_id',
+                        'muncity_id',
+                        'barangay_id',
+                        'number_or_street_name',
+                        'zip_code',
+                        'email_address',
+                        'mobile_number',
+                        'landline_number',
+                        'family_member',
+                        'dswd_nhts_member',
+                        'four_ps_member',
+                        'facility_household_number',
+                        'family_serial_number',
+                        'philhealth_member',
+                        'philhealth_number',
+                        'philhealth_category',
+                        'pcb_eligible',
+                        'created_at',
+                        'updated_at',
+                    ],
+                    'joins' => [
+                        ['muncity', 'pch_risk_assessment_tool_profile.municipal_id', '=', 'muncity.id'],
+                        ['province', 'pch_risk_assessment_tool_profile.province_id', '=', 'province.id']
+                    ],
+                    'additional_columns' => [
+                        'muncity.description as municipal_name',
+                        'province.description as province_name',
                     ]
                 ],
             ];

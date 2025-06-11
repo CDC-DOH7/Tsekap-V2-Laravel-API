@@ -31,6 +31,8 @@ class PchRiskProfile extends Model
         'suffix ',
         'sex',
         'dob',
+        'age',
+        'age_bracket_id',
         'birth_place',
         'civil_status',
         'educational_attainment',

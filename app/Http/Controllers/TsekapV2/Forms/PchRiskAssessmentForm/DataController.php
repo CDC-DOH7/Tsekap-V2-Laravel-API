@@ -317,7 +317,7 @@ class DataController extends Controller
             'vit_heart_rate_or_pulse_rate',
             'vit_is_normal_rate',
             'vit_is_regular_rhythm',
-            'vitals_respiratory_rate',
+            'vit_respiratory_rate',
             'vit_temperature',
             'vit_weight',
             'vit_height',
@@ -387,17 +387,17 @@ class DataController extends Controller
             'pahas_or_tia_q6',
             'pahas_or_tia_q7',
             'pahas_or_tia_q8',
-            'presence_or_absence_of_diabetes',
+            'diagnosed_as_having_diabetes',
             'symptoms_polyphagia',
             'symptoms_polydipsia',
             'symptoms_polyuria',
-            'symptoms_presence_of_urine_ketones_newly_diagnosed',
-            'raised_blood_glucose',
+            'presence_of_urine_ketones_newly_diagnosed',
+            'has_raised_blood_glucose',
             'urine_ketones',
             'fbs_rbs',
             'fbs_rbs_date_taken',
             'urine_ketones_date_taken',
-            'raised_blood_lipid',
+            'has_raised_blood_lipid',
             'management',
             'total_cholesterol',
             'total_cholesterol_date_taken',
@@ -419,9 +419,22 @@ class DataController extends Controller
         );
 
         if ($id) {
-            $query->where('risk_profile_id', $id);
+            $query->where('pch_profile_id', "=", $id);
         }
         return response()->json($query->simplePaginate(30), 200);
+    }
+
+    private function calculateAge($dob, $asOfDate = null)
+    {
+        try {
+            $dob = new \DateTime($dob);
+            $asOf = $asOfDate ? new \DateTime($asOfDate) : new \DateTime();
+            $age = $dob->diff($asOf)->y;
+            return $age;
+        } catch (Exception $e) {
+            Log::error('Error calculating age: ' . $e->getMessage());
+            return null;
+        }
     }
 
     public function addPchRiskProfile(Request $request)
@@ -433,6 +446,11 @@ class DataController extends Controller
         }
 
         $fields = $request->input('fields');
+
+        // Calculate age from dob if dob is present
+        if (!empty($fields['dob'])) {
+            $fields['age'] = $this->calculateAge($fields['dob']);
+        }
 
         // Define validation rules
         $rules = [
@@ -451,7 +469,7 @@ class DataController extends Controller
             'fields.suffix' => 'sometimes|nullable|string|max:15',
             'fields.sex' => 'required|string|max:10',
             'fields.dob' => 'required|date',
-            'fields.age' => 'required|numeric|min:0|max:120',
+            'fields.age' => 'sometimes|numeric|min:0|max:120',
             'fields.birth_place' => 'required|string',
 
             'fields.civil_status' => 'required|string|max:20',
