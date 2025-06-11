@@ -244,7 +244,12 @@ class UserController extends Controller
             'updated_at' => now(),
         ]);
 
-        return response()->json(['status' => 'success', 'message' => 'User account deactivated.'], 200);
+        // Revoke all bearer tokens (works for Laravel Sanctum and Passport)
+        if (method_exists($existingUser, 'tokens')) {
+            $existingUser->tokens()->delete();
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'User account deactivated and tokens revoked.'], 200);
     }
 
     public function storeUserRemarks(Request $request)
