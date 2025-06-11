@@ -253,7 +253,7 @@ Route::prefix('v2')->group(function () {
             Route::post('/update-contact', [UserController::class, 'updateUserContact'])->name('api-v2-update-contact');
             Route::post('/update-email', [UserController::class, 'updateUserEmail'])->name('api-v2-update-email');
             Route::post('/create-remarks', [UserController::class, 'storeUserRemarks'])->name('api-v2-create-remarks');
-            Route::post('/deactivate-account', [UserController::class, 'deactivateUserAccount'])->('api-v2-deactivate-account');
+            Route::post('/deactivate-account', [UserController::class, 'deactivateUserAccount'])->name('api-v2-deactivate-account');
             // two logouts for different functions
             Route::post('/logout', [AuthController::class, 'logout'])->name('api-v2-logout');
             Route::post('/logout-all-sessions', [AuthController::class, 'logoutAllSessions'])->name('api-v2-logout-all-sessions');
