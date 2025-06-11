@@ -89,7 +89,7 @@ return new class extends Migration
                 $table->string('soch_illicit_drug_use', 15)->nullable();
                 $table->string('soch_illicit_drug_use_specify_illicit_drug_used', 255)->nullable();
                 $table->string('soch_sexual_activity_is_sexually_active', 15)->nullable();
-                $table->unsignedInteger('soch_sexual_activity_number_of_partners')->nullable();
+                $table->string('soch_sexual_activity_number_of_partners', 15)->nullable();
                 $table->string('soch_sexual_activity_with_protection', 15)->nullable();
                 $table->string('soch_sexual_activity_testing_done', 15)->nullable();
 

@@ -609,7 +609,7 @@ class DataController extends Controller
             'fields' => 'required|array',
             'fields.pch_profile_id' => 'required|integer',
             'fields.nature_of_visit' => 'required|string|max:255',
-            'fields.nature_of_visit_duration' => 'required|date',
+            'fields.nature_of_visit_duration' => 'required|string|max:255',
             'fields.type_of_consultation' => 'required|string|max:255',
 
             'fields.vit_bp_systolic' => 'required|integer|min:0|max:300',
@@ -680,7 +680,7 @@ class DataController extends Controller
             'fields.soch_illicit_drug_use' => 'sometimes|nullable|string|max:15',
             'fields.soch_illicit_drug_use_specify_illicit_drug_used' => 'sometimes|nullable|string|max:255',
             'fields.soch_sexual_activity_is_sexually_active' => 'sometimes|nullable|string|max:15',
-            'fields.soch_sexual_activity_number_of_partners' => 'sometimes|nullable|integer|min:0',
+            'fields.soch_sexual_activity_number_of_partners' => 'sometimes|nullable|string|max:15',
             'fields.soch_sexual_activity_with_protection' => 'sometimes|nullable|string|max:15',
             'fields.soch_sexual_activity_testing_done' => 'sometimes|nullable|string|max:15',
 
