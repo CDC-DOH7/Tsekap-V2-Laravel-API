@@ -295,14 +295,14 @@ class DataController extends Controller
 
         // Validate the request using the Validator facade
         $validator = Validator::make($request->all(), [
-            'profile_id' => 'required|numeric',
+            'pch_profile_id' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => 'Invalid input'], 400);
         }
 
-        $id = $request->query('profile_id');
+        $id = $request->query('pch_profile_id');
 
         // Building the query
         $query = PchRiskAssessmentForm::select(
@@ -465,7 +465,7 @@ class DataController extends Controller
             'fields.prefix' => 'sometimes|nullable|string|max:15',
             'fields.lname' => 'required|string|max:255',
             'fields.fname' => 'required|string|max:255',
-            'fields.mname' => 'required|string|max:255',
+            'fields.mname' => 'sometimes|nullable|string|max:255',
             'fields.suffix' => 'sometimes|nullable|string|max:15',
             'fields.sex' => 'required|string|max:10',
             'fields.dob' => 'required|date',
@@ -513,8 +513,9 @@ class DataController extends Controller
             return response()->json(['error' => $validator->errors()], 422);
         }
 
+        // ---- Redacted ----
         // Check for malformed parameters
-        if (empty($fields['offline_entry']) && !empty($fields['profile_id'])) {
+        if ($fields['offline_entry'] === false && empty($fields['profile_id'])) {
             return response()->json(['error' => 'Malformed parameter. Please recheck request.'], 403);
         }
 
@@ -522,7 +523,8 @@ class DataController extends Controller
         $existingRiskProfile = PchRiskProfile::where('fname', $fields['fname'])
             ->where('lname', $fields['lname'])
             ->where('dob', $fields['dob'])
-            ->where('facility_id_updated', $fields['facility_id_updated']);
+            ->where('facility_id_updated', $fields['facility_id_updated'])
+            ->whereDate('created_at', '!=', now()->toDateString()); // Exclude records created today
 
         if (!empty($fields['mname'])) {
             $existingRiskProfile->where('mname', $fields['mname']);
@@ -670,7 +672,7 @@ class DataController extends Controller
             'fields.wr_number_of_abortion' => 'sometimes|nullable|integer',
             'fields.wr_number_of_living_children' => 'sometimes|nullable|integer',
 
-            'fields.fmh_first_degree_relatives_with' => 'sometimes|nullable|string|max:50',
+            'fields.fmh_first_degree_relatives_with' => 'sometimes|nullable|string|max:255',
             'fields.fmh_first_degree_relatives_with_specify_others' => 'sometimes|nullable|string|max:255',
 
             'fields.sh_smoking' => 'sometimes|nullable|string|max:50',
@@ -739,11 +741,13 @@ class DataController extends Controller
         }
 
         try {
+
+            // ---- Disregard Duplication for this form ----
             // Check for duplicate risk_profile_id
-            $existingPchRiskForm = PchRiskAssessmentForm::where('profile_id', '=', $fields['profile_id'])->first();
+            $existingPchRiskForm = PchRiskAssessmentForm::where('pch_profile_id', '=', $fields['pch_profile_id'])->first();
 
             if ($existingPchRiskForm) {
-                return response()->json(['error' => 'Record with the same duplicate risk_profile_id found. Please recheck.'], 409);
+                return response()->json(['error' => 'Record with the same duplicate pch_profile_id found. Please recheck.'], 409);
             }
 
             $pchRiskForm = new PchRiskAssessmentForm();
@@ -759,7 +763,7 @@ class DataController extends Controller
             $pchRiskForm->save();
             return response()->json(['message' => 'Entry successfully saved.'], 200);
         } catch (Exception $e) {
-            Log::error('An error has occurred in adding of PCH risk form: ' + $e->getMessage());
+            Log::error('An error has occurred in adding of PCH risk form: ' . $e->getMessage());
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
@@ -1001,7 +1005,7 @@ class DataController extends Controller
         }
 
         // Find the existing RiskFormAssessment
-        $pchRiskAssessmentform = PchRiskAssessmentForm::where('risk_profile_id', "=", $fields['risk_profile_id'])->first();
+        $pchRiskAssessmentform = PchRiskAssessmentForm::where('pch_profile_id', "=", $fields['pch_profile_id'])->first();
 
         if (!$pchRiskAssessmentform) {
             return response()->json(['error' => 'Risk form not found.'], 404);
@@ -1071,9 +1075,6 @@ class DataController extends Controller
         }
 
         $id = $request->input('fields.pch_profile_id');
-
-        // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
 
         try {
             $riskForm = PchRiskAssessmentForm::where('pch_profile_id', '=', $id)->first();

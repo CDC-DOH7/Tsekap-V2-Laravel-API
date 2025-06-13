@@ -112,10 +112,25 @@ class MiscDataController extends Controller
     }
 
     // get all regions
-    public function getRegions()
+    public function getRegions(Request $request)
     {
+        // optional field
+        $validator = Validator::make($request->query(), [
+            'country_id' => 'sometimes|nullable|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
+        }
+
         try {
-            $regions = Region::select('id', 'region_code', 'region_name')->get();
+            $query = Region::select('id', 'region_code', 'region_name');
+
+            if ($request->has('country_id')) {
+                $query->where('country_id', $request->query('country_id'));
+            }
+
+            $regions = $query->get();
             return response()->json($regions);
         } catch (Exception $e) {
             Log::error('Error in retrieving regions.' . $e->getMessage());
