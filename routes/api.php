@@ -3,19 +3,21 @@
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TsekapV2\SessionController;
 use App\Http\Controllers\TsekapV2\UserController;
 use App\Http\Controllers\TsekapV2\Misc\MiscDataController;
 use App\Http\Controllers\TsekapV2\FacilityController;
 use App\Http\Controllers\TsekapV2\ProfileController;
 use App\Http\Controllers\TsekapV2\UserHealthFacilityController;
-use App\Http\Controllers\TsekapV2\Forms\GeneralDataController;
+
+// Websockets Controllers
+use App\Http\Controllers\TsekapV2\Websockets\NotificationController;
 
 // Data Controllers
+use App\Http\Controllers\TsekapV2\Forms\GeneralDataController;
 use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController as PhilpenRiskDataController;
 use App\Http\Controllers\TsekapV2\Forms\PchRiskAssessmentForm\DataController as PchRiskDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\AnalyticsDataController;
-use App\Http\Controllers\TsekapV2\SessionController;
-
 use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTargetController;
 use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTotalPopulationController;
 
@@ -273,6 +275,15 @@ Route::prefix('v2')->group(function () {
             Route::post('/add-profile', [ProfileController::class, 'addProfile'])->name('api-v2-add-profile');
             Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('api-v2-update-profile');
             Route::post('/delete-profile', [ProfileController::class, 'deleteProfile'])->name('api-v2-delete-profile');
+        });
+
+        Route::prefix('system')->group(function () {
+            Route::prefix('notifications')->group(function () {
+                Route::get('/retrieve-notification-by-facility', [NotificationController::class, 'retrieveNotificationsByFacility'])->name('api-v2-retrieve-notifications-by-facility');
+                Route::post('/add-notification', [NotificationController::class, 'addNotification'])->name('api-v2-add-notification');
+                Route::post('/mark-notification-as-read', [NotificationController::class, 'markNotificationAsRead'])->name('api-v2-mark-notification-as-read');
+                Route::post('/delete-notification', [NotificationController::class, 'deleteNotification'])->name('api-v2-delete-notification');
+            });
         });
 
         Route::prefix('forms')->group(function () {
