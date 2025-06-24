@@ -144,8 +144,8 @@ class AnalyticsDataController extends Controller
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching age bracket summary: " . $e->getMessage());
-            return response()->json(['error' => 'Error fetching data'], 500);
+            Log::error("Error fetching age bracket summary: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Error fetching data.'], 500);
         }
     }
     // ================== END AGE RANGE SUMMARY FUNCTIONS ==================
@@ -345,30 +345,30 @@ class AnalyticsDataController extends Controller
             }
 
             // PCHRAT Form
-            if ($form_type === 'pch') {
-                $records = DB::table('pch_risk_assessment_tool_form f')
-                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
-                    ->select(
-                        'f.pch_profile_id',
-                        'f.ar_chest_pain',
-                        'f.ar_difficulty_breathing',
-                        'f.ar_loss_of_consciousness',
-                        'f.ar_slurred_speech',
-                        'f.ar_facial_asymmetry',
-                        'f.ar_weakness_numbness',
-                        'f.ar_disoriented',
-                        'f.ar_chest_retractions',
-                        'f.ar_seizure_convulsion',
-                        'f.ar_act_self_harm_suicide',
-                        'f.ar_agitated_behavior',
-                        'f.ar_eye_injury',
-                        'f.ar_severe_injuries',
-                        'f.created_at'
-                    )
-                    ->where('p.facility_id_updated', "=", $hf_id)
-                    ->whereBetween('f.created_at', [$start_date, $end_date])
-                    ->get();
-            }
+            // if ($form_type === 'pch') {
+            //     $records = DB::table('pch_risk_assessment_tool_form f')
+            //         ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+            //         ->select(
+            //             'f.pch_profile_id',
+            //             'f.ar_chest_pain',
+            //             'f.ar_difficulty_breathing',
+            //             'f.ar_loss_of_consciousness',
+            //             'f.ar_slurred_speech',
+            //             'f.ar_facial_asymmetry',
+            //             'f.ar_weakness_numbness',
+            //             'f.ar_disoriented',
+            //             'f.ar_chest_retractions',
+            //             'f.ar_seizure_convulsion',
+            //             'f.ar_act_self_harm_suicide',
+            //             'f.ar_agitated_behavior',
+            //             'f.ar_eye_injury',
+            //             'f.ar_severe_injuries',
+            //             'f.created_at'
+            //         )
+            //         ->where('p.facility_id_updated', "=", $hf_id)
+            //         ->whereBetween('f.created_at', [$start_date, $end_date])
+            //         ->get();
+            // }
 
             return response()->json($records);
         } catch (Exception $e) {
@@ -444,16 +444,16 @@ class AnalyticsDataController extends Controller
                     ->get();
             }
 
-            // Philpen Risk Asssessment Form
-            if ($form_type === 'pch') {
-                $results = DB::table('pch_risk_assessment_tool_form as f')
-                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
-                    ->select('f.pch_profile_id', 'f.rf_tobacco_use', 'f.created_at')
-                    ->where('p.facility_id_updated', "=", $hf_id)
-                    ->where('f.created_at', '>=', $start_date)
-                    ->where('f.created_at', '<', $end_date)
-                    ->get();
-            }
+            // // Philpen Risk Asssessment Form
+            // if ($form_type === 'pch') {
+            //     $results = DB::table('pch_risk_assessment_tool_form as f')
+            //         ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+            //         ->select('f.pch_profile_id', 'f.sh_smoking', 'f.sh_use_of_vape', 'f.sh_use_of_vape_age_started', 'f.created_at')
+            //         ->where('p.facility_id_updated', "=", $hf_id)
+            //         ->where('f.created_at', '>=', $start_date)
+            //         ->where('f.created_at', '<', $end_date)
+            //         ->get();
+            // }
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -468,7 +468,7 @@ class AnalyticsDataController extends Controller
         $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
         }
 
         if (!in_array($form_type, ['pch', 'raf'])) {
@@ -567,15 +567,15 @@ class AnalyticsDataController extends Controller
             }
 
             // PCHRAT Form
-            if ($form_type === 'pch') {
-                $results = DB::table('pch_risk_assessment_tool_form as f')
-                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
-                    ->select('f.pch_profile_id', 'f.rf_alcohol_intake', 'f.created_at')
-                    ->where('p.facility_id_updated', "=", $hf_id)
-                    ->where('f.created_at', '>=', $start_date)
-                    ->where('f.created_at', '<', $end_date)
-                    ->get();
-            }
+            // if ($form_type === 'pch') {
+            //     $results = DB::table('pch_risk_assessment_tool_form as f')
+            //         ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+            //         ->select('f.pch_profile_id', 'f.rf_alcohol_intake', 'f.created_at')
+            //         ->where('p.facility_id_updated', "=", $hf_id)
+            //         ->where('f.created_at', '>=', $start_date)
+            //         ->where('f.created_at', '<', $end_date)
+            //         ->get();
+            // }
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -652,6 +652,7 @@ class AnalyticsDataController extends Controller
                     ->where('facility_id_updated', "=", $hf_id)
                     ->get();
             }
+
             return response()->json($results);
         } catch (Exception $e) {
             Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
@@ -956,30 +957,30 @@ class AnalyticsDataController extends Controller
             }
 
             // PCHRAT Form
-            if ($form_type === 'pch') {
-                $results = DB::table('pch_risk_assessment_tool_form as f')
-                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
-                    ->select(
-                        'f.pch_profile_id',
-                        'f.pmh_allergies',
-                        'f.pmh_asthma',
-                        'f.pmh_cancer',
-                        'f.pmh_copd',
-                        'f.pmh_diabetes',
-                        'f.pmh_mn_and_s_disorder',
-                        'f.pmh_heart_disease',
-                        'f.pmh_hypertension',
-                        'f.pmh_kidney_disorders',
-                        'f.pmh_previous_surgical',
-                        'f.pmh_thyroid_disorders',
-                        'f.pmh_vision_problems',
-                        'f.created_at'
-                    )
-                    ->where('p.facility_id_updated', "=", $hf_id)
-                    ->where('f.created_at', '>=', $start_date)
-                    ->where('f.created_at', '<=', $end_date)
-                    ->get();
-            }
+            // if ($form_type === 'pch') {
+            //     $results = DB::table('pch_risk_assessment_tool_form as f')
+            //         ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+            //         ->select(
+            //             'f.pch_profile_id',
+            //             'f.pmh_allergies',
+            //             'f.pmh_asthma',
+            //             'f.pmh_cancer',
+            //             'f.pmh_copd',
+            //             'f.pmh_diabetes',
+            //             'f.pmh_mn_and_s_disorder',
+            //             'f.pmh_heart_disease',
+            //             'f.pmh_hypertension',
+            //             'f.pmh_kidney_disorders',
+            //             'f.pmh_previous_surgical',
+            //             'f.pmh_thyroid_disorders',
+            //             'f.pmh_vision_problems',
+            //             'f.created_at'
+            //         )
+            //         ->where('p.facility_id_updated', "=", $hf_id)
+            //         ->where('f.created_at', '>=', $start_date)
+            //         ->where('f.created_at', '<=', $end_date)
+            //         ->get();
+            // }
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -1017,6 +1018,7 @@ class AnalyticsDataController extends Controller
                     ->where('facility_id_updated', "=", $hf_id)
                     ->get();
             }
+
             return response()->json($results);
         } catch (Exception $e) {
             Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
@@ -1065,7 +1067,7 @@ class AnalyticsDataController extends Controller
     public function getFamilyHistorySummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
-        $form_type = $request->query('form_type');
+        $form_type = $request->query('form');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
@@ -1105,28 +1107,28 @@ class AnalyticsDataController extends Controller
             }
 
             // PCHRAT Form
-            if ($form_type === 'pch') {
-                $results = DB::table('pch_risk_assessment_tool_form as f')
-                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
-                    ->select(
-                        'f.pch_profile_id',
-                        'f.fmh_asthma',
-                        'f.fmh_cancer',
-                        'f.fmh_copd',
-                        'f.fmh_diabetes_mellitus',
-                        'f.fmh_mn_and_s_disorder',
-                        'f.fmh_heart_disease',
-                        'f.fmh_hypertension',
-                        'f.fmh_kidney_disease',
-                        'f.fmh_stroke',
-                        'f.fmh_having_tuberculosis_5_years',
-                        'f.fmh_first_degree_relative',
-                        'f.created_at'
-                    )
-                    ->where('p.facility_id_updated', "=", $hf_id)
-                    ->whereBetween('f.created_at', [$start_date, $end_date])
-                    ->get();
-            }
+            // if ($form_type === 'pch') {
+            //     $results = DB::table('pch_risk_assessment_tool_form as f')
+            //         ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+            //         ->select(
+            //             'f.pch_profile_id',
+            //             'f.fmh_asthma',
+            //             'f.fmh_cancer',
+            //             'f.fmh_copd',
+            //             'f.fmh_diabetes_mellitus',
+            //             'f.fmh_mn_and_s_disorder',
+            //             'f.fmh_heart_disease',
+            //             'f.fmh_hypertension',
+            //             'f.fmh_kidney_disease',
+            //             'f.fmh_stroke',
+            //             'f.fmh_having_tuberculosis_5_years',
+            //             'f.fmh_first_degree_relative',
+            //             'f.created_at'
+            //         )
+            //         ->where('p.facility_id_updated', "=", $hf_id)
+            //         ->whereBetween('f.created_at', [$start_date, $end_date])
+            //         ->get();
+            // }
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -1244,19 +1246,19 @@ class AnalyticsDataController extends Controller
             }
 
             // PCHRAT Form
-            if ($form_type === 'pch') {
-                $results = DB::table('pch_risk_assessment_tool_form as f')
-                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
-                    ->select(
-                        'f.pch_profile_id',
-                        'f.rs_systolic_t1',
-                        'f.rs_diastolic_t1',
-                        'f.created_at'
-                    )
-                    ->where('p.facility_id_updated', "=", $hf_id)
-                    ->whereBetween('f.created_at', [$start_date, $end_date])
-                    ->get();
-            }
+            // if ($form_type === 'pch') {
+            //     $results = DB::table('pch_risk_assessment_tool_form as f')
+            //         ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+            //         ->select(
+            //             'f.pch_profile_id',
+            //             'f.rs_systolic_t1',
+            //             'f.rs_diastolic_t1',
+            //             'f.created_at'
+            //         )
+            //         ->where('p.facility_id_updated', "=", $hf_id)
+            //         ->whereBetween('f.created_at', [$start_date, $end_date])
+            //         ->get();
+            // }
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -1370,19 +1372,19 @@ class AnalyticsDataController extends Controller
             }
 
             // PCHRAT Form
-            if ($form_type === 'pch') {
-                $results = DB::table('pch_risk_assessment_tool_form as f')
-                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
-                    ->select(
-                        'f.pch_profile_id',
-                        'f.rs_systolic_t2',
-                        'f.rs_diastolic_t2',
-                        'f.created_at'
-                    )
-                    ->where('p.facility_id_updated', "=", $hf_id)
-                    ->whereBetween('f.created_at', [$start_date, $end_date])
-                    ->get();
-            }
+            // if ($form_type === 'pch') {
+            //     $results = DB::table('pch_risk_assessment_tool_form as f')
+            //         ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+            //         ->select(
+            //             'f.pch_profile_id',
+            //             'f.rs_systolic_t2',
+            //             'f.rs_diastolic_t2',
+            //             'f.created_at'
+            //         )
+            //         ->where('p.facility_id_updated', "=", $hf_id)
+            //         ->whereBetween('f.created_at', [$start_date, $end_date])
+            //         ->get();
+            // }
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -1461,7 +1463,7 @@ class AnalyticsDataController extends Controller
     public function getDiabetesSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
-        $form_type = $request->query('form_type');
+        $form_type = $request->query('form');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
@@ -1491,18 +1493,18 @@ class AnalyticsDataController extends Controller
             }
 
             // PCHRAT Form
-            if ($form_type === 'pch') {
-                $results = DB::table('pch_risk_assessment_tool_form as f')
-                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
-                    ->select(
-                        'f.pch_profile_id',
-                        'f.rs_blood_sugar_fbs',
-                        'f.created_at'
-                    )
-                    ->where('p.facility_id_updated', "=", $hf_id)
-                    ->whereBetween('f.created_at', [$start_date, $end_date])
-                    ->get();
-            }
+            // if ($form_type === 'pch') {
+            //     $results = DB::table('pch_risk_assessment_tool_form as f')
+            //         ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+            //         ->select(
+            //             'f.pch_profile_id',
+            //             'f.rs_blood_sugar_fbs',
+            //             'f.created_at'
+            //         )
+            //         ->where('p.facility_id_updated', "=", $hf_id)
+            //         ->whereBetween('f.created_at', [$start_date, $end_date])
+            //         ->get();
+            // }
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -1616,20 +1618,20 @@ class AnalyticsDataController extends Controller
                     ->get();
             }
 
-            if ($form_type === 'pch') {
-                $results = DB::table('pch_risk_assessment_tool_form as f')
-                    ->join('pch_risk_assessment_profile as p', 'f.pch_profile_id', '=', 'p.id')
-                    ->select(
-                        'f.pch_profile_id',
-                        'f.rs_lipid_cholesterol',
-                        'f.rs_lipid_ldl',
-                        'f.rs_lipid_hdl',
-                        'f.created_at'
-                    )
-                    ->where('p.facility_id_updated', "=", $hf_id)
-                    ->whereBetween('f.created_at', [$start_date, $end_date])
-                    ->get();
-            }
+            // if ($form_type === 'pch') {
+            //     $results = DB::table('pch_risk_assessment_tool_form as f')
+            //         ->join('pch_risk_assessment_profile as p', 'f.pch_profile_id', '=', 'p.id')
+            //         ->select(
+            //             'f.pch_profile_id',
+            //             'f.rs_lipid_cholesterol',
+            //             'f.rs_lipid_ldl',
+            //             'f.rs_lipid_hdl',
+            //             'f.created_at'
+            //         )
+            //         ->where('p.facility_id_updated', "=", $hf_id)
+            //         ->whereBetween('f.created_at', [$start_date, $end_date])
+            //         ->get();
+            // }
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -1741,18 +1743,18 @@ class AnalyticsDataController extends Controller
                     ->get();
             }
 
-            if ($form_type === 'pch') {
-                $results = DB::table('pch_risk_assessment_tool_form as f')
-                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
-                    ->select(
-                        'f.pch_profile_id',
-                        'f.rs_chronic_respiratory_disease',
-                        'f.created_at'
-                    )
-                    ->where('p.facility_id_updated', $hf_id)
-                    ->whereBetween('f.created_at', [$start_date, $end_date])
-                    ->get();
-            }
+            // if ($form_type === 'pch') {
+            //     $results = DB::table('pch_risk_assessment_tool_form as f')
+            //         ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+            //         ->select(
+            //             'f.pch_profile_id',
+            //             'f.rs_chronic_respiratory_disease',
+            //             'f.created_at'
+            //         )
+            //         ->where('p.facility_id_updated', $hf_id)
+            //         ->whereBetween('f.created_at', [$start_date, $end_date])
+            //         ->get();
+            // }
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -1839,7 +1841,7 @@ class AnalyticsDataController extends Controller
     public function getProbableSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
-        $form_type = $request->query('form_type');
+        $form_type = $request->query('form');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
@@ -1870,18 +1872,18 @@ class AnalyticsDataController extends Controller
             }
 
             // PCHRAT Form
-            if ($form_type === 'pch') {
-                $results = DB::table('pch_risk_assessment_tool_form as f')
-                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
-                    ->select(
-                        'f.pch_profile_id',
-                        'f.rs_if_yes_any_symptoms',
-                        'f.created_at'
-                    )
-                    ->where('p.facility_id_updated', "=", $hf_id)
-                    ->whereBetween('f.created_at', [$start_date, $end_date])
-                    ->get();
-            }
+            // if ($form_type === 'pch') {
+            //     $results = DB::table('pch_risk_assessment_tool_form as f')
+            //         ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+            //         ->select(
+            //             'f.pch_profile_id',
+            //             'f.rs_if_yes_any_symptoms',
+            //             'f.created_at'
+            //         )
+            //         ->where('p.facility_id_updated', "=", $hf_id)
+            //         ->whereBetween('f.created_at', [$start_date, $end_date])
+            //         ->get();
+            // }
 
             return response()->json($results);
         } catch (Exception $e) {
