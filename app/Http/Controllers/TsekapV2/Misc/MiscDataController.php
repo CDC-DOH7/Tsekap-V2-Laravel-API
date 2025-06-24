@@ -124,7 +124,7 @@ class MiscDataController extends Controller
         }
 
         try {
-            $query = Region::select('id', 'region_code', 'region_name');
+            $query = Region::select('id', 'country_id', 'region_code', 'region_name');
 
             if ($request->has('country_id')) {
                 $query->where('country_id', $request->query('country_id'));

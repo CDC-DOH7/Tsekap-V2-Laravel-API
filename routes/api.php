@@ -86,6 +86,9 @@ Route::prefix('v2')->group(function () {
                 Route::post('/delete-total-profiling-population', [ProfilingTotalPopulationController::class, 'deleteProfilingTotalPopulation'])->name('api-v2-delete-profiling-total-population');
             });
 
+            // endpoint: /age_brackets
+            Route::get('/get-age-brackets', [AnalyticsDataController::class, 'getAgeBrackets'])->name('api-v2-analytics-get-age-brackets');
+
             // endpoint : /patient_summary
             Route::get('/get-patient-summary', [AnalyticsDataController::class, 'getPatientSummary'])->name('api-v2-analytics-get-patient-summary');
 
@@ -94,8 +97,6 @@ Route::prefix('v2')->group(function () {
 
             // endpoint : /age_range_summary
             Route::get('/get-age-range-summary', [AnalyticsDataController::class, 'getAgeRangeSummary'])->name('api-v2-analytics-get-age-range-summary');
-            Route::get('/get-age-range-summary-age-brackets', [AnalyticsDataController::class, 'getAgeRangeSummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-age-range-summary-age-brackets');
 
             // endpoint : /month_year_summary
             Route::get('/get-month-year-summary-patient-data', [AnalyticsDataController::class, 'getMonthYearSummaryPatientData'])
@@ -108,8 +109,6 @@ Route::prefix('v2')->group(function () {
             // endpoint: /monthly_summary   
             Route::get('/get-monthly-summary-patient-data', [AnalyticsDataController::class, 'getMonthlySummaryPatientData'])
                 ->name('api-v2-analytics-get-monthly-summary-patient-data');
-            Route::get('/get-all-monthly-summary-age-brackets', [AnalyticsDataController::class, 'getAllMonthlySummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-all-monthly-summary-age-brackets');
             Route::get('/get-monthly-summary-risk-profile-by-facility', [AnalyticsDataController::class, 'getMonthlySummaryRiskProfileByFacility'])
                 ->name('api-v2-analytics-get-monthly-summary-risk-profile-by-facility');
 
@@ -118,8 +117,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-get-clinical-complaints-ar-records');
             Route::get('/get-clinical-complaints-risk-profile', [AnalyticsDataController::class, 'getClinicalComplaintsRiskProfile'])
                 ->name('api-v2-analytics-get-clinical-complaints-risk-profile');
-            Route::get('/get-clinical-complaints-age-brackets', [AnalyticsDataController::class, 'getClinicalComplaintsAgeBrackets'])
-                ->name('api-v2-analytics-get-clinical-complaints-age-brackets');
 
             // endpoint: /tobacco_summary
             Route::get('/get-tobacco-summary-data', [AnalyticsDataController::class, 'getTobaccoSummaryData'])
@@ -128,8 +125,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-tobacco-summary-patient-info');
             Route::get('/get-tobacco-summary-risk-profile', [AnalyticsDataController::class, 'getTobaccoSummaryRiskProfile'])
                 ->name('api-v2-analytics-get-tobacco-summary-risk-profile');
-            Route::get('/get-tobacco-summary-age-brackets', [AnalyticsDataController::class, 'getTobaccoSummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-tobacco-summary-age-brackets');
 
             // endpoint: /alcohol_intake_summary
             Route::get('/get-alcohol-intake-summary-data', [AnalyticsDataController::class, 'getAlcoholIntakeSummaryData'])
@@ -138,8 +133,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-get-alcohol-intake-summary-patient-info');
             Route::get('/get-alcohol-intake-summary-risk-profile', [AnalyticsDataController::class, 'getAlcoholIntakeSummaryRiskProfile'])
                 ->name('api-v2-analytics-get-alcohol-intake-summary-risk-profile');
-            Route::get('/get-alcohol-intake-summary-age-brackets', [AnalyticsDataController::class, 'getAlcoholIntakeSummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-alcohol-intake-summary-age-brackets');
 
             // endpoint: /physical_activity_summary
             Route::get('/get-physical-activity-summary-data', [AnalyticsDataController::class, 'getPhysicalActivitySummaryData'])
@@ -148,8 +141,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-get-physical-activity-summary-patient-info');
             Route::get('/get-physical-activity-summary-risk-profile', [AnalyticsDataController::class, 'getPhysicalActivitySummaryRiskProfile'])
                 ->name('api-v2-analytics-get-physical-activity-summary-risk-profile');
-            Route::get('/get-physical-activity-summary-age-brackets', [AnalyticsDataController::class, 'getPhysicalActivitySummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-physical-activity-summary-age-brackets');
 
             // endpoint: /nutrition_summary
             Route::get('/get-nutrition-summary-data', [AnalyticsDataController::class, 'getNutritionSummaryData'])
@@ -158,8 +149,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-get-nutrition-summary-patient-info');
             Route::get('/get-nutrition-summary-risk-profile', [AnalyticsDataController::class, 'getNutritionSummaryRiskProfile'])
                 ->name('api-v2-analytics-get-nutrition-summary-risk-profile');
-            Route::get('/get-nutrition-summary-age-brackets', [AnalyticsDataController::class, 'getNutritionSummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-nutrition-summary-age-brackets');
 
             // endpoint: /prev_med_history_summary
             Route::get('/get-prev-med-history-summary-data', [AnalyticsDataController::class, 'getPrevMedHistorySummaryData'])
@@ -168,8 +157,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-get-prev-med-history-summary-patient-info');
             Route::get('/get-prev-med-history-summary-risk-profile', [AnalyticsDataController::class, 'getPrevMedHistorySummaryPatientInfo'])
                 ->name('api-v2-analytics-get-prev-med-history-summary-risk-profile');
-            Route::get('/get-prev-med-history-summary-age-brackets', [AnalyticsDataController::class, 'getPrevMedHistorySummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-prev-med-history-summary-age-brackets');
 
             // endpoint: /family_history_summary
             Route::get('/get-family-history-summary-data', [AnalyticsDataController::class, 'getFamilyHistorySummaryData'])
@@ -178,8 +165,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-get-family-history-summary-patient-info');
             Route::get('/get-family-history-summary-risk-profile', [AnalyticsDataController::class, 'getFamilyHistorySummaryPatientInfo'])
                 ->name('api-v2-analytics-get-family-history-summary-risk-profile');
-            Route::get('/get-family-history-summary-age-brackets', [AnalyticsDataController::class, 'getFamilyHistorySummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-family-history-summary-age-brackets');
 
             // endpoint: /bp1_summary
             Route::get('/get-bp1-summary-data', [AnalyticsDataController::class, 'getBp1SummaryData'])
@@ -188,8 +173,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-get-bp1-summary-patient-info');
             Route::get('/get-bp1-summary-risk-profile', [AnalyticsDataController::class, 'getBp1SummaryPatientInfo'])
                 ->name('api-v2-analytics-get-bp1-summary-risk-profile');
-            Route::get('/get-bp1-summary-age-brackets', [AnalyticsDataController::class, 'getBp1SummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-bp1-summary-age-brackets');
 
             // endpoint: /hypertension_summary
             Route::get('/get-hypertension-summary-data', [AnalyticsDataController::class, 'getBp2SummaryData'])
@@ -198,8 +181,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-get-hypertension-summary-patient-info');
             Route::get('/get-hypertension-summary-risk-profile', [AnalyticsDataController::class, 'getBp2SummaryPatientInfo'])
                 ->name('api-v2-analytics-get-hypertension-summary-risk-profile');
-            Route::get('/get-hypertension-summary-age-brackets', [AnalyticsDataController::class, 'getBp2SummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-hypertension-summary-age-brackets');
 
             // endpoint: /diabetes_summary
             Route::get('/get-diabetes-summary-data', [AnalyticsDataController::class, 'getDiabetesSummaryData'])
@@ -208,8 +189,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-get-diabetes-summary-patient-info');
             Route::get('/get-diabetes-summary-risk-profile', [AnalyticsDataController::class, 'getDiabetesSummaryPatientInfo'])
                 ->name('api-v2-analytics-get-diabetes-summary-risk-profile');
-            Route::get('/get-diabetes-summary-age-brackets', [AnalyticsDataController::class, 'getDiabetesSummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-diabetes-summary-age-brackets');
 
             // endpoint: /hypercholesterolemia_summary
             Route::get('/get-hypercholesterolemia-summary-data', [AnalyticsDataController::class, 'getHypercholesterolemiaSummaryData'])
@@ -218,8 +197,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-get-hypercholesterolemia-summary-patient-info');
             Route::get('/get-hypercholesterolemia-summary-risk-profile', [AnalyticsDataController::class, 'getHypercholesterolemiaSummaryPatientInfo'])
                 ->name('api-v2-analytics-get-hypercholesterolemia-summary-risk-profile');
-            Route::get('/get-hypercholesterolemia-summary-age-brackets', [AnalyticsDataController::class, 'getHypercholesterolemiaSummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-hypercholesterolemia-summary-age-brackets');
 
             // endpoint: /respiratory_summary
             Route::get('/get-respiratory-summary-data', [AnalyticsDataController::class, 'getRespiratorySummaryData'])
@@ -228,8 +205,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-get-respiratory-summary-patient-info');
             Route::get('/get-respiratory-summary-risk-profile', [AnalyticsDataController::class, 'getRespiratorySummaryPatientInfo'])
                 ->name('api-v2-analytics-get-respiratory-summary-risk-profile');
-            Route::get('/get-respiratory-summary-age-brackets', [AnalyticsDataController::class, 'getRespiratorySummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-respiratory-summary-age-brackets');
 
             // endpoint: /probable_summary
             Route::get('/get-probable-summary-data', [AnalyticsDataController::class, 'getProbableSummaryData'])
@@ -238,8 +213,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-get-probable-summary-patient-info');
             Route::get('/get-probable-summary-risk-profile', [AnalyticsDataController::class, 'getProbableSummaryPatientInfo'])
                 ->name('api-v2-analytics-get-probable-summary-risk-profile');
-            Route::get('/get-probable-summary-age-brackets', [AnalyticsDataController::class, 'getProbableSummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-probable-summary-age-brackets');
         });
 
         // session validator

@@ -28,7 +28,7 @@ class PchRiskProfile extends Model
         'lname',
         'fname',
         'mname',
-        'suffix ',
+        'suffix',
         'sex',
         'dob',
         'age',

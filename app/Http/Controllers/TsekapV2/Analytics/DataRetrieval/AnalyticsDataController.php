@@ -10,7 +10,22 @@ use Exception;
 
 class AnalyticsDataController extends Controller
 {
-    // private function generalPatientQuery(){}
+    // Mapping for requests through string
+    // 1. pch - PCHRAT forms
+    // 2. raf - Philpen Risk Assessment Form
+
+    // ###########################################################################################
+    // ================== GENERAL CONTROLLERS (/age_brackets) ==================
+    public function getAgeBrackets(Request $request)
+    {
+        try {
+            $ageBrackets = DB::table('new_age_brackets')->get();
+            return response()->json($ageBrackets);
+        } catch (Exception $e) {
+            Log::error("Error fetching age brackets: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch age brackets.'], 500);
+        }
+    }
 
     // ###########################################################################################
     // ================== 1. PATIENT SUMMARY FUNCTIONS (/patient_summary) ==================
@@ -18,21 +33,35 @@ class AnalyticsDataController extends Controller
     public function getPatientSummary(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $patients = DB::table('risk_profile')
-                ->where('facility_id_updated', "=", $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $patients = DB::table('risk_profile')
+                    ->where('facility_id_updated', $hf_id)
+                    ->get();
+            }
 
-            // Do something with $patients, e.g., process it or return directly
+            // PCHRAT Form 
+            if ($form_type === 'pch') {
+                $patients = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', $hf_id)
+                    ->get();
+            }
+
             return response()->json($patients);
         } catch (Exception $e) {
-            Log::error("Error retrieving patient summary: " . $e->getMessage());
-            return response()->json(['error' => 'Error retrieving patient summary data'], 500);
+            Log::error("Error retrieving patient summary: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Error retrieving patient summary data.'], 500);
         }
     }
     // ================== END PATIENT SUMMARY FUNCTIONS ==================
@@ -42,23 +71,41 @@ class AnalyticsDataController extends Controller
     public function getAgeGroupSummary(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile as p')
-                ->join('new_age_brackets as a', 'p.age_bracket_id', '=', 'a.id')
-                ->select('a.id', 'a.description', 'p.age_bracket_id', 'p.sex', 'p.age')
-                ->whereNotNull('p.age_bracket_id')
-                ->where('p.facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile as p')
+                    ->join('new_age_brackets as a', 'p.age_bracket_id', '=', 'a.id')
+                    ->select('a.id', 'a.description', 'p.age_bracket_id', 'p.sex', 'p.age')
+                    ->whereNotNull('p.age_bracket_id')
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile as p')
+                    ->join('new_age_brackets as a', 'p.age_bracket_id', '=', 'a.id')
+                    ->select('a.id', 'a.description', 'p.age_bracket_id', 'p.sex', 'p.age')
+                    ->whereNotNull('p.age_bracket_id')
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching age bracket summary: " . $e->getMessage());
-            return response()->json(['error' => 'Error fetching data'], 500);
+            Log::error("Error fetching age bracket summary: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Error fetching data.'], 500);
         }
     }
     // ================== END AGE GROUP SUMMARY FUNCTIONS ==================
@@ -68,34 +115,37 @@ class AnalyticsDataController extends Controller
     public function getAgeRangeSummary(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
+            // Philpen Risk Assessment Form
             $results = DB::table('risk_profile as p')
                 ->join('new_age_brackets as a', 'p.age_bracket_id', '=', 'a.id')
                 ->select('a.id', 'a.description', 'p.age_bracket_id', 'p.sex', 'p.age')
                 ->whereNotNull('p.age_bracket_id')
-                ->where('p.facility_id_updated', $hf_id)
+                ->where('p.facility_id_updated', "=", $hf_id)
+                ->get();
+
+            // PCHRAT Form
+            $results = DB::table('pch_risk_assessment_tool_profile as p')
+                ->join('new_age_brackets as a', 'p.age_bracket_id', '=', 'a.id')
+                ->select('a.id', 'a.description', 'p.age_bracket_id', 'p.sex', 'p.age')
+                ->whereNotNull('p.age_bracket_id')
+                ->where('p.facility_id_updated', "=", $hf_id)
                 ->get();
 
             return response()->json($results);
         } catch (Exception $e) {
             Log::error("Error fetching age bracket summary: " . $e->getMessage());
             return response()->json(['error' => 'Error fetching data'], 500);
-        }
-    }
-
-    public function getAgeRangeSummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
         }
     }
     // ================== END AGE RANGE SUMMARY FUNCTIONS ==================
@@ -105,22 +155,35 @@ class AnalyticsDataController extends Controller
     public function getMonthYearSummaryPatientData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
+            // Philpen Risk Assessment Form
             $patients = DB::table('risk_profile')
                 ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
                 ->whereNotNull('age_bracket_id')
-                ->where('facility_id_updated', $hf_id)
+                ->where('facility_id_updated', "=", $hf_id)
+                ->get();
+
+            // PCHRAT Form
+            $patients = DB::table('pch_risk_assessment_tool_profile')
+                ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
+                ->whereNotNull('age_bracket_id')
+                ->where('facility_id_updated', "=", $hf_id)
                 ->get();
 
             return response()->json($patients);
         } catch (Exception $e) {
-            Log::error("Error fetching patient data: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to retrieve data'], 500);
+            Log::error("Error fetching patient data: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to retrieve data.'], 500);
         }
     }
     // ================== END MONTH YEAR SUMMARY FUNCTIONS ==================
@@ -130,22 +193,36 @@ class AnalyticsDataController extends Controller
     public function getMorbiditySummaryPatientData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
+
+            // Philpen Risk Assessment Form
             $patients = DB::table('risk_profile')
                 ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
                 ->whereNotNull('age_bracket_id')
-                ->where('facility_id_updated', $hf_id)
+                ->where('facility_id_updated', "=", $hf_id)
+                ->get();
+
+            // PCHRAT Form
+            $patients = DB::table('pch_risk_assessment_tool_profile')
+                ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
+                ->whereNotNull('age_bracket_id')
+                ->where('facility_id_updated', "=", $hf_id)
                 ->get();
 
             return response()->json($patients);
         } catch (Exception $e) {
-            Log::error("Error fetching patient data: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to retrieve data'], 500);
+            Log::error("Error fetching patient data: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to retrieve data.'], 500);
         }
     }
     // ================== END MORBIDITY SUMMARY FUNCTIONS ==================
@@ -155,53 +232,70 @@ class AnalyticsDataController extends Controller
     public function getMonthlySummaryPatientData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
+            // Philpen Risk Assessment Form
             $patients = DB::table('risk_profile')
                 ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
                 ->whereNotNull('age_bracket_id')
-                ->where('facility_id_updated', $hf_id)
+                ->where('facility_id_updated', "=", $hf_id)
+                ->get();
+
+            // PCHRAT Form 
+            $patients = DB::table('pch_risk_assessment_tool_profile')
+                ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
+                ->whereNotNull('age_bracket_id')
+                ->where('facility_id_updated', "=", $hf_id)
                 ->get();
 
             return response()->json($patients);
         } catch (Exception $e) {
-            Log::error("Error fetching patient data: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to retrieve data'], 500);
-        }
-    }
-
-    public function getAllMonthlySummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            Log::error("Error fetching patient data: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to retrieve data.'], 500);
         }
     }
 
     public function getMonthlySummaryRiskProfileByFacility(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $profiles = DB::table('risk_profile')
-                ->where('facility_id_updated', "=", $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $profiles = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $profiles = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($profiles);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to retrieve data'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to retrieve data.'], 500);
         }
     }
     // ================== END MONTHLY SUMMARY FUNCTIONS ==================
@@ -211,72 +305,110 @@ class AnalyticsDataController extends Controller
     public function getClinicalComplaintsArRecords(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form_type');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
         if (!$hf_id || !$start_date || !$end_date) {
-            return response()->json(['error' => 'hf_id, start_date, and end_date are required'], 400);
+            return response()->json(['error' => 'hf_id, start_date, and end_date are required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $records = DB::table('risk_form as f')
-                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
-                ->select(
-                    'f.risk_profile_id',
-                    'f.ar_chest_pain',
-                    'f.ar_difficulty_breathing',
-                    'f.ar_loss_of_consciousness',
-                    'f.ar_slurred_speech',
-                    'f.ar_facial_asymmetry',
-                    'f.ar_weakness_numbness',
-                    'f.ar_disoriented',
-                    'f.ar_chest_retractions',
-                    'f.ar_seizure_convulsion',
-                    'f.ar_act_self_harm_suicide',
-                    'f.ar_agitated_behavior',
-                    'f.ar_eye_injury',
-                    'f.ar_severe_injuries',
-                    'f.created_at'
-                )
-                ->where('p.facility_id_updated', $hf_id)
-                ->whereBetween('f.created_at', [$start_date, $end_date])
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $records = DB::table('risk_form as f')
+                    ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.risk_profile_id',
+                        'f.ar_chest_pain',
+                        'f.ar_difficulty_breathing',
+                        'f.ar_loss_of_consciousness',
+                        'f.ar_slurred_speech',
+                        'f.ar_facial_asymmetry',
+                        'f.ar_weakness_numbness',
+                        'f.ar_disoriented',
+                        'f.ar_chest_retractions',
+                        'f.ar_seizure_convulsion',
+                        'f.ar_act_self_harm_suicide',
+                        'f.ar_agitated_behavior',
+                        'f.ar_eye_injury',
+                        'f.ar_severe_injuries',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $records = DB::table('pch_risk_assessment_tool_form f')
+                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.pch_profile_id',
+                        'f.ar_chest_pain',
+                        'f.ar_difficulty_breathing',
+                        'f.ar_loss_of_consciousness',
+                        'f.ar_slurred_speech',
+                        'f.ar_facial_asymmetry',
+                        'f.ar_weakness_numbness',
+                        'f.ar_disoriented',
+                        'f.ar_chest_retractions',
+                        'f.ar_seizure_convulsion',
+                        'f.ar_act_self_harm_suicide',
+                        'f.ar_agitated_behavior',
+                        'f.ar_eye_injury',
+                        'f.ar_severe_injuries',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
 
             return response()->json($records);
         } catch (Exception $e) {
-            Log::error("Error fetching ARD records: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to retrieve ARD data'], 500);
+            Log::error("Error fetching ARD records: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to retrieve ARD data.'], 500);
         }
     }
 
     public function getClinicalComplaintsRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form 
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated',  "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    public function getClinicalComplaintsAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
     // ================== END CLINICAL COMPLAINTS SUMMARY FUNCTIONS ==================
@@ -286,80 +418,119 @@ class AnalyticsDataController extends Controller
     public function getTobaccoSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form_type');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
         if (!$hf_id || !$start_date || !$end_date) {
             return response()->json([
-                'error' => 'hf_id, start_date, and end_date are required'
+                'error' => 'hf_id, start_date, and end_date are required.'
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_form as f')
-                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
-                ->select('f.risk_profile_id', 'f.rf_tobacco_use', 'f.created_at')
-                ->where('p.facility_id_updated', $hf_id)
-                ->where('f.created_at', '>=', $start_date)
-                ->where('f.created_at', '<', $end_date)
-                ->get();
+            // Philpen Risk Asssessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_form as f')
+                    ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                    ->select('f.risk_profile_id', 'f.rf_tobacco_use', 'f.created_at')
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->where('f.created_at', '>=', $start_date)
+                    ->where('f.created_at', '<', $end_date)
+                    ->get();
+            }
+
+            // Philpen Risk Asssessment Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_form as f')
+                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                    ->select('f.pch_profile_id', 'f.rf_tobacco_use', 'f.created_at')
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->where('f.created_at', '>=', $start_date)
+                    ->where('f.created_at', '<', $end_date)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching tobacco usage data: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch tobacco usage data'], 500);
+            Log::error("Error fetching tobacco usage data: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch tobacco usage data.'], 500);
         }
     }
 
     public function getTobaccoSummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
             return response()->json(['error' => 'hf_id is required'], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_profile')
-                ->select('id', 'sex', 'age_bracket_id')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->select('id', 'sex', 'age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->select('id', 'sex', 'age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching patient basic info: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
+            Log::error("Error fetching patient basic info: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
 
     public function getTobaccoSummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    public function getTobaccoSummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
     // ================== END TOBACCO SUMMARY FUNCTIONS ==================
@@ -369,34 +540,54 @@ class AnalyticsDataController extends Controller
     public function getAlcoholIntakeSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
         if (!$hf_id || !$start_date || !$end_date) {
             return response()->json([
-                'error' => 'hf_id, start_date, and end_date are required'
+                'error' => 'hf_id, start_date, and end_date are required.'
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_form as f')
-                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
-                ->select('f.risk_profile_id', 'f.rf_alcohol_intake', 'f.created_at')
-                ->where('p.facility_id_updated', $hf_id)
-                ->where('f.created_at', '>=', $start_date)
-                ->where('f.created_at', '<', $end_date)
-                ->get();
+            // Philpen Risk Asessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_form as f')
+                    ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                    ->select('f.risk_profile_id', 'f.rf_alcohol_intake', 'f.created_at')
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->where('f.created_at', '>=', $start_date)
+                    ->where('f.created_at', '<', $end_date)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_form as f')
+                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                    ->select('f.pch_profile_id', 'f.rf_alcohol_intake', 'f.created_at')
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->where('f.created_at', '>=', $start_date)
+                    ->where('f.created_at', '<', $end_date)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching alcohol intake data: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch alcohol intake data'], 500);
+            Log::error("Error fetching alcohol intake data: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch alcohol intake data.'], 500);
         }
     }
 
     public function getAlcoholIntakeSummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
             return response()->json([
@@ -404,17 +595,32 @@ class AnalyticsDataController extends Controller
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_profile')
-                ->select('id', 'sex', 'age_bracket_id')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->select('id', 'sex', 'age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->select('id', 'sex', 'age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error retrieving patient info: " . $e->getMessage());
+            Log::error("Error retrieving patient info: " . $e->getMessage() . ".");
             return response()->json([
-                'error' => 'Failed to fetch patient information'
+                'error' => 'Failed to fetch patient information.'
             ], 500);
         }
     }
@@ -422,31 +628,34 @@ class AnalyticsDataController extends Controller
     public function getAlcoholIntakeSummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    public function getAlcoholIntakeSummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
     // ================== END ALCOHOL INTAKE SUMMARY FUNCTIONS ==================
@@ -456,35 +665,55 @@ class AnalyticsDataController extends Controller
     public function getPhysicalActivitySummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form_type');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
         if (!$hf_id || !$start_date || !$end_date) {
             return response()->json([
-                'error' => 'hf_id, start_date, and end_date are required'
+                'error' => 'hf_id, start_date, and end_date are required.'
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_form as f')
-                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
-                ->select('f.risk_profile_id', 'f.rf_physical_activity', 'f.created_at')
-                ->where('p.facility_id_updated', $hf_id)
-                ->where('f.created_at', '>=', $start_date)
-                ->where('f.created_at', '<', $end_date)
-                ->get();
+            // Philpen Risk Assessment Form 
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_form as f')
+                    ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                    ->select('f.risk_profile_id', 'f.rf_physical_activity', 'f.created_at')
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->where('f.created_at', '>=', $start_date)
+                    ->where('f.created_at', '<', $end_date)
+                    ->get();
+            }
+
+            // PCHRAT Form 
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_form as f')
+                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                    ->select('f.risk_profile_id', 'f.rf_physical_activity', 'f.created_at')
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->where('f.created_at', '>=', $start_date)
+                    ->where('f.created_at', '<', $end_date)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching physical activity data: " . $e->getMessage());
+            Log::error("Error fetching physical activity data: " . $e->getMessage() . ".");
             return response()->json([
-                'error' => 'Failed to fetch physical activity data'
+                'error' => 'Failed to fetch physical activity data.'
             ], 500);
         }
     }
     public function getPhysicalActivitySummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
             return response()->json([
@@ -492,15 +721,30 @@ class AnalyticsDataController extends Controller
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_profile')
-                ->select('id', 'sex', 'age_bracket_id')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->select('id', 'sex', 'age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->select('id', 'sex', 'age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching patient info: " . $e->getMessage());
+            Log::error("Error fetching patient info: " . $e->getMessage() . ".");
             return response()->json([
                 'error' => 'Failed to retrieve patient info.'
             ], 500);
@@ -510,31 +754,35 @@ class AnalyticsDataController extends Controller
     public function getPhysicalActivitySummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form 
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    public function getPhysicalActivitySummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
     // ================== END PHYSICAL ACTIVITY SUMMARY FUNCTIONS ==================
@@ -544,6 +792,7 @@ class AnalyticsDataController extends Controller
     public function getNutritionSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
@@ -553,25 +802,44 @@ class AnalyticsDataController extends Controller
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_form as f')
-                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
-                ->select('f.risk_profile_id', 'f.rf_nutrition_dietary', 'f.created_at')
-                ->where('p.facility_id_updated', $hf_id)
-                ->where('f.created_at', '>=', $start_date)
-                ->where('f.created_at', '<', $end_date)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_form as f')
+                    ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                    ->select('f.risk_profile_id', 'f.rf_nutrition_dietary', 'f.created_at')
+                    ->where('p.facility_id_updated', $hf_id)
+                    ->where('f.created_at', '>=', $start_date)
+                    ->where('f.created_at', '<', $end_date)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_form as f')
+                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                    ->select('f.pch_profile_id', 'f.rf_nutrition_dietary', 'f.created_at')
+                    ->where('p.facility_id_updated', $hf_id)
+                    ->where('f.created_at', '>=', $start_date)
+                    ->where('f.created_at', '<', $end_date)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error retrieving nutrition data: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch nutrition dietary data'], 500);
+            Log::error("Error retrieving nutrition data: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch nutrition dietary data.'], 500);
         }
     }
 
     public function getNutritionSummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
             return response()->json([
@@ -579,15 +847,30 @@ class AnalyticsDataController extends Controller
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_profile')
-                ->select('id', 'sex', 'age_bracket_id')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->select('id', 'sex', 'age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->select('id', 'sex', 'age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching patient info: " . $e->getMessage());
+            Log::error("Error fetching patient info: " . $e->getMessage() . ".");
             return response()->json([
                 'error' => 'Failed to retrieve patient info.'
             ], 500);
@@ -597,31 +880,31 @@ class AnalyticsDataController extends Controller
     public function getNutritionSummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Asessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form 
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    public function getNutritionSummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
     // ================== END NUTRITION SUMMARY FUNCTIONS ==================
@@ -631,6 +914,7 @@ class AnalyticsDataController extends Controller
     public function getPrevMedHistorySummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
@@ -640,33 +924,66 @@ class AnalyticsDataController extends Controller
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_form as f')
-                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
-                ->select(
-                    'f.risk_profile_id',
-                    'f.pmh_allergies',
-                    'f.pmh_asthma',
-                    'f.pmh_cancer',
-                    'f.pmh_copd',
-                    'f.pmh_diabetes',
-                    'f.pmh_mn_and_s_disorder',
-                    'f.pmh_heart_disease',
-                    'f.pmh_hypertension',
-                    'f.pmh_kidney_disorders',
-                    'f.pmh_previous_surgical',
-                    'f.pmh_thyroid_disorders',
-                    'f.pmh_vision_problems',
-                    'f.created_at'
-                )
-                ->where('p.facility_id_updated', $hf_id)
-                ->where('f.created_at', '>=', $start_date)
-                ->where('f.created_at', '<=', $end_date)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_form as f')
+                    ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.risk_profile_id',
+                        'f.pmh_allergies',
+                        'f.pmh_asthma',
+                        'f.pmh_cancer',
+                        'f.pmh_copd',
+                        'f.pmh_diabetes',
+                        'f.pmh_mn_and_s_disorder',
+                        'f.pmh_heart_disease',
+                        'f.pmh_hypertension',
+                        'f.pmh_kidney_disorders',
+                        'f.pmh_previous_surgical',
+                        'f.pmh_thyroid_disorders',
+                        'f.pmh_vision_problems',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->where('f.created_at', '>=', $start_date)
+                    ->where('f.created_at', '<=', $end_date)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_form as f')
+                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.pch_profile_id',
+                        'f.pmh_allergies',
+                        'f.pmh_asthma',
+                        'f.pmh_cancer',
+                        'f.pmh_copd',
+                        'f.pmh_diabetes',
+                        'f.pmh_mn_and_s_disorder',
+                        'f.pmh_heart_disease',
+                        'f.pmh_hypertension',
+                        'f.pmh_kidney_disorders',
+                        'f.pmh_previous_surgical',
+                        'f.pmh_thyroid_disorders',
+                        'f.pmh_vision_problems',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->where('f.created_at', '>=', $start_date)
+                    ->where('f.created_at', '<=', $end_date)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching PMH data: " . $e->getMessage());
+            Log::error("Error fetching PMH data: " . $e->getMessage() . ".");
             return response()->json([
                 'error' => 'Failed to retrieve PMH data.'
             ], 500);
@@ -676,51 +993,69 @@ class AnalyticsDataController extends Controller
     public function getPrevMedHistorySummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
+            // PCHRAT Form 
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
 
     public function getPrevMedHistorySummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    public function getPrevMedHistorySummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
     // ================== END PREV MED HISTORY SUMMARY FUNCTIONS ==================
@@ -730,6 +1065,7 @@ class AnalyticsDataController extends Controller
     public function getFamilyHistorySummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form_type');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
@@ -739,31 +1075,62 @@ class AnalyticsDataController extends Controller
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_form as f')
-                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
-                ->select(
-                    'f.risk_profile_id',
-                    'f.fmh_asthma',
-                    'f.fmh_cancer',
-                    'f.fmh_copd',
-                    'f.fmh_diabetes_mellitus',
-                    'f.fmh_mn_and_s_disorder',
-                    'f.fmh_heart_disease',
-                    'f.fmh_hypertension',
-                    'f.fmh_kidney_disease',
-                    'f.fmh_stroke',
-                    'f.fmh_having_tuberculosis_5_years',
-                    'f.fmh_first_degree_relative',
-                    'f.created_at'
-                )
-                ->where('p.facility_id_updated', $hf_id)
-                ->whereBetween('f.created_at', [$start_date, $end_date])
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_form as f')
+                    ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.risk_profile_id',
+                        'f.fmh_asthma',
+                        'f.fmh_cancer',
+                        'f.fmh_copd',
+                        'f.fmh_diabetes_mellitus',
+                        'f.fmh_mn_and_s_disorder',
+                        'f.fmh_heart_disease',
+                        'f.fmh_hypertension',
+                        'f.fmh_kidney_disease',
+                        'f.fmh_stroke',
+                        'f.fmh_having_tuberculosis_5_years',
+                        'f.fmh_first_degree_relative',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_form as f')
+                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.pch_profile_id',
+                        'f.fmh_asthma',
+                        'f.fmh_cancer',
+                        'f.fmh_copd',
+                        'f.fmh_diabetes_mellitus',
+                        'f.fmh_mn_and_s_disorder',
+                        'f.fmh_heart_disease',
+                        'f.fmh_hypertension',
+                        'f.fmh_kidney_disease',
+                        'f.fmh_stroke',
+                        'f.fmh_having_tuberculosis_5_years',
+                        'f.fmh_first_degree_relative',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching family history data: " . $e->getMessage());
+            Log::error("Error fetching family history data: " . $e->getMessage() . ".");
             return response()->json([
                 'error' => 'Failed to retrieve family history data.'
             ], 500);
@@ -773,51 +1140,70 @@ class AnalyticsDataController extends Controller
     public function getFamilyHistorySummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
 
     public function getFamilyHistorySummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    public function getFamilyHistorySummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
     // ================== END FAMILY HISTORY SUMMARY FUNCTIONS ==================
@@ -827,6 +1213,7 @@ class AnalyticsDataController extends Controller
     public function getBp1SummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
@@ -836,18 +1223,40 @@ class AnalyticsDataController extends Controller
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_form as f')
-                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
-                ->select(
-                    'f.risk_profile_id',
-                    'f.rs_systolic_t1',
-                    'f.rs_diastolic_t1',
-                    'f.created_at'
-                )
-                ->where('p.facility_id_updated', $hf_id)
-                ->whereBetween('f.created_at', [$start_date, $end_date])
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_form as f')
+                    ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.risk_profile_id',
+                        'f.rs_systolic_t1',
+                        'f.rs_diastolic_t1',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_form as f')
+                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.pch_profile_id',
+                        'f.rs_systolic_t1',
+                        'f.rs_diastolic_t1',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -861,51 +1270,66 @@ class AnalyticsDataController extends Controller
     public function getBp1SummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
 
     public function getBp1SummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
             Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    public function getBp1SummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
     // ================== END BP1 HISTORY SUMMARY FUNCTIONS ==================
@@ -915,6 +1339,7 @@ class AnalyticsDataController extends Controller
     public function getBp2SummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
@@ -924,22 +1349,44 @@ class AnalyticsDataController extends Controller
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_form as f')
-                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
-                ->select(
-                    'f.risk_profile_id',
-                    'f.rs_systolic_t2',
-                    'f.rs_diastolic_t2',
-                    'f.created_at'
-                )
-                ->where('p.facility_id_updated', $hf_id)
-                ->whereBetween('f.created_at', [$start_date, $end_date])
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_form as f')
+                    ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.risk_profile_id',
+                        'f.rs_systolic_t2',
+                        'f.rs_diastolic_t2',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_form as f')
+                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.pch_profile_id',
+                        'f.rs_systolic_t2',
+                        'f.rs_diastolic_t2',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching blood pressure data: " . $e->getMessage());
+            Log::error("Error fetching blood pressure data: " . $e->getMessage() . ".");
             return response()->json([
                 'error' => 'Failed to retrieve blood pressure data.'
             ], 500);
@@ -949,51 +1396,62 @@ class AnalyticsDataController extends Controller
     public function getBp2SummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
 
     public function getBp2SummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    public function getBp2SummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
     // ================== END HYPERTENSION SUMMARY FUNCTIONS ==================
@@ -1003,6 +1461,7 @@ class AnalyticsDataController extends Controller
     public function getDiabetesSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form_type');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
@@ -1012,21 +1471,42 @@ class AnalyticsDataController extends Controller
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_form as f')
-                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
-                ->select(
-                    'f.risk_profile_id',
-                    'f.rs_blood_sugar_fbs',
-                    'f.created_at'
-                )
-                ->where('p.facility_id_updated', $hf_id)
-                ->whereBetween('f.created_at', [$start_date, $end_date])
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_form as f')
+                    ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.risk_profile_id',
+                        'f.rs_blood_sugar_fbs',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_form as f')
+                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.pch_profile_id',
+                        'f.rs_blood_sugar_fbs',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching blood sugar (FBS) data: " . $e->getMessage());
+            Log::error("Error fetching blood sugar (FBS) data: " . $e->getMessage() . ".");
             return response()->json([
                 'error' => 'Failed to retrieve blood sugar data.'
             ], 500);
@@ -1036,51 +1516,66 @@ class AnalyticsDataController extends Controller
     public function getDiabetesSummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
 
     public function getDiabetesSummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    public function getDiabetesSummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
     // ================== END DIABETES SUMMARY FUNCTIONS ==================
@@ -1090,6 +1585,7 @@ class AnalyticsDataController extends Controller
     public function getHypercholesterolemiaSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
@@ -1099,23 +1595,45 @@ class AnalyticsDataController extends Controller
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_form as f')
-                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
-                ->select(
-                    'f.risk_profile_id',
-                    'f.rs_lipid_cholesterol',
-                    'f.rs_lipid_ldl',
-                    'f.rs_lipid_hdl',
-                    'f.created_at'
-                )
-                ->where('p.facility_id_updated', $hf_id)
-                ->whereBetween('f.created_at', [$start_date, $end_date])
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_form as f')
+                    ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.risk_profile_id',
+                        'f.rs_lipid_cholesterol',
+                        'f.rs_lipid_ldl',
+                        'f.rs_lipid_hdl',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
+
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_form as f')
+                    ->join('pch_risk_assessment_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.pch_profile_id',
+                        'f.rs_lipid_cholesterol',
+                        'f.rs_lipid_ldl',
+                        'f.rs_lipid_hdl',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching lipid panel data: " . $e->getMessage());
+            Log::error("Error fetching lipid panel data: " . $e->getMessage() . ".");
             return response()->json([
                 'error' => 'Failed to retrieve lipid panel data.'
             ], 500);
@@ -1125,51 +1643,66 @@ class AnalyticsDataController extends Controller
     public function getHypercholesterolemiaSummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
 
     public function getHypercholesterolemiaSummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    public function getHypercholesterolemiaSummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
     // ================== END HYPERCHOLESTEROLEMIA SUMMARY FUNCTIONS ==================
@@ -1179,6 +1712,7 @@ class AnalyticsDataController extends Controller
     public function getRespiratorySummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
@@ -1188,21 +1722,41 @@ class AnalyticsDataController extends Controller
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_form as f')
-                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
-                ->select(
-                    'f.risk_profile_id',
-                    'f.rs_chronic_respiratory_disease',
-                    'f.created_at'
-                )
-                ->where('p.facility_id_updated', $hf_id)
-                ->whereBetween('f.created_at', [$start_date, $end_date])
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_form as f')
+                    ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.risk_profile_id',
+                        'f.rs_chronic_respiratory_disease',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
+
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_form as f')
+                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.pch_profile_id',
+                        'f.rs_chronic_respiratory_disease',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching respiratory screening data: " . $e->getMessage());
+            Log::error("Error fetching respiratory screening data: " . $e->getMessage() . ".");
             return response()->json([
                 'error' => 'Failed to retrieve respiratory screening data.'
             ], 500);
@@ -1212,51 +1766,70 @@ class AnalyticsDataController extends Controller
     public function getRespiratorySummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
 
     public function getRespiratorySummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    public function getRespiratorySummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
     // ================== END RESPIRATORY SUMMARY FUNCTIONS ==================
@@ -1266,6 +1839,7 @@ class AnalyticsDataController extends Controller
     public function getProbableSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form_type');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
@@ -1275,21 +1849,43 @@ class AnalyticsDataController extends Controller
             ], 400);
         }
 
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
+        }
+
         try {
-            $results = DB::table('risk_form as f')
-                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
-                ->select(
-                    'f.risk_profile_id',
-                    'f.rs_if_yes_any_symptoms',
-                    'f.created_at'
-                )
-                ->where('p.facility_id_updated', $hf_id)
-                ->whereBetween('f.created_at', [$start_date, $end_date])
-                ->get();
+
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_form as f')
+                    ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.risk_profile_id',
+                        'f.rs_if_yes_any_symptoms',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_form as f')
+                    ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                    ->select(
+                        'f.pch_profile_id',
+                        'f.rs_if_yes_any_symptoms',
+                        'f.created_at'
+                    )
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->whereBetween('f.created_at', [$start_date, $end_date])
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching symptom screening data: " . $e->getMessage());
+            Log::error("Error fetching symptom screening data: " . $e->getMessage() . ".");
             return response()->json([
                 'error' => 'Failed to retrieve symptom screening data.'
             ], 500);
@@ -1299,51 +1895,66 @@ class AnalyticsDataController extends Controller
     public function getProbableSummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
 
     public function getProbableSummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
+        $form_type = $request->query('form');
 
         if (!$hf_id) {
-            return response()->json(['error' => 'hf_id is required'], 400);
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        if (!in_array($form_type, ['pch', 'raf'])) {
+            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
-            $results = DB::table('risk_profile')
-                ->where('facility_id_updated', $hf_id)
-                ->get();
+            // Philpen Risk Assessment Form
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
+
+            // PCHRAT Form
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    public function getProbableSummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching age brackets: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
         }
     }
     // ================== END PROBABLE HISTORY SUMMARY FUNCTIONS ==================
