@@ -133,6 +133,7 @@ return new class extends Migration
 
                 $table->string('do_laboratory_request', 255)->nullable();
                 $table->string('do_imaging', 255)->nullable();
+                $table->string('do_imaging_with_contrast', 10)->nullable();
                 $table->text('do_diagnosis')->nullable();
                 $table->text('do_treatment_plan')->nullable();
                 $table->date('do_follow_up_date')->nullable();

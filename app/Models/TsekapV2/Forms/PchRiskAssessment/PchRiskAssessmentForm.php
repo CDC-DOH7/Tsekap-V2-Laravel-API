@@ -127,6 +127,7 @@ class PchRiskAssessmentForm extends Model
 
         'do_laboratory_request',
         'do_imaging',
+        'do_imaging_with_contrast',
         'do_diagnosis',
         'do_treatment_plan',
         'do_follow_up_date',

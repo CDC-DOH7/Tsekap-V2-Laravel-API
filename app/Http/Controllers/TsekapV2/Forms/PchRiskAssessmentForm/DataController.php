@@ -409,6 +409,7 @@ class DataController extends Controller
             'date_follow_up',
             'do_laboratory_request',
             'do_imaging',
+            'do_imaging_with_contrast',
             'do_diagnosis',
             'do_treatment_plan',
             'do_follow_up_date',
@@ -726,6 +727,7 @@ class DataController extends Controller
 
             'fields.do_laboratory_request' => 'sometimes|nullable|string|max:255',
             'fields.do_imaging' => 'sometimes|nullable|string|max:255',
+            'fields.do_imaging_with_contrast' => 'sometimes|nullable|string|max:10',
             'fields.do_diagnosis' => 'sometimes|nullable|string',
             'fields.do_treatment_plan' => 'sometimes|nullable|string|max:255',
             'fields.do_follow_up_date' => 'sometimes|nullable|date',
@@ -990,6 +992,7 @@ class DataController extends Controller
 
             'fields.do_laboratory_request' => 'sometimes|nullable|string|max:255',
             'fields.do_imaging' => 'sometimes|nullable|string|max:255',
+            'fields.do_imaging_with_contrast' => 'sometimes|nullable|string|max:10',
             'fields.do_diagnosis' => 'sometimes|nullable|string',
             'fields.do_treatment_plan' => 'sometimes|nullable|string|max:255',
             'fields.do_follow_up_date' => 'sometimes|nullable|date',

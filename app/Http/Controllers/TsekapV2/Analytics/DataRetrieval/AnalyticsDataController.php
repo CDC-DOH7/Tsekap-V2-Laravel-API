@@ -126,21 +126,26 @@ class AnalyticsDataController extends Controller
         }
 
         try {
+
             // Philpen Risk Assessment Form
-            $results = DB::table('risk_profile as p')
-                ->join('new_age_brackets as a', 'p.age_bracket_id', '=', 'a.id')
-                ->select('a.id', 'a.description', 'p.age_bracket_id', 'p.sex', 'p.age')
-                ->whereNotNull('p.age_bracket_id')
-                ->where('p.facility_id_updated', "=", $hf_id)
-                ->get();
+            if ($form_type === 'raf') {
+                $results = DB::table('risk_profile as p')
+                    ->join('new_age_brackets as a', 'p.age_bracket_id', '=', 'a.id')
+                    ->select('a.id', 'a.description', 'p.age_bracket_id', 'p.sex', 'p.age')
+                    ->whereNotNull('p.age_bracket_id')
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             // PCHRAT Form
-            $results = DB::table('pch_risk_assessment_tool_profile as p')
-                ->join('new_age_brackets as a', 'p.age_bracket_id', '=', 'a.id')
-                ->select('a.id', 'a.description', 'p.age_bracket_id', 'p.sex', 'p.age')
-                ->whereNotNull('p.age_bracket_id')
-                ->where('p.facility_id_updated', "=", $hf_id)
-                ->get();
+            if ($form_type === 'pch') {
+                $results = DB::table('pch_risk_assessment_tool_profile as p')
+                    ->join('new_age_brackets as a', 'p.age_bracket_id', '=', 'a.id')
+                    ->select('a.id', 'a.description', 'p.age_bracket_id', 'p.sex', 'p.age')
+                    ->whereNotNull('p.age_bracket_id')
+                    ->where('p.facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -167,18 +172,22 @@ class AnalyticsDataController extends Controller
 
         try {
             // Philpen Risk Assessment Form
-            $patients = DB::table('risk_profile')
-                ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
-                ->whereNotNull('age_bracket_id')
-                ->where('facility_id_updated', "=", $hf_id)
-                ->get();
+            if ($form_type === 'raf') {
+                $patients = DB::table('risk_profile')
+                    ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
+                    ->whereNotNull('age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             // PCHRAT Form
-            $patients = DB::table('pch_risk_assessment_tool_profile')
-                ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
-                ->whereNotNull('age_bracket_id')
-                ->where('facility_id_updated', "=", $hf_id)
-                ->get();
+            if ($form_type === 'pch') {
+                $patients = DB::table('pch_risk_assessment_tool_profile')
+                    ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
+                    ->whereNotNull('age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($patients);
         } catch (Exception $e) {
@@ -204,20 +213,23 @@ class AnalyticsDataController extends Controller
         }
 
         try {
-
             // Philpen Risk Assessment Form
-            $patients = DB::table('risk_profile')
-                ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
-                ->whereNotNull('age_bracket_id')
-                ->where('facility_id_updated', "=", $hf_id)
-                ->get();
+            if ($form_type === 'raf') {
+                $patients = DB::table('risk_profile')
+                    ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
+                    ->whereNotNull('age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             // PCHRAT Form
-            $patients = DB::table('pch_risk_assessment_tool_profile')
-                ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
-                ->whereNotNull('age_bracket_id')
-                ->where('facility_id_updated', "=", $hf_id)
-                ->get();
+            if ($form_type === 'pch') {
+                $patients = DB::table('pch_risk_assessment_tool_profile')
+                    ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
+                    ->whereNotNull('age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($patients);
         } catch (Exception $e) {
@@ -244,18 +256,22 @@ class AnalyticsDataController extends Controller
 
         try {
             // Philpen Risk Assessment Form
-            $patients = DB::table('risk_profile')
-                ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
-                ->whereNotNull('age_bracket_id')
-                ->where('facility_id_updated', "=", $hf_id)
-                ->get();
+            if ($form_type === 'raf') {
+                $patients = DB::table('risk_profile')
+                    ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
+                    ->whereNotNull('age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             // PCHRAT Form 
-            $patients = DB::table('pch_risk_assessment_tool_profile')
-                ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
-                ->whereNotNull('age_bracket_id')
-                ->where('facility_id_updated', "=", $hf_id)
-                ->get();
+            if ($form_type === 'pch') {
+                $patients = DB::table('pch_risk_assessment_tool_profile')
+                    ->select('profile_id', 'sex', 'age', 'age_bracket_id', 'created_at')
+                    ->whereNotNull('age_bracket_id')
+                    ->where('facility_id_updated', "=", $hf_id)
+                    ->get();
+            }
 
             return response()->json($patients);
         } catch (Exception $e) {
@@ -476,7 +492,7 @@ class AnalyticsDataController extends Controller
         }
 
         try {
-
+            // Philpen Risk Assessment Form
             if ($form_type === 'raf') {
                 $results = DB::table('risk_profile')
                     ->select('id', 'sex', 'age_bracket_id')
@@ -484,6 +500,7 @@ class AnalyticsDataController extends Controller
                     ->get();
             }
 
+            // PCHRAT Form
             if ($form_type === 'pch') {
                 $results = DB::table('pch_risk_assessment_tool_profile')
                     ->select('id', 'sex', 'age_bracket_id')
