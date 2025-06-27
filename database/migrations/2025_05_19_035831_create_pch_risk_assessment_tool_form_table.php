@@ -117,7 +117,8 @@ return new class extends Migration
                 $table->string('presence_of_urine_ketones_newly_diagnosed', 15)->nullable();
                 $table->double('urine_ketones')->nullable();
                 $table->date('urine_ketones_date_taken')->nullable();
-                $table->string('fbs_rbs', 255)->nullable();
+                $table->unsignedInteger('fbs')->nullable();
+                $table->unsignedInteger('rbs')->nullable();
                 $table->date('fbs_rbs_date_taken')->nullable();
                 $table->double('blood_lipid')->nullable();
                 $table->string('has_raised_blood_lipid', 15)->nullable();

@@ -142,8 +142,6 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-get-alcohol-binge-drinker-summary-patient-info');
             Route::get('/get-alcohol-binge-drinker-summary-risk-profile', [AnalyticsDataController::class, 'getAlcoholBingeDrinkerSummaryRiskProfile'])
                 ->name('api-v2-analytics-get-alcohol-binge-drinker-summary-risk-profile');
-            Route::get('/get-alcohol-binge-drinker-summary-age-brackets', [AnalyticsDataController::class, 'getAlcoholBingeDrinkerSummaryAgeBrackets'])
-                ->name('api-v2-analytics-get-alcohol-binge-drinker-summary-age-brackets');
 
             // endpoint: /physical_activity_summary
             Route::get('/get-physical-activity-summary-data', [AnalyticsDataController::class, 'getPhysicalActivitySummaryData'])

@@ -111,7 +111,7 @@ class AnalyticsDataController extends Controller
     // ================== END AGE GROUP SUMMARY FUNCTIONS ==================
 
     // ================== 3. AGE RANGE SUMMARY FUNCTIONS (/age_range_summary) ==================
-    // Controller Count: 2
+    // Controller Count: 1
     public function getAgeRangeSummary(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -240,7 +240,7 @@ class AnalyticsDataController extends Controller
     // ================== END MORBIDITY SUMMARY FUNCTIONS ==================
 
     // ================== 6. MONTHLY SUMMARY FUNCTIONS (/monthly_summary) ==================
-    // Controller Count: 3
+    // Controller Count: 2
     public function getMonthlySummaryPatientData(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -317,7 +317,7 @@ class AnalyticsDataController extends Controller
     // ================== END MONTHLY SUMMARY FUNCTIONS ==================
 
     // ================== 7. CLINICAL COMPLAINTS SUMMARY FUNCTIONS (/clinical_complaints_summary) ==================
-    // Controller Count: 3
+    // Controller Count: 2
     public function getClinicalComplaintsArRecords(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -430,7 +430,7 @@ class AnalyticsDataController extends Controller
     // ================== END CLINICAL COMPLAINTS SUMMARY FUNCTIONS ==================
 
     // ================== 8. TOBACCO SUMMARY FUNCTIONS (/tobacco_summary) ==================
-    // Controller Count: 4
+    // Controller Count: 3
     public function getTobaccoSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -552,7 +552,7 @@ class AnalyticsDataController extends Controller
     // ================== END TOBACCO SUMMARY FUNCTIONS ==================
 
     // ================== 9. ALCOHOL INTAKE SUMMARY FUNCTIONS (/alcohol_intake_summary) ==================
-    // Controller Count: 4
+    // Controller Count: 3
     public function getAlcoholIntakeSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -777,22 +777,10 @@ class AnalyticsDataController extends Controller
             return response()->json(['error' => 'Failed to fetch data'], 500);
         }
     }
-
-    public function getAlcoholBingeDrinkerSummaryAgeBrackets(Request $request)
-    {
-        try {
-            $ageBrackets = DB::table('new_age_brackets')->get();
-            return response()->json($ageBrackets);
-        } catch (Exception $e) {
-            Log::error("Error fetching risk profiles: " . $e->getMessage() . ".");
-            return response()->json(['error' => 'Failed to fetch data.'], 500);
-        }
-    }
-    // ================== END ALCOHOL INTAKE SUMMARY FUNCTIONS ==================
+    // ================== END ALCOHOL BINGE DRINKER SUMMARY FUNCTIONS ==================
 
     // ================== 11. PHYSICAL ACTIVITY SUMMARY FUNCTIONS (/physical_activity_summary) ==================
-
-    // Controller Count: 4
+    // Controller Count: 3
     public function getPhysicalActivitySummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -919,7 +907,7 @@ class AnalyticsDataController extends Controller
     // ================== END PHYSICAL ACTIVITY SUMMARY FUNCTIONS ==================
 
     // ================== 12. NUTRITION SUMMARY FUNCTIONS (/nutrition_summary) ==================
-    // Controller Count: 4
+    // Controller Count: 3
     public function getNutritionSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -1041,7 +1029,7 @@ class AnalyticsDataController extends Controller
     // ================== END NUTRITION SUMMARY FUNCTIONS ==================
 
     // ================== 13. PREV MED HISTORY SUMMARY FUNCTIONS (/prev_med_history_summary) ==================
-    // Controller Count: 4
+    // Controller Count: 3
     public function getPrevMedHistorySummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -1193,7 +1181,7 @@ class AnalyticsDataController extends Controller
     // ================== END PREV MED HISTORY SUMMARY FUNCTIONS ==================
 
     // ================== 14. FAMILY HISTORY SUMMARY FUNCTIONS (/family_history_summary) ==================
-    // Controller Count: 4
+    // Controller Count: 3
     public function getFamilyHistorySummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -1341,7 +1329,7 @@ class AnalyticsDataController extends Controller
     // ================== END FAMILY HISTORY SUMMARY FUNCTIONS ==================
 
     // ================== 15. BP1 SUMMARY FUNCTIONS (/bp1_summary) ==================
-    // Controller Count: 4
+    // Controller Count: 3
     public function getBp1SummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -1467,7 +1455,7 @@ class AnalyticsDataController extends Controller
     // ================== END BP1 HISTORY SUMMARY FUNCTIONS ==================
 
     // ================== 16. HYPERTENSION/BP2 SUMMARY FUNCTIONS (/hypertension_summary) ==================
-    // Controller Count: 4
+    // Controller Count: 3
     public function getBp2SummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -1589,7 +1577,7 @@ class AnalyticsDataController extends Controller
     // ================== END HYPERTENSION SUMMARY FUNCTIONS ==================
 
     // ================== 17. DIABETES SUMMARY FUNCTIONS (/diabetes_summary) ==================
-    // Controller Count: 4
+    // Controller Count: 3
     public function getDiabetesSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -1713,7 +1701,7 @@ class AnalyticsDataController extends Controller
     // ================== END DIABETES SUMMARY FUNCTIONS ==================
 
     // ================== 18. HYPERCHOLESTEROLEMIA SUMMARY FUNCTIONS (/hypercholesterolemia_summary) ==================
-    // Controller Count: 4
+    // Controller Count: 3
     public function getHypercholesterolemiaSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -1840,7 +1828,7 @@ class AnalyticsDataController extends Controller
     // ================== END HYPERCHOLESTEROLEMIA SUMMARY FUNCTIONS ==================
 
     // ================== 19. RESPIRATORY SUMMARY FUNCTIONS (/respiratory_summary) ==================
-    // Controller Count: 4
+    // Controller Count: 3
     public function getRespiratorySummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -1967,7 +1955,7 @@ class AnalyticsDataController extends Controller
     // ================== END RESPIRATORY SUMMARY FUNCTIONS ==================
 
     // ================== 20. PROBABLE SUMMARY FUNCTIONS (/probable_summary) ==================
-    // Controller Count: 4
+    // Controller Count: 3
     public function getProbableSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
