@@ -81,6 +81,7 @@ Route::prefix('v2')->group(function () {
             Route::prefix('population')->group(function () {
                 Route::post('/create-total-profiling-population', [ProfilingTotalPopulationController::class, 'createProfilingTotalPopulation'])->name('api-v2-create-profiling-total-population');
                 Route::get('/retrieve-total-profiling-population', [ProfilingTotalPopulationController::class, 'retrieveProfilingTotalPopulation'])->name('api-v2-retrieve-profiling-total-population');
+                Route::get('/retrieve-total-profiling-population-breakdown', [ProfilingTotalPopulationController::class, 'retrieveProfilingTotalPopulationValuesBreakdown'])->name('api-v2-retrieve-profiling-total-population-breakdown');
                 Route::get('/retrieve-total-profiling-population-values', [ProfilingTotalPopulationController::class, 'retrieveProfilingTotalPopulationValues'])->name('api-v2-retrieve-total-profiling-population-values');
                 Route::post('/update-total-profiling-population', [ProfilingTotalPopulationController::class, 'updateProfilingTotalPopulation'])->name('api-v2-update-profiling-total-population');
                 Route::post('/delete-total-profiling-population', [ProfilingTotalPopulationController::class, 'deleteProfilingTotalPopulation'])->name('api-v2-delete-profiling-total-population');
@@ -133,6 +134,16 @@ Route::prefix('v2')->group(function () {
                 ->name('api-v2-analytics-get-alcohol-intake-summary-patient-info');
             Route::get('/get-alcohol-intake-summary-risk-profile', [AnalyticsDataController::class, 'getAlcoholIntakeSummaryRiskProfile'])
                 ->name('api-v2-analytics-get-alcohol-intake-summary-risk-profile');
+
+            // endpoint: /alcohol_binge_drinker_summary
+            Route::get('/get-alcohol-binge-drinker-summary-data', [AnalyticsDataController::class, 'getAlcoholBingeDrinkerSummaryData'])
+                ->name('api-v2-analytics-get-alcohol-binge-drinker-summary-data');
+            Route::get('/get-alcohol-binge-drinker-summary-patient-info', [AnalyticsDataController::class, 'getAlcoholBingeDrinkerSummaryPatientInfo'])
+                ->name('api-v2-analytics-get-alcohol-binge-drinker-summary-patient-info');
+            Route::get('/get-alcohol-binge-drinker-summary-risk-profile', [AnalyticsDataController::class, 'getAlcoholBingeDrinkerSummaryRiskProfile'])
+                ->name('api-v2-analytics-get-alcohol-binge-drinker-summary-risk-profile');
+            Route::get('/get-alcohol-binge-drinker-summary-age-brackets', [AnalyticsDataController::class, 'getAlcoholBingeDrinkerSummaryAgeBrackets'])
+                ->name('api-v2-analytics-get-alcohol-binge-drinker-summary-age-brackets');
 
             // endpoint: /physical_activity_summary
             Route::get('/get-physical-activity-summary-data', [AnalyticsDataController::class, 'getPhysicalActivitySummaryData'])

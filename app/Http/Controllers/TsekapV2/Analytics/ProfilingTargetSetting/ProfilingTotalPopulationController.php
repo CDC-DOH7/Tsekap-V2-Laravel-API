@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting;
 
 use App\Http\Controllers\Controller;
+
+use App\Models\User;
+use App\Models\TsekapV2\Barangay;
+use App\Models\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTargetModel;
+use App\Models\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTotalPopulationModel;
+
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
-use App\Models\User;
-use App\Models\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTotalPopulationModel;
 use Exception;
 
 class ProfilingTotalPopulationController extends Controller
@@ -22,6 +26,8 @@ class ProfilingTotalPopulationController extends Controller
             Log::error('Denied access to (ProfilingTargetController) for: ' . " " . $queryUser->id);
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
+        return $queryUser;
     }
 
     private function getAuthenticatedUser($username)
@@ -61,9 +67,7 @@ class ProfilingTotalPopulationController extends Controller
             $validatedFields = $validator->validate();
         } catch (ValidationException $e) {
             Log::error('Validation error in the creation of a profiling population: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Validation failed'
-            ], 422);
+            return response()->json(['error' => 'Invalid input: fields are required'], 422);
         }
 
         $validatedFields = $validatedFields['fields'];
@@ -157,6 +161,68 @@ class ProfilingTotalPopulationController extends Controller
                 'total_population' => $profilingTotalPopulation->total_population,
             ]
         ], 200);
+    }
+
+    public function retrieveProfilingTotalPopulationValuesBreakdown(Request $request)
+    {
+        // Ensure the user is authenticated via Sanctum
+        $user = $this->getAuthenticatedUser($request->user()->username);
+
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
+        }
+
+        $validator = Validator::make($request->all(), [
+            'muncity_id' => 'required|integer',
+        ]);
+
+        try {
+            $validatedFields = $validator->validate();
+        } catch (ValidationException $e) {
+            Log::error('Validation error in retrieving sex breakdown: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Validation failed'
+            ], 422);
+        }
+
+        $muncityId = $validatedFields['muncity_id'];
+
+        // retrieve the list of barangays in the muncity
+        $barangays = Barangay::where('muncity_id', "=", $muncityId)
+            ->select('id', 'muncity_id', 'description')
+            ->get();
+
+        if ($barangays->isEmpty()) {
+            return response()->json(['status' => 'error', 'message' => 'No barangays found.'], 404);
+        }
+
+        // Isolate only the barangay IDs as an array
+        $barangayIds = $barangays->pluck('id')->toArray();
+
+        $totalMalePopulationCount = 0;
+        $totalFemalePopulationCount = 0;
+
+        foreach ($barangayIds as $barangayId) {
+            $population = ProfilingTargetModel::where('barangay_id', "=", $barangayId)
+                ->select('id', 'male_population', 'female_population')
+                ->first();
+
+            $male_population = $population ? $population->male_population : 0;
+            $female_population = $population ? $population->female_population : 0;
+
+            $totalMalePopulationCount += $male_population;
+            $totalFemalePopulationCount += $female_population;
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'muncity_id' => $muncityId,
+                'male' => $totalMalePopulationCount,
+                'female' => $totalFemalePopulationCount,
+                'total_population' => $totalMalePopulationCount + $totalFemalePopulationCount,
+            ] // <-- add this
+        ], 200); // <-- and this
     }
 
     public function updateProfilingTotalPopulation(Request $request)

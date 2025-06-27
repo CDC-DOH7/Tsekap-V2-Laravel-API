@@ -63,7 +63,7 @@ class UserController extends Controller
         $currentPassword = $fields['current_password'];
         $newPassword = $fields['new_password'];
 
-        if (!Hash::check($currentPassword, $queryUser->password)) {
+        if (!Hash::check($currentPassword, (string) $queryUser->password)) {
             return response()->json(['status' => 'error', 'message' => 'Current password is incorrect'], 400);
         }
 
