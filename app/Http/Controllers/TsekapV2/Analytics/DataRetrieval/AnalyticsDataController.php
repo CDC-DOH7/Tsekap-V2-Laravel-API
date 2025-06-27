@@ -10,8 +10,6 @@ use Exception;
 
 class AnalyticsDataController extends Controller
 {
-    // private function generalPatientQuery(){}
-
     // ###########################################################################################
     // ================== 1. PATIENT SUMMARY FUNCTIONS (/patient_summary) ==================
     // Controller Count: 1
@@ -451,7 +449,94 @@ class AnalyticsDataController extends Controller
     }
     // ================== END ALCOHOL INTAKE SUMMARY FUNCTIONS ==================
 
-    // ================== 10. PHYSICAL ACTIVITY SUMMARY FUNCTIONS (/physical_activity_summary) ==================
+    // ================== 10. ALCOHOL BINGE DRINKER SUMMARY FUNCTIONS (/alcohol_binge_drinker_summary) ==================
+    // Controller Count: 4
+    public function getAlcoholBingeDrinkerSummaryData(Request $request)
+    {
+        $hf_id = $request->query('hf_id');
+        $start_date = $request->query('start_date');
+        $end_date = $request->query('end_date');
+
+        if (!$hf_id || !$start_date || !$end_date) {
+            return response()->json([
+                'error' => 'hf_id, start_date, and end_date are required'
+            ], 400);
+        }
+
+        try {
+            $results = DB::table('risk_form as f')
+                ->join('risk_profile as p', 'f.risk_profile_id', '=', 'p.id')
+                ->select('f.risk_profile_id', 'f.rf_alcohol_binge_drinker', 'f.created_at')
+                ->where('p.facility_id_updated', $hf_id)
+                ->where('f.created_at', '>=', $start_date)
+                ->where('f.created_at', '<', $end_date)
+                ->get();
+
+            return response()->json($results);
+        } catch (Exception $e) {
+            Log::error("Error fetching alcohol binge drinker data: " . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch alcohol binge drinker data'], 500);
+        }
+    }
+
+    public function getAlcoholBingeDrinkerSummaryPatientInfo(Request $request)
+    {
+        $hf_id = $request->query('hf_id');
+
+        if (!$hf_id) {
+            return response()->json([
+                'error' => 'hf_id is required'
+            ], 400);
+        }
+
+        try {
+            $results = DB::table('risk_profile')
+                ->select('id', 'sex', 'age_bracket_id')
+                ->where('facility_id_updated', $hf_id)
+                ->get();
+
+            return response()->json($results);
+        } catch (Exception $e) {
+            Log::error("Error retrieving patient info: " . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to fetch patient information'
+            ], 500);
+        }
+    }
+
+    public function getAlcoholBingeDrinkerSummaryRiskProfile(Request $request)
+    {
+        $hf_id = $request->query('hf_id');
+
+        if (!$hf_id) {
+            return response()->json(['error' => 'hf_id is required'], 400);
+        }
+
+        try {
+            $results = DB::table('risk_profile')
+                ->where('facility_id_updated', $hf_id)
+                ->get();
+
+            return response()->json($results);
+        } catch (Exception $e) {
+            Log::error("Error fetching risk profiles: " . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch data'], 500);
+        }
+    }
+
+    public function getAlcoholBingeDrinkerSummaryAgeBrackets(Request $request)
+    {
+        try {
+            $ageBrackets = DB::table('new_age_brackets')->get();
+            return response()->json($ageBrackets);
+        } catch (Exception $e) {
+            Log::error("Error fetching age brackets: " . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch age brackets'], 500);
+        }
+    }
+    // ================== END ALCOHOL INTAKE SUMMARY FUNCTIONS ==================
+
+    // ================== 11. PHYSICAL ACTIVITY SUMMARY FUNCTIONS (/physical_activity_summary) ==================
     // Controller Count: 4
     public function getPhysicalActivitySummaryData(Request $request)
     {
@@ -539,7 +624,7 @@ class AnalyticsDataController extends Controller
     }
     // ================== END PHYSICAL ACTIVITY SUMMARY FUNCTIONS ==================
 
-    // ================== 11. NUTRITION SUMMARY FUNCTIONS (/nutrition_summary) ==================
+    // ================== 12. NUTRITION SUMMARY FUNCTIONS (/nutrition_summary) ==================
     // Controller Count: 4
     public function getNutritionSummaryData(Request $request)
     {
@@ -626,7 +711,7 @@ class AnalyticsDataController extends Controller
     }
     // ================== END NUTRITION SUMMARY FUNCTIONS ==================
 
-    // ================== 12. PREV MED HISTORY SUMMARY FUNCTIONS (/prev_med_history_summary) ==================
+    // ================== 13. PREV MED HISTORY SUMMARY FUNCTIONS (/prev_med_history_summary) ==================
     // Controller Count: 4
     public function getPrevMedHistorySummaryData(Request $request)
     {
@@ -725,7 +810,7 @@ class AnalyticsDataController extends Controller
     }
     // ================== END PREV MED HISTORY SUMMARY FUNCTIONS ==================
 
-    // ================== 13. FAMILY HISTORY SUMMARY FUNCTIONS (/family_history_summary) ==================
+    // ================== 14. FAMILY HISTORY SUMMARY FUNCTIONS (/family_history_summary) ==================
     // Controller Count: 4
     public function getFamilyHistorySummaryData(Request $request)
     {
@@ -822,7 +907,7 @@ class AnalyticsDataController extends Controller
     }
     // ================== END FAMILY HISTORY SUMMARY FUNCTIONS ==================
 
-    // ================== 14. BP1 SUMMARY FUNCTIONS (/bp1_summary) ==================
+    // ================== 15. BP1 SUMMARY FUNCTIONS (/bp1_summary) ==================
     // Controller Count: 4
     public function getBp1SummaryData(Request $request)
     {
@@ -910,7 +995,7 @@ class AnalyticsDataController extends Controller
     }
     // ================== END BP1 HISTORY SUMMARY FUNCTIONS ==================
 
-    // ================== 15. HYPERTENSION/BP2 SUMMARY FUNCTIONS (/hypertension_summary) ==================
+    // ================== 16. HYPERTENSION/BP2 SUMMARY FUNCTIONS (/hypertension_summary) ==================
     // Controller Count: 4
     public function getBp2SummaryData(Request $request)
     {
@@ -998,7 +1083,7 @@ class AnalyticsDataController extends Controller
     }
     // ================== END HYPERTENSION SUMMARY FUNCTIONS ==================
 
-    // ================== 16. DIABETES SUMMARY FUNCTIONS (/diabetes_summary) ==================
+    // ================== 17. DIABETES SUMMARY FUNCTIONS (/diabetes_summary) ==================
     // Controller Count: 4
     public function getDiabetesSummaryData(Request $request)
     {
@@ -1085,7 +1170,7 @@ class AnalyticsDataController extends Controller
     }
     // ================== END DIABETES SUMMARY FUNCTIONS ==================
 
-    // ================== 17. HYPERCHOLESTEROLEMIA SUMMARY FUNCTIONS (/hypercholesterolemia_summary) ==================
+    // ================== 18. HYPERCHOLESTEROLEMIA SUMMARY FUNCTIONS (/hypercholesterolemia_summary) ==================
     // Controller Count: 4
     public function getHypercholesterolemiaSummaryData(Request $request)
     {
@@ -1174,7 +1259,7 @@ class AnalyticsDataController extends Controller
     }
     // ================== END HYPERCHOLESTEROLEMIA SUMMARY FUNCTIONS ==================
 
-    // ================== 18. RESPIRATORY SUMMARY FUNCTIONS (/respiratory_summary) ==================
+    // ================== 19. RESPIRATORY SUMMARY FUNCTIONS (/respiratory_summary) ==================
     // Controller Count: 4
     public function getRespiratorySummaryData(Request $request)
     {
@@ -1261,7 +1346,7 @@ class AnalyticsDataController extends Controller
     }
     // ================== END RESPIRATORY SUMMARY FUNCTIONS ==================
 
-    // ================== 19. PROBABLE SUMMARY FUNCTIONS (/probable_summary) ==================
+    // ================== 20. PROBABLE SUMMARY FUNCTIONS (/probable_summary) ==================
     // Controller Count: 4
     public function getProbableSummaryData(Request $request)
     {
