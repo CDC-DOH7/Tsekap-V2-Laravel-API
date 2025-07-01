@@ -161,7 +161,7 @@ class DataController extends Controller
         }
 
         // Paginate and return results
-        $results = $query->simplePaginate(30);
+        $results = $query->orderBy('created_at', 'desc')->simplePaginate(30);
         return response()->json($results, 200);
     }
 
@@ -281,7 +281,7 @@ class DataController extends Controller
         }
 
         // Paginate and return results
-        $results = $query->simplePaginate(30);
+        $results = $query->orderBy('created_at', 'desc')->simplePaginate(30);
         return response()->json($results, 200);
     }
 
@@ -391,19 +391,20 @@ class DataController extends Controller
             'symptoms_polyphagia',
             'symptoms_polydipsia',
             'symptoms_polyuria',
-            'presence_of_urine_ketones_newly_diagnosed',
             'has_raised_blood_glucose',
+            'presence_of_urine_ketones_newly_diagnosed',
             'urine_ketones',
-            'fbs_rbs',
-            'fbs_rbs_date_taken',
             'urine_ketones_date_taken',
+            'fbs',
+            'rbs',
+            'fbs_rbs_date_taken',
             'has_raised_blood_lipid',
-            'management',
             'total_cholesterol',
             'total_cholesterol_date_taken',
+            'management',
             'lifestyle_modification',
-            'presence_of_urine_protein',
             'medications',
+            'presence_of_urine_protein',
             'urine_protein',
             'urine_protein_date_taken',
             'date_follow_up',
@@ -657,28 +658,28 @@ class DataController extends Controller
             'fields.ph_immunization_record_adult_and_elderly_others_specify' => 'sometimes|nullable|string|max:255',
 
             'fields.wr_menarche' => 'sometimes|nullable|string|max:15',
-            'fields.wr_menarche_age' => 'sometimes|nullable|integer|max:255',
+            'fields.wr_menarche_age' => 'sometimes|nullable|integer|min:0',
             'fields.wr_menopause' => 'sometimes|nullable|string|max:15',
-            'fields.wr_menopause_age' => 'sometimes|nullable|integer',
-            'fields.wr_no_of_pads_used_per_day' => 'sometimes|nullable|integer',
-            'fields.wr_interval_cycle_of_menstruation_in_days' => 'sometimes|nullable|integer',
+            'fields.wr_menopause_age' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_no_of_pads_used_per_day' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_interval_cycle_of_menstruation_in_days' => 'sometimes|nullable|integer|min:0',
             'fields.wr_birth_control_method_used' => 'sometimes|nullable|string',
-            'fields.wr_onset_of_sexual_intercourse_age' => 'sometimes|nullable|integer',
-            'fields.wr_pregnancy_history_gravidity' => 'sometimes|nullable|integer',
-            'fields.wr_pregnancy_history_parity' => 'sometimes|nullable|integer',
+            'fields.wr_onset_of_sexual_intercourse_age' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_pregnancy_history_gravidity' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_pregnancy_history_parity' => 'sometimes|nullable|integer|min:0',
             'fields.wr_pre_eclampsia' => 'sometimes|nullable|string|max:15',
             'fields.wr_with_access_to_family_planning_counseling' => 'sometimes|nullable|string|max:15',
-            'fields.wr_pregnancy_history_num_of_full_term_pregnancy' => 'sometimes|nullable|integer',
-            'fields.wr_pregnancy_history_num_of_premature_pregnancy' => 'sometimes|nullable|integer',
-            'fields.wr_number_of_abortion' => 'sometimes|nullable|integer',
-            'fields.wr_number_of_living_children' => 'sometimes|nullable|integer',
+            'fields.wr_pregnancy_history_num_of_full_term_pregnancy' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_pregnancy_history_num_of_premature_pregnancy' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_number_of_abortion' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_number_of_living_children' => 'sometimes|nullable|integer|min:0',
 
             'fields.fmh_first_degree_relatives_with' => 'sometimes|nullable|string|max:255',
             'fields.fmh_first_degree_relatives_with_specify_others' => 'sometimes|nullable|string|max:255',
 
             'fields.sh_smoking' => 'sometimes|nullable|string|max:50',
             'fields.sh_use_of_vape' => 'sometimes|nullable|string|max:15',
-            'fields.sh_use_of_vape_age_started' => 'sometimes|nullable|integer',
+            'fields.sh_use_of_vape_age_started' => 'sometimes|nullable|integer|min:0',
 
             'fields.soch_illicit_drug_use' => 'sometimes|nullable|string|max:15',
             'fields.soch_illicit_drug_use_specify_illicit_drug_used' => 'sometimes|nullable|string|max:255',
@@ -711,7 +712,8 @@ class DataController extends Controller
             'fields.presence_of_urine_ketones_newly_diagnosed' => 'sometimes|nullable|string|max:15',
             'fields.urine_ketones' => 'sometimes|nullable|numeric',
             'fields.urine_ketones_date_taken' => 'sometimes|nullable|date',
-            'fields.fbs_rbs' => 'sometimes|nullable|string|max:255',
+            'fields.fbs' => 'sometimes|nullable|integer|min:0',
+            'fields.rbs' => 'sometimes|nullable|integer|min:0',
             'fields.fbs_rbs_date_taken' => 'sometimes|nullable|date',
             'fields.blood_lipid' => 'sometimes|nullable|numeric',
             'fields.has_raised_blood_lipid' => 'sometimes|nullable|string|max:15',
@@ -922,28 +924,28 @@ class DataController extends Controller
             'fields.ph_immunization_record_adult_and_elderly_others_specify' => 'sometimes|nullable|string|max:255',
 
             'fields.wr_menarche' => 'sometimes|nullable|string|max:15',
-            'fields.wr_menarche_age' => 'sometimes|nullable|integer|max:255',
+            'fields.wr_menarche_age' => 'sometimes|nullable|integer|min:0',
             'fields.wr_menopause' => 'sometimes|nullable|string|max:15',
-            'fields.wr_menopause_age' => 'sometimes|nullable|integer',
-            'fields.wr_no_of_pads_used_per_day' => 'sometimes|nullable|integer',
-            'fields.wr_interval_cycle_of_menstruation_in_days' => 'sometimes|nullable|integer',
+            'fields.wr_menopause_age' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_no_of_pads_used_per_day' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_interval_cycle_of_menstruation_in_days' => 'sometimes|nullable|integer|min:0',
             'fields.wr_birth_control_method_used' => 'sometimes|nullable|string',
-            'fields.wr_onset_of_sexual_intercourse_age' => 'sometimes|nullable|integer',
-            'fields.wr_pregnancy_history_gravidity' => 'sometimes|nullable|integer',
-            'fields.wr_pregnancy_history_parity' => 'sometimes|nullable|integer',
+            'fields.wr_onset_of_sexual_intercourse_age' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_pregnancy_history_gravidity' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_pregnancy_history_parity' => 'sometimes|nullable|integer|min:0',
             'fields.wr_pre_eclampsia' => 'sometimes|nullable|string|max:15',
             'fields.wr_with_access_to_family_planning_counseling' => 'sometimes|nullable|string|max:15',
-            'fields.wr_pregnancy_history_num_of_full_term_pregnancy' => 'sometimes|nullable|integer',
-            'fields.wr_pregnancy_history_num_of_premature_pregnancy' => 'sometimes|nullable|integer',
-            'fields.wr_number_of_abortion' => 'sometimes|nullable|integer',
-            'fields.wr_number_of_living_children' => 'sometimes|nullable|integer',
+            'fields.wr_pregnancy_history_num_of_full_term_pregnancy' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_pregnancy_history_num_of_premature_pregnancy' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_number_of_abortion' => 'sometimes|nullable|integer|min:0',
+            'fields.wr_number_of_living_children' => 'sometimes|nullable|integer|min:0',
 
             'fields.fmh_first_degree_relatives_with' => 'sometimes|nullable|string|max:50',
             'fields.fmh_first_degree_relatives_with_specify_others' => 'sometimes|nullable|string|max:255',
 
             'fields.sh_smoking' => 'sometimes|nullable|string|max:50',
             'fields.sh_use_of_vape' => 'sometimes|nullable|string|max:15',
-            'fields.sh_use_of_vape_age_started' => 'sometimes|nullable|integer',
+            'fields.sh_use_of_vape_age_started' => 'sometimes|nullable|integer|min:0',
 
             'fields.soch_illicit_drug_use' => 'sometimes|nullable|string|max:15',
             'fields.soch_illicit_drug_use_specify_illicit_drug_used' => 'sometimes|nullable|string|max:255',
@@ -976,7 +978,8 @@ class DataController extends Controller
             'fields.presence_of_urine_ketones_newly_diagnosed' => 'sometimes|nullable|string|max:15',
             'fields.urine_ketones' => 'sometimes|nullable|numeric',
             'fields.urine_ketones_date_taken' => 'sometimes|nullable|date',
-            'fields.fbs_rbs' => 'sometimes|nullable|string|max:255',
+            'fields.fbs' => 'sometimes|nullable|integer|min:0',
+            'fields.rbs' => 'sometimes|nullable|integer|min:0',
             'fields.fbs_rbs_date_taken' => 'sometimes|nullable|date',
             'fields.blood_lipid' => 'sometimes|nullable|numeric',
             'fields.has_raised_blood_lipid' => 'sometimes|nullable|string|max:15',

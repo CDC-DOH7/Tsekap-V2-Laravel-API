@@ -243,7 +243,7 @@ class DataController extends Controller
         }
 
         // Paginate and return results
-        $results = $query->simplePaginate(30);
+        $results = $query->orderBy('created_by', 'desc')->simplePaginate(30);
         return response()->json($results, 200);
     }
 
@@ -346,7 +346,7 @@ class DataController extends Controller
         }
 
         // Paginate and return results
-        $results = $query->simplePaginate(30);
+        $results = $query->orderBy('created_by', 'desc')->simplePaginate(30);
         return response()->json($results, 200);
     }
 
