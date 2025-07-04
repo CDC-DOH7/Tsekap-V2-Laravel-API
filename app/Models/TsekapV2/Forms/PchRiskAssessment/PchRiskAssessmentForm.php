@@ -75,6 +75,9 @@ class PchRiskAssessmentForm extends Model
         'wr_number_of_abortion',
         'wr_number_of_living_children',
 
+        'comorbidities',
+        'comorbidities_others',
+
         'fmh_first_degree_relatives_with',
         'fmh_first_degree_relatives_with_specify_others',
 

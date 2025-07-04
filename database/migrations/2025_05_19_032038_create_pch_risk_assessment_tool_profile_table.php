@@ -36,6 +36,7 @@ return new class extends Migration
                 $table->string('educational_attainment', 50);
                 $table->string('employment_status', 50);
                 $table->string('occupation', 255)->nullable();
+                $table->string('monthly_income', 50)->nullable();
                 $table->string('religion', 50)->nullable();
                 $table->string('other_religion', 255)->nullable();
                 $table->string('indigenous', 50)->nullable();
@@ -64,6 +65,7 @@ return new class extends Migration
                 $table->string('facility_household_number', 50)->nullable();
                 $table->string('family_serial_number', 50)->nullable();
                 $table->string('philhealth_member', 25)->nullable();
+                $table->string('philhealth_membership_type', 255)->nullable();
                 $table->string('philhealth_number', 50)->nullable();
                 $table->string('philhealth_category', 25)->nullable();
                 $table->string('pcb_eligible', 25)->nullable();
