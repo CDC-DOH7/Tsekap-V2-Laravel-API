@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\AdministrativeAnalyticsDataController;
 use App\Http\Controllers\TsekapV2\SessionController;
 use App\Http\Controllers\TsekapV2\UserController;
 use App\Http\Controllers\TsekapV2\Misc\MiscDataController;
@@ -61,13 +62,19 @@ Route::prefix('v2')->group(function () {
 
             // additional routes for verifying users
             Route::post('/verify-user', [AdminController::class, 'verifyUser'])->name('api-v2-admin-verify-user');
-            Route::get('/list-users', [AdminController::class, 'listUnverifiedUsers'])->name('api-v2-admin-list-unverified-users');
+            Route::get('/list-users', [AdminController::class, 'listAllUsers'])->name('api-v2-admin-list-all-users');
+            Route::get('/list-unverified-users', [AdminController::class, 'listUnverifiedUsers'])->name('api-v2-admin-list-unverified-users');
         });
 
         // Analytics Routes
         Route::prefix('analytics')->group(function () {
-            // ---- Analytics Endpoints for Profiling Target Setting ----
 
+            // Administrative Analytics
+            Route::prefix('admin-analytics')->group(function () {
+                Route::get('/get-number-of-entries-by-user-per-facility', [AdministrativeAnalyticsDataController::class, 'countNumberOfEntriesPerByUserPerFacility']);
+            });
+
+            // ---- Analytics Endpoints for Profiling Target Setting ---- 
             // Targets
             Route::prefix('target')->group(function () {
                 Route::post('/create-profiling-target', [ProfilingTargetController::class, 'createProfilingTarget'])->name('api-v2-create-profiling-target');

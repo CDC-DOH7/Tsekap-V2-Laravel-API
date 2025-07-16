@@ -228,4 +228,60 @@ class AdminController extends Controller
             ], 500);
         }
     }
+
+    // list all users, verified or not (priv 1)
+    public function listAllUsers(Request $request)
+    {
+        $admin = $this->getAuthenticatedUser($request->user()->username);
+
+        if ($admin instanceof \Illuminate\Http\JsonResponse) {
+            return $admin; // Return the unauthorized response
+        }
+
+        try {
+            $users = User::select(['id', 'fname', 'mname', 'lname', 'username', 'user_priv', 'verified'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User list retrieved successfully.',
+                'users' => $users
+            ]);
+        } catch (Exception $e) {
+            Log::error('Error fetching users: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while fetching users.',
+            ], 500);
+        }
+    }
+
+    // list all users for facility only (priv 3 and 10) 
+    public function listAllUsersByFacility(Request $request)
+    {
+        $admin = $this->getAuthenticatedUser($request->user()->username);
+
+        if ($admin instanceof \Illuminate\Http\JsonResponse) {
+            return $admin; // Return the unauthorized response
+        }
+
+        try {
+            $users = User::select(['id', 'fname', 'mname', 'lname', 'username', 'user_priv', 'verified'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User list retrieved successfully.',
+                'users' => $users
+            ]);
+        } catch (Exception $e) {
+            Log::error('Error fetching users: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while fetching users.',
+            ], 500);
+        }
+    }
 }

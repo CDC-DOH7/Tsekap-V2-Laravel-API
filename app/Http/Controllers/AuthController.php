@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Models\TsekapV2\UserHealthFacility;
+use Carbon\Traits\ToStringFormat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cookie;
@@ -135,7 +136,7 @@ class AuthController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Your account is not yet verified. Please contact the administrator.'], 403);
         }
 
-        if ($user && Hash::check($validatedFields['pass'], $user->password)) {
+        if ($user && Hash::check($validatedFields['pass'], strval($user->password))) {
 
             // Generate Sanctum token
             $token = $user->createToken('auth_token')->plainTextToken;
