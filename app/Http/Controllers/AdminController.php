@@ -239,7 +239,7 @@ class AdminController extends Controller
         }
 
         try {
-            $users = User::select(['id', 'fname', 'mname', 'lname', 'username', 'user_priv', 'verified'])
+            $users = User::select(['id', 'fname', 'mname', 'lname', 'username', 'user_priv', 'verified', 'created_at'])
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -267,7 +267,7 @@ class AdminController extends Controller
         }
 
         try {
-            $users = User::select(['id', 'fname', 'mname', 'lname', 'username', 'user_priv', 'verified'])
+            $users = User::select(['id', 'fname', 'mname', 'lname', 'username', 'user_priv', 'verified', 'created_at'])
                 ->orderBy('created_at', 'desc')
                 ->get();
 
