@@ -434,7 +434,7 @@ class AnalyticsDataController extends Controller
     public function getTobaccoSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
-        $form_type = $request->query('form_type');
+        $form_type = $request->query('form');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
 
