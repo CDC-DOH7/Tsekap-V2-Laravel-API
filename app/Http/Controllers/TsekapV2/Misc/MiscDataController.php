@@ -192,7 +192,7 @@ class MiscDataController extends Controller
     // get all muncities
     public function getAllMuncities(Request $request)
     {
-        $muncities = Muncity::select('id', 'province_id', 'description')->get();
+        $muncities = Muncity::select('id', 'province_id', 'zip_code', 'description')->get();
         return response()->json($muncities);
     }
 

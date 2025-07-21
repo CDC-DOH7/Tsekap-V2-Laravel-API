@@ -118,6 +118,7 @@ class DataController extends Controller
             'pch_risk_assessment_tool_profile.family_serial_number',
             'pch_risk_assessment_tool_profile.philhealth_member',
             'pch_risk_assessment_tool_profile.philhealth_number',
+            'pch_risk_assessment_tool_profile.philhealth_membership_type',
             'pch_risk_assessment_tool_profile.philhealth_category',
             'pch_risk_assessment_tool_profile.pcb_eligible',
             'pch_risk_assessment_tool_profile.created_at',
@@ -237,6 +238,7 @@ class DataController extends Controller
             'pch_risk_assessment_tool_profile.facility_household_number',
             'pch_risk_assessment_tool_profile.family_serial_number',
             'pch_risk_assessment_tool_profile.philhealth_member',
+            'pch_risk_assessment_tool_profile.philhealth_membership_type',
             'pch_risk_assessment_tool_profile.philhealth_number',
             'pch_risk_assessment_tool_profile.philhealth_category',
             'pch_risk_assessment_tool_profile.pcb_eligible',
@@ -505,6 +507,7 @@ class DataController extends Controller
             'fields.family_serial_number' => 'sometimes|nullable|string|max:50',
             'fields.philhealth_member' => 'sometimes|nullable|string|max:25',
             'fields.philhealth_number' => 'sometimes|nullable|string|max:50',
+            'fields.philhealth_membership_type' => 'sometimes|nullable|string|max:25',
             'fields.philhealth_category' => 'sometimes|nullable|string|max:25',
             'fields.pcb_eligible' => 'sometimes|nullable|string|max:25',
         ];
@@ -834,6 +837,7 @@ class DataController extends Controller
             'fields.family_serial_number' => 'sometimes|nullable|string|max:50',
             'fields.philhealth_member' => 'sometimes|nullable|string|max:25',
             'fields.philhealth_number' => 'sometimes|nullable|string|max:50',
+            'fields.philhealth_membership_type' => 'sometimes|nullable|string|max:25',
             'fields.philhealth_category' => 'sometimes|nullable|string|max:25',
             'fields.pcb_eligible' => 'sometimes|nullable|string|max:25',
         ];
