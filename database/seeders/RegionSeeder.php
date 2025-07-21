@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\TsekapV2\Region;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class RegionSeeder extends Seeder
@@ -14,6 +13,7 @@ class RegionSeeder extends Seeder
     public function run(): void
     {
 
+        // list other regions here
         $regions = [
             ['region_name' => 'Central Visayas', 'region_code' => 'Region VII', 'country_id' => 1]
         ];

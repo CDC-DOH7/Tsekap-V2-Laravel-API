@@ -13,6 +13,7 @@ class ReligionsTableSeeder extends Seeder
     public function run(): void
     {
 
+        // list other religions here
         $religions = [
             'Roman Catholic',
             'Islam',
