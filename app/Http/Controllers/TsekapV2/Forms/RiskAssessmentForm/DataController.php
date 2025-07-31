@@ -21,8 +21,8 @@ class DataController extends Controller
     {
         $queryUser = User::where('username', '=', $username)->first();
 
-        if (!$queryUser || $queryUser->verified !== 1) {
-            Log::error('Denied access to (Risk Assessment, DataController) for:' . " " . $queryUser->id);
+        if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
+            Log::error('Denied access to (Risk Assessment, DataController) for:' . " " . $queryUser->getAttribute('id'));
             return response()->json(['error' => 'User not found'], 404);
         }
 
@@ -35,8 +35,8 @@ class DataController extends Controller
         $queryUser = User::where('username', '=', $username)->first();
 
         // do not authorize update unless 1, 3, 10
-        if ((!$queryUser || !in_array($queryUser->user_priv, [1, 3, 10])) || ($queryUser->verified !== 1)) {
-            Log::error('Denied administrative access to (Risk Assessment, DataController) for: ' + $queryUser->id);
+        if ((!$queryUser || !in_array($queryUser->getAttribute('user_priv'), [1, 3, 10])) || ($queryUser->getAttribute('verified') !== 1)) {
+            Log::error('Denied administrative access to (Risk Assessment, DataController) for: ' + $queryUser->getAttribute('id'));
             return response()->json(['error' => 'Unauthorized'], 401);
         }
     }
@@ -46,7 +46,7 @@ class DataController extends Controller
         $userHealthFacilityMapping = UserHealthFacility::where('user_id', $user->id)->first();
         if ($userHealthFacilityMapping) {
             return Facilities::select('id', 'name', 'address', 'hospital_type')
-                ->where('id', $userHealthFacilityMapping->facility_id)
+                ->where('id', $userHealthFacilityMapping->getAttribute('facility_id'))
                 ->first();
         }
         return null;
@@ -155,7 +155,7 @@ class DataController extends Controller
     public function retrievePatientRiskProfileWithoutFacility(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -211,8 +211,8 @@ class DataController extends Controller
             ->join('province', 'risk_profile.province_id', '=', 'province.id');
 
         // Apply user privilege filters
-        if ($user->user_priv === 3) {
-            $query->where('risk_profile.province_id', $user->province);
+        if ($user->getAttribute('user_priv') === 3) {
+            $query->where('risk_profile.province_id', $user->getAttribute('province'));
         }
 
         // Apply keyword filter
@@ -251,7 +251,7 @@ class DataController extends Controller
     public function retrievePatientRiskProfileByFacility(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -272,7 +272,7 @@ class DataController extends Controller
         // Retrieve the facility for the user
         $facility = $this->getHealthFacilityForUser($user);
 
-        if (($user->user_priv === 6 || $user->verified !== 1) && !$facility) {
+        if (($user->getAttribute('user_priv') === 6 || $user->getAttribute('verified') !== 1) && !$facility) {
             return response()->json(['error' => 'Facility not found for user'], 404);
         }
 
@@ -314,10 +314,10 @@ class DataController extends Controller
             ->join('province', 'risk_profile.province_id', '=', 'province.id');
 
         // Apply user privilege filters
-        if ($user->user_priv === 3) {
-            $query->where('risk_profile.province_id', $user->province);
-        } elseif ($user->user_priv === 6 && $facility) {
-            $query->where('risk_profile.facility_id_updated', $facility->id);
+        if ($user->getAttribute('user_priv') === 3) {
+            $query->where('risk_profile.province_id', $user->getAttribute('province'));
+        } elseif ($user->getAttribute('user_priv') === 6 && $facility) {
+            $query->where('risk_profile.facility_id_updated', $facility->getAttribute('id'));
         }
 
         // Apply keyword filter
@@ -353,7 +353,7 @@ class DataController extends Controller
     public function retrievePatientRiskAssessment(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -465,7 +465,7 @@ class DataController extends Controller
     public function addRiskProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->username);
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -578,7 +578,7 @@ class DataController extends Controller
 
             return response()->json([
                 'message' => 'Entry successfully saved.',
-                'id' => $riskProfile->id
+                'id' => $riskProfile->getAttribute('id')
             ], 200);
         } catch (Exception $e) {
             Log::error('An error occurred while adding a risk profile: ' . $e->getMessage());
@@ -589,7 +589,7 @@ class DataController extends Controller
     public function addRiskForm(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -730,7 +730,7 @@ class DataController extends Controller
     public function updateRiskProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -798,7 +798,7 @@ class DataController extends Controller
     public function updateRiskForm(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -930,7 +930,7 @@ class DataController extends Controller
     public function deleteRiskProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -965,7 +965,7 @@ class DataController extends Controller
     public function deleteRiskForm(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->username); // This replaces Auth::check()x
+        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()x
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }

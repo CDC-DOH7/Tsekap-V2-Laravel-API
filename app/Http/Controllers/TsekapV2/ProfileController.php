@@ -19,8 +19,8 @@ class ProfileController extends Controller
     {
         $queryUser = User::where('username', '=', $username)->first();
 
-        if (!$queryUser || $queryUser->verified !== 1) {
-            Log::error('Denied access for: ' . " " . $queryUser->id);
+        if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
+            Log::error('Denied access for: ' . " " . $queryUser->getAttribute('id'));
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
@@ -32,8 +32,8 @@ class ProfileController extends Controller
     {
         $queryUser = User::where('username', '=', $username)->first();
 
-        if ((!$queryUser || !in_array($queryUser->user_priv, [1, 3, 10])) || ($queryUser->verified !== 1)) {
-            Log::error('Denied administrative access for: ' + $queryUser->id);
+        if ((!$queryUser || !in_array($queryUser->getAttribute('user_priv'), [1, 3, 10])) || ($queryUser->getAttribute('verified') !== 1)) {
+            Log::error('Denied administrative access for: ' . " " . $queryUser->getAttribute('id'));
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
@@ -44,7 +44,7 @@ class ProfileController extends Controller
     private function generateFamilyId(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -53,7 +53,7 @@ class ProfileController extends Controller
         $getFormattedDate = date('His');
 
         $ctrlNo = str_pad($getFormattedDate, 4, 0, STR_PAD_LEFT);
-        $idNo = str_pad($user->id, 4, 0, STR_PAD_LEFT); // prove that there is a user that is logged-in
+        $idNo = str_pad($user->getAttribute('id'), 4, 0, STR_PAD_LEFT); // prove that there is a user that is logged-in
 
         return date('mdy') . '-' . $idNo . '-' . $ctrlNo;
     }
@@ -66,7 +66,7 @@ class ProfileController extends Controller
     public function retrieveProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -124,7 +124,7 @@ class ProfileController extends Controller
     public function addProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -287,7 +287,7 @@ class ProfileController extends Controller
             ])->toArray();
 
             // Ensure profile_id is assigned even if other fields are empty
-            $profileOtherDetailsData['profile_id'] = $profile->id;
+            $profileOtherDetailsData['profile_id'] = $profile->getAttribute('id');
 
             // Save ProfileOtherDetails if at least one address field exists
             if (!empty(array_filter($profileOtherDetailsData))) {
@@ -304,7 +304,7 @@ class ProfileController extends Controller
     public function updateProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->username);
+        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -339,7 +339,7 @@ class ProfileController extends Controller
         // Validate fields
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
-            'fields.unique_id' => 'sometimes|string|max:255|unique:profiles,unique_id,' . $profile->id,
+            'fields.unique_id' => 'sometimes|string|max:255|unique:profiles,unique_id,' . $profile->getAttribute('id'),
             'fields.familyID' => 'sometimes|string|max:255',
             'fields.phicID' => 'sometimes|string|max:100',
             'fields.nhtsID' => 'sometimes|string|max:100',
@@ -433,7 +433,7 @@ class ProfileController extends Controller
     public function deleteProfile(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->username);
+        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }

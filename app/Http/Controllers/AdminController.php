@@ -18,8 +18,8 @@ class AdminController extends Controller
     {
         $queryUser = User::where('username', '=', $username)->first();
 
-        if (!$queryUser || $queryUser->user_priv !== 1 || $queryUser->verified !== 1) {
-            Log::error('Denied administrative access for: ' + $queryUser->id);
+        if (!$queryUser || $queryUser->getAttribute('user_priv') !== 1 || $queryUser->getAttribute('verified') !== 1) {
+            Log::error('Denied administrative access for: ' . $queryUser->getAttribute('id'));
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
@@ -33,10 +33,10 @@ class AdminController extends Controller
 
         if (
             !$queryUser ||
-            !in_array($queryUser->user_priv, [1, 3, 10]) ||
-            $queryUser->verified !== 1
+            !in_array($queryUser->getAttribute('user_priv'), [1, 3, 10]) ||
+            $queryUser->getAttribute('verified') !== 1
         ) {
-            Log::error('Denied administrative access for: ' . ($queryUser->id ?? 'unknown'));
+            Log::error('Denied administrative access for: ' . ($queryUser->getAttribute('id') ?? 'unknown'));
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
@@ -48,7 +48,7 @@ class AdminController extends Controller
     public function registerUser(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
-        $admin = $this->getAuthenticatedUser($request->user()->username);
+        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
         if ($admin instanceof \Illuminate\Http\JsonResponse) {
             return $admin; // Return the unauthorized response
@@ -114,7 +114,7 @@ class AdminController extends Controller
             }
 
             $userHfMapping = UserHealthFacility::create([
-                'user_id' => $user->id,
+                'user_id' => $user->getAttribute('id'),
                 'facility_id' => $validatedFields['facility_id'],
                 'user_designation' => $validatedFields['user_designation'],
                 'assigned_at' => \Carbon\Carbon::now(),
@@ -124,14 +124,14 @@ class AdminController extends Controller
             return response()->json(['status' => 'error', 'message' => 'An error occurred while creating the user.'], 500);
         }
 
-        $message = "Welcome to Tsekapp, " . $user->fname . " (" . $userHfMapping->user_designation . ")!";
+        $message = "Welcome to Tsekapp, " . $user->getAttribute('fname') . " (" . $userHfMapping->getAttribute('user_designation') . ")!";
         return response()->json(['status' => 'success', 'message' => $message], 201);
     }
 
     // reset a user's password
     public function resetUserPassword(Request $request)
     {
-        $admin = $this->getAuthenticatedUser($request->user()->username);
+        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
         if ($admin instanceof \Illuminate\Http\JsonResponse) {
             return $admin; // Return the unauthorized response
@@ -175,13 +175,13 @@ class AdminController extends Controller
         $existingUser->password = bcrypt($validatedFields['new_password']);
         $existingUser->save();
 
-        return response()->json(['status' => 'success', 'message' => 'Password successfully updated for ' . $existingUser->username], 200);
+        return response()->json(['status' => 'success', 'message' => 'Password successfully updated for ' . $existingUser->getAttribute('username')], 200);
     }
 
     // verify a user
     public function verifyUser(Request $request)
     {
-        $admin = $this->getAuthenticatedAdmin($request->user()->username);
+        $admin = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
 
         if ($admin instanceof \Illuminate\Http\JsonResponse) {
             return $admin; // Return the unauthorized response
@@ -224,7 +224,7 @@ class AdminController extends Controller
     // unverify a user
     public function unverifyUser(Request $request)
     {
-        $admin = $this->getAuthenticatedAdmin($request->user()->username);
+        $admin = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
 
         if ($admin instanceof \Illuminate\Http\JsonResponse) {
             return $admin; // Return the unauthorized response
@@ -267,7 +267,7 @@ class AdminController extends Controller
     // list unverified users
     public function listUnverifiedUsers(Request $request)
     {
-        $admin = $this->getAuthenticatedAdmin($request->user()->username);
+        $admin = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
 
         if ($admin instanceof \Illuminate\Http\JsonResponse) {
             return $admin; // Return the unauthorized response
@@ -296,7 +296,7 @@ class AdminController extends Controller
     // list all users, verified or not (priv 1)
     public function listAllUsers(Request $request)
     {
-        $admin = $this->getAuthenticatedAdmin($request->user()->username);
+        $admin = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
 
         if ($admin instanceof \Illuminate\Http\JsonResponse) {
             return $admin; // Return the unauthorized response
@@ -323,7 +323,7 @@ class AdminController extends Controller
 
     public function listAllUsersByFacility(Request $request)
     {
-        $admin = $this->getAuthenticatedUser($request->user()->username);
+        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
         if ($admin instanceof \Illuminate\Http\JsonResponse) {
             return $admin; // Return unauthorized
@@ -331,7 +331,7 @@ class AdminController extends Controller
 
         try {
             // Only allow access if user_priv is 3 or 10
-            if (!in_array($admin->user_priv, [3, 10])) {
+            if (!in_array($admin->getAttribute('user_priv'), [3, 10])) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Unauthorized to view users by facility.',
@@ -340,7 +340,7 @@ class AdminController extends Controller
 
             // Get the admin's facility ID from the user_health_facility table
             $adminFacilityId = DB::table('user_health_facility')
-                ->where('user_id', $admin->id)
+                ->where('user_id', $admin->getAttribute('id'))
                 ->value('facility_id');
 
             if (!$adminFacilityId) {

@@ -19,8 +19,12 @@ use App\Http\Controllers\TsekapV2\Forms\GeneralDataController;
 use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController as PhilpenRiskDataController;
 use App\Http\Controllers\TsekapV2\Forms\PchRiskAssessmentForm\DataController as PchRiskDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\AnalyticsDataController;
-use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTargetController;
-use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTotalPopulationController;
+
+// Total Population and Target Setting Controllers
+use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\Muncity\ProfilingTotalPerMuncityController;
+use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\Muncity\ProfilingTargetPerMuncityController;
+use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\Barangay\ProfilingTotalPerBarangayController;
+use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\Barangay\ProfilingTargetPerBarangayController;
 
 Route::prefix('v2')->group(function () {
     // Non-authenticated Routes
@@ -79,21 +83,44 @@ Route::prefix('v2')->group(function () {
             // ---- Analytics Endpoints for Profiling Target Setting ---- 
             // Targets
             Route::prefix('target')->group(function () {
-                Route::post('/create-profiling-target', [ProfilingTargetController::class, 'createProfilingTarget'])->name('api-v2-create-profiling-target');
-                Route::get('/retrieve-profiling-target', [ProfilingTargetController::class, 'retrieveProfilingTarget'])->name('api-v2-retrieve-profiling-target');
-                Route::get('/retrieve-profiling-target-values', [ProfilingTargetController::class, 'retrieveProfilingTargetValues'])->name('api-v2-retrieve-profiling-target-values');
-                Route::post('/update-profiling-target', [ProfilingTargetController::class, 'updateProfilingTarget'])->name('api-v2-update-profiling-target');
-                Route::post('/delete-profiling-target', [ProfilingTargetController::class, 'deleteProfilingTarget'])->name('api-v2-delete-profiling-target');
+                // muncity
+                Route::prefix('muncity')->group(function () {
+                    Route::get('/check-if-target-muncity-mapping-exists', [ProfilingTargetPerMuncityController::class, 'checkTargetMappingPerMuncityExists'])->name('api-v2-check-if-target-per-muncity-mapping-exists');
+                    Route::post('/create-target-per-muncity', [ProfilingTargetPerMuncityController::class, 'createTargetPerMuncity'])->name('api-v2-create-target-per-muncity');
+                    Route::get('/retrieve-target-per-muncity', [ProfilingTargetPerMuncityController::class, 'retrieveTargetPerMuncity'])->name('api-v2-retrieve-target-per-muncity');
+                    Route::post('/update-target-per-muncity', [ProfilingTargetPerMuncityController::class, 'updateTargetPerMuncity'])->name('api-v2-update-target-per-muncity');
+                    Route::post('/delete-target-per-muncity', [ProfilingTargetPerMuncityController::class, 'deleteTargetPerMuncity'])->name('api-v2-delete-target-per-muncity');
+                });
+
+                // barangayx
+                Route::prefix('barangay')->group(function () {
+                    Route::get('/check-if-target-barangay-mapping-exists', [ProfilingTargetPerBarangayController::class, 'checkTargetMappingPerBarangayExists'])->name('api-v2-check-if-target-per-barangay-mapping-exists');
+                    Route::post('/create-target-per-barangay', [ProfilingTargetPerBarangayController::class, 'createTargetPerBarangay'])->name('api-v2-create-target-per-barangay');
+                    Route::get('/retrieve-target-per-barangay', [ProfilingTargetPerBarangayController::class, 'retrieveTargetPerBarangay'])->name('api-v2-retrieve-target-per-barangay');
+                    Route::post('/update-target-per-barangay', [ProfilingTargetPerBarangayController::class, 'updateTargetPerBarangay'])->name('api-v2-update-target-per-barangay');
+                    Route::post('/delete-target-per-barangay', [ProfilingTargetPerBarangayController::class, 'deleteTargetPerBarangay'])->name('api-v2-delete-target-per-barangay');
+                });
             });
 
             // Population
             Route::prefix('population')->group(function () {
-                Route::post('/create-total-profiling-population', [ProfilingTotalPopulationController::class, 'createProfilingTotalPopulation'])->name('api-v2-create-profiling-total-population');
-                Route::get('/retrieve-total-profiling-population', [ProfilingTotalPopulationController::class, 'retrieveProfilingTotalPopulation'])->name('api-v2-retrieve-profiling-total-population');
-                Route::get('/retrieve-total-profiling-population-breakdown', [ProfilingTotalPopulationController::class, 'retrieveProfilingTotalPopulationValuesBreakdown'])->name('api-v2-retrieve-profiling-total-population-breakdown');
-                Route::get('/retrieve-total-profiling-population-values', [ProfilingTotalPopulationController::class, 'retrieveProfilingTotalPopulationValues'])->name('api-v2-retrieve-total-profiling-population-values');
-                Route::post('/update-total-profiling-population', [ProfilingTotalPopulationController::class, 'updateProfilingTotalPopulation'])->name('api-v2-update-profiling-total-population');
-                Route::post('/delete-total-profiling-population', [ProfilingTotalPopulationController::class, 'deleteProfilingTotalPopulation'])->name('api-v2-delete-profiling-total-population');
+                // muncity
+                Route::prefix('muncity')->group(function () {
+                    Route::get('/check-if-totals-per-muncity-mapping-exists', [ProfilingTotalPerMuncityController::class, 'checkPopulationMappingPerMuncityExists'])->name('api-v2-check-if-totals-per-muncity-mapping-exists');
+                    Route::post('/create-totals-per-muncity', [ProfilingTotalPerMuncityController::class, 'createTotalsPerMuncity'])->name('api-v2-create-population-totals-per-muncity');
+                    Route::get('/retrieve-totals-per-muncity', [ProfilingTotalPerMuncityController::class, 'retrieveTotalsPerMuncity'])->name('api-v2-retrieve-population-totals-per-muncity');
+                    Route::post('/update-totals-per-muncity', [ProfilingTotalPerMuncityController::class, 'updateTotalsPerMuncity'])->name('api-v2-update-population-totals-per-muncity');
+                    Route::post('/delete-totals-per-muncity', [ProfilingTotalPerMuncityController::class, 'deleteTotalsPerMuncity'])->name('api-v2-delete-population-totals-per-muncity');
+                });
+
+                // barangay
+                Route::prefix('barangay')->group(function () {
+                    Route::get('/check-if-totals-per-barangay-mapping-exists', [ProfilingTotalPerBarangayController::class, 'checkPopulationMappingPerBarangayExists'])->name('api-v2-check-if-totals-per-barangay-mapping-exists');
+                    Route::post('/create-totals-per-barangay', [ProfilingTotalPerBarangayController::class, 'createTotalsPerBarangay'])->name('api-v2-create-population-totals-per-barangay');
+                    Route::get('/retrieve-totals-per-barangay', [ProfilingTotalPerBarangayController::class, 'retrieveTotalsPerBarangay'])->name('api-v2-retrieve-population-totals-per-barangay');
+                    Route::post('/update-totals-per-barangay', [ProfilingTotalPerBarangayController::class, 'updateTotalsPerBarangay'])->name('api-v2-update-population-totals-per-barangay');
+                    Route::post('/delete-totals-per-barangay', [ProfilingTotalPerBarangayController::class, 'deleteTotalsPerBarangay'])->name('api-v2-delete-population-totals-per-barangay');
+                });
             });
 
             // endpoint: /age_brackets

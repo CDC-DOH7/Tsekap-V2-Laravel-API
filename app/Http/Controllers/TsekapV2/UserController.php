@@ -18,8 +18,8 @@ class UserController extends Controller
     {
         $queryUser = User::where('username', '=', $username)->first();
 
-        if (!$queryUser || $queryUser->verified !== 1) {
-            Log::error('Denied access for: ' . " " . $queryUser->id);
+        if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
+            Log::error('Denied access for: ' . " " . $queryUser->getAttribute('id'));
             throw new Exception('User not found or not verified');
         }
 
@@ -35,7 +35,7 @@ class UserController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        $queryUser = $this->getAuthenticatedUser($user->username);
+        $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -87,7 +87,7 @@ class UserController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        $queryUser = $this->getAuthenticatedUser($user->username);
+        $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -137,7 +137,7 @@ class UserController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        $queryUser = $this->getAuthenticatedUser($user->username);
+        $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -173,7 +173,7 @@ class UserController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        $queryUser = $this->getAuthenticatedUser($user->username);
+        $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -228,7 +228,7 @@ class UserController extends Controller
         $userId = $validatedFields['fields']['user_id'];
 
         // Only allow deactivation if the user_id matches the authenticated user's id
-        if ($authUser->id !== $userId) {
+        if ($authUser->getAttribute('id') !== $userId) {
             return response()->json(['status' => 'error', 'message' => 'Unauthorized.'], 403);
         }
 

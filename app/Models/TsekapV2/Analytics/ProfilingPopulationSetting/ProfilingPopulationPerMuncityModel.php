@@ -1,22 +1,21 @@
 <?php
 
-namespace App\Models\TsekapV2\Analytics\ProfilingTargetSetting;
+namespace App\Models\TsekapV2\Analytics\ProfilingPopulationSetting;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProfilingTargetModel extends Model
+class ProfilingPopulationPerMuncityModel extends Model
 {
     protected $connection = 'mysql';
 
-    protected $table = "profiling_target";
+    protected $table = "profiling_population_per_muncity";
 
     protected $fillable = [
         'id',
-        'barangay_id',
+        'province_id',
+        'muncity_id',
         'male_population',
         'female_population',
-        'male_target',
-        'female_target',
 
         // system metadata
         'created_at',

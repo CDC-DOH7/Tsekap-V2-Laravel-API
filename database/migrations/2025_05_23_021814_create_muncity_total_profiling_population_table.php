@@ -11,10 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('profiling_total_population', function (Blueprint $table) {
+        Schema::create('profiling_total_population_muncity', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('muncity_id')->index();
             $table->unsignedInteger('total_population')->default(0);
+            $table->timestamps();
+
+            $table->foreign('muncity_id')
+                ->references('id')
+                ->on('muncity')
+                ->onDelete('cascade');
+        });
+
+        Schema::create('profiling_target_population_muncity', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('muncity_id')->index();
+            $table->unsignedInteger('target_population')->default(0);
             $table->timestamps();
 
             $table->foreign('muncity_id')
@@ -29,6 +41,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('profiling_total_population');
+        Schema::dropIfExists('profiling_total_population_per_muncity');
+        Schema::dropIfExists('profiling_target_population_per_muncity');
     }
 };

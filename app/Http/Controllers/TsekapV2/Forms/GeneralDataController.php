@@ -16,7 +16,7 @@ class GeneralDataController extends Controller
     {
         $queryUser = User::where('username', '=', $username)->first();
 
-        if (!$queryUser || $queryUser->verified !== 1) {
+        if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
             Log::error('Denied access for: ' . $username);
             return response()->json(['error' => 'User not found'], 404);
         }
@@ -28,7 +28,7 @@ class GeneralDataController extends Controller
     {
         try {
             // Ensure the user is authenticated via Sanctum
-            $user = $this->getAuthenticatedUser($request->user()->username); // Use query parameter for GET request
+            $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // Use query parameter for GET request
             if ($user instanceof \Illuminate\Http\JsonResponse) {
                 return $user;
             }
@@ -187,8 +187,8 @@ class GeneralDataController extends Controller
                 }
 
                 // Apply user privilege filters
-                if (!in_array($user->user_priv, [1, 3, 10])) {
-                    $query->where("{$config['table']}.facility_id_updated", "=", $user->facility_id);
+                if (!in_array($user->getAttribute('user_priv'), [1, 3, 10])) {
+                    $query->where("{$config['table']}.facility_id_updated", "=", $user->getAttribute('facility_id'));
                 }
 
                 // Apply keyword filter
@@ -230,7 +230,7 @@ class GeneralDataController extends Controller
     {
         try {
             // Ensure the user is authenticated via Sanctum
-            $user = $this->getAuthenticatedUser($request->user()->username); // Use query parameter for GET request
+            $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // Use query parameter for GET request
             if ($user instanceof \Illuminate\Http\JsonResponse) {
                 return $user;
             }
@@ -366,8 +366,8 @@ class GeneralDataController extends Controller
                 }
 
                 // Apply user privilege filters
-                if (!in_array($user->user_priv, [1, 3, 10])) {
-                    $query->where("{$config['table']}.facility_id_updated", "=", $user->facility_id);
+                if (!in_array($user->getAttribute('user_priv'), [1, 3, 10])) {
+                    $query->where("{$config['table']}.facility_id_updated", "=", $user->getAttribute('facility_id'));
                 }
 
                 // Apply keyword filter

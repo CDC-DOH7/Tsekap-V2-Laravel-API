@@ -17,7 +17,7 @@ class UserHealthFacilityController extends Controller
         $queryUser = User::where('username', '=', $username)->first();
 
         if (!$queryUser) {
-            Log::error('Denied access for: ' . " " . $queryUser->id);
+            Log::error('Denied access for: ' . " " . $queryUser->getAttribute('id'));
             return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
         }
 
@@ -28,12 +28,12 @@ class UserHealthFacilityController extends Controller
     {
         $fields = $request->input('fields');
 
-        $user = $this->getAuthenticatedUser($request->user()->username);
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
 
-        if ($user->user_priv != 1) {
+        if ($user->getAttribute('user_priv') != 1) {
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 403);
         }
 
@@ -66,7 +66,7 @@ class UserHealthFacilityController extends Controller
     {
         $fields = $request->input('fields');
 
-        $user = $this->getAuthenticatedUser($request->user()->username);
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
@@ -104,12 +104,12 @@ class UserHealthFacilityController extends Controller
     {
         $fields = $request->input('fields');
 
-        $user = $this->getAuthenticatedUser($request->user()->username);
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
 
-        if ($user->user_priv != 1) {
+        if ($user->getAttribute('user_priv') != 1) {
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 403);
         }
 
@@ -160,12 +160,12 @@ class UserHealthFacilityController extends Controller
     {
         $fields = $request->input('fields');
 
-        $user = $this->getAuthenticatedUser($request->user()->username);
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
 
-        if ($user->user_priv != 1) {
+        if ($user->getAttribute('user_priv') != 1) {
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 403);
         }
 

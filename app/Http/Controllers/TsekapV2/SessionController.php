@@ -15,8 +15,8 @@ class SessionController extends Controller
     {
         $queryUser = User::where('username', '=', $username)->first();
 
-        if (!$queryUser || $queryUser->verified !== 1) {
-            Log::error('Denied access for: ' . " " . $queryUser->id);
+        if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
+            Log::error('Denied access for: ' . " " . $queryUser->getAttribute('id'));
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
@@ -33,7 +33,7 @@ class SessionController extends Controller
 
         try {
             // Check if the user is verified
-            $queryUser = $this->getAuthenticatedUser($user->username);
+            $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
             if ($queryUser instanceof \Illuminate\Http\JsonResponse) {
                 return $queryUser;
             }
@@ -51,7 +51,7 @@ class SessionController extends Controller
             )
                 ->leftJoin('user_health_facility', 'users.id', '=', 'user_health_facility.user_id')
                 ->leftJoin('facilities', 'user_health_facility.facility_id', '=', 'facilities.id')
-                ->where('users.username', '=', $user->username)
+                ->where('users.username', '=', $user->getAttribute('username'))
                 ->first();
 
             if (!$userDetails) {

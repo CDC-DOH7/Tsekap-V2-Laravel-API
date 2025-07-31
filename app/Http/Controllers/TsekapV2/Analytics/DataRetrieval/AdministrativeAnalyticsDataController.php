@@ -32,14 +32,14 @@ class AdministrativeAnalyticsDataController extends Controller
     // ================== GENERAL CONTROLLERS (/admin_analytics) ==================
     public function countNumberOfEntriesPerByUserPerFacility(Request $request)
     {
-        $admin = $this->getAuthenticatedUser($request->user()->username);
+        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
         if ($admin instanceof \Illuminate\Http\JsonResponse) {
             return $admin;
         }
 
         try {
-            $hf = UserHealthFacility::where('user_id', $request->user()->id)->first();
+            $hf = UserHealthFacility::where('user_id', $request->user()->getAttribute('id'))->first();
             if (!$hf) {
                 return response()->json(['error' => 'No health facility found for user.'], 404);
             }
@@ -51,7 +51,7 @@ class AdministrativeAnalyticsDataController extends Controller
 
             $model = $form_type === 'pch' ? PchRiskProfile::class : RiskProfile::class;
 
-            $entries = $model::where('facility_id_updated', $hf->facility_id)
+            $entries = $model::where('facility_id_updated', $hf->getAttribute('facility_id'))
                 ->selectRaw('encoded_by as id, COUNT(*) as total_entries, MAX(created_at) as last_entry_date')
                 ->groupBy('encoded_by')
                 ->orderByDesc('total_entries')

@@ -4,16 +4,18 @@ namespace App\Models\TsekapV2\Analytics\ProfilingTargetSetting;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProfilingTotalPopulationModel extends Model
+class ProfilingTargetPerBarangayModel extends Model
 {
     protected $connection = 'mysql';
 
-    protected $table = "profiling_total_population";
+    protected $table = "profiling_target_per_barangay";
 
     protected $fillable = [
         'id',
         'muncity_id',
-        'total_population',
+        'barangay_id',
+        'male_target',
+        'female_target',
 
         // system metadata
         'created_at',
