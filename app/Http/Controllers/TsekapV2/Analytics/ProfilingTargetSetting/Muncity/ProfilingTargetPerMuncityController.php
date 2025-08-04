@@ -108,7 +108,6 @@ class ProfilingTargetPerMuncityController extends Controller
 
         if (ProfilingTargetPerMuncityModel::where('province_id', "=", $validatedFields['province_id'])
             ->where('muncity_id', "=", $validatedFields['muncity_id'])
-            ->fresh()
             ->exists()
         ) {
             return response()->json(['status' => 'error', 'message' => 'Mapping already exists.'], 400);
@@ -121,7 +120,7 @@ class ProfilingTargetPerMuncityController extends Controller
                 'male_target' => $validatedFields["male_target"],
                 'female_target' => $validatedFields["female_target"],
                 'total_target' => $validatedFields["total_target"],
-            ])->fresh();
+            ]);
         } catch (Exception $e) {
             Log::error('Error in creation of a profiling target (muncity): ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
@@ -215,8 +214,7 @@ class ProfilingTargetPerMuncityController extends Controller
 
         $target = ProfilingTargetPerMuncityModel::where('province_id', "=", $validatedFields['province_id'])
             ->where('muncity_id', "=", $validatedFields['muncity_id'])
-            ->first()
-            ->fresh();
+            ->first();
 
         if (!$target) {
             Log::error('Mapping does not exist for muncity_id: ' . $validatedFields['muncity_id']);

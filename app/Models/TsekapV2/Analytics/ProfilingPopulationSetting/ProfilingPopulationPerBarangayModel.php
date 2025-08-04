@@ -8,7 +8,7 @@ class ProfilingPopulationPerBarangayModel extends Model
 {
     protected $connection = 'mysql';
 
-    protected $table = "profiling_population_per_barangay";
+    protected $table = "profiling_total_per_barangay";
 
     protected $fillable = [
         'id',
@@ -16,6 +16,7 @@ class ProfilingPopulationPerBarangayModel extends Model
         'barangay_id',
         'male_population',
         'female_population',
+        'total_population',
 
         // system metadata
         'created_at',

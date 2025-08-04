@@ -16,6 +16,7 @@ class ProfilingTargetPerMuncityModel extends Model
         'muncity_id',
         'male_target',
         'female_target',
+        'total_target',
 
         // system metadata
         'created_at',

@@ -107,7 +107,6 @@ class ProfilingTotalPerMuncityController extends Controller
 
         if (ProfilingPopulationPerMuncityModel::where('province_id', "=", $validatedFields['province_id'])
             ->where('muncity_id', "=", $validatedFields['muncity_id'])
-            ->fresh()
             ->exists()
         ) {
             return response()->json(['status' => 'error', 'message' => 'Mapping already exists.'], 400);
@@ -120,7 +119,7 @@ class ProfilingTotalPerMuncityController extends Controller
                 'male_population' => $validatedFields["male_population"],
                 'female_population' => $validatedFields["female_population"],
                 'total_population' => $validatedFields["total_population"],
-            ])->fresh();
+            ]);
         } catch (Exception $e) {
             Log::error('Error in creation of profiling totals (muncity): ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
@@ -213,8 +212,7 @@ class ProfilingTotalPerMuncityController extends Controller
 
         $totals = ProfilingPopulationPerMuncityModel::where('province_id', "=", $validatedFields['province_id'])
             ->where('muncity_id', "=", $validatedFields['muncity_id'])
-            ->first()
-            ->fresh();
+            ->first();
 
         if (!$totals) {
             Log::error('Mapping does not exist for muncity_id: ' . $validatedFields['muncity_id']);

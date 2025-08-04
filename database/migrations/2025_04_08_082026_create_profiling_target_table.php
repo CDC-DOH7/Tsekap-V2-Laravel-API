@@ -87,8 +87,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-
         Schema::dropIfExists('profiling_target_per_barangay');
         Schema::dropIfExists('profiling_total_per_barangay');
+        Schema::dropIfExists('profiling_target_per_muncity');
+        Schema::dropIfExists('profiling_total_per_muncity');
     }
 };

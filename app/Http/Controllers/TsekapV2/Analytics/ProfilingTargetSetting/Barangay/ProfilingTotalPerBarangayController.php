@@ -107,7 +107,6 @@ class ProfilingTotalPerBarangayController extends Controller
 
         if (ProfilingPopulationPerBarangayModel::where('muncity_id', "=", $validatedFields['muncity_id'])
             ->where('barangay_id', "=", $validatedFields['barangay_id'])
-            ->fresh()
             ->exists()
         ) {
             return response()->json(['status' => 'error', 'message' => 'Mapping already exists.'], 400);
@@ -120,7 +119,7 @@ class ProfilingTotalPerBarangayController extends Controller
                 'male_population' => $validatedFields["male_population"],
                 'female_population' => $validatedFields["female_population"],
                 'total_population' => $validatedFields["total_population"],
-            ])->fresh();
+            ]);
         } catch (Exception $e) {
             Log::error('Error in creation of profiling totals (barangay): ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
@@ -214,8 +213,7 @@ class ProfilingTotalPerBarangayController extends Controller
 
         $totals = ProfilingPopulationPerBarangayModel::where('muncity_id', "=", $validatedFields['muncity_id'])
             ->where('barangay_id', "=", $validatedFields['barangay_id'])
-            ->first()
-            ->fresh();
+            ->first();
 
         if (!$totals) {
             Log::error('Mapping does not exist for barangay_id: ' . $validatedFields['barangay_id']);
@@ -237,7 +235,7 @@ class ProfilingTotalPerBarangayController extends Controller
         return response()->json(['status' => 'success', 'message' => $message], 200);
     }
 
-    public function deleteTargetPerBarangay(Request $request)
+    public function deleteTotalsPerBarangay(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));

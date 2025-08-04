@@ -20,6 +20,7 @@ use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController as Phi
 use App\Http\Controllers\TsekapV2\Forms\PchRiskAssessmentForm\DataController as PchRiskDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\AnalyticsDataController;
 
+
 // Total Population and Target Setting Controllers
 use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\Muncity\ProfilingTotalPerMuncityController;
 use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\Muncity\ProfilingTargetPerMuncityController;
@@ -123,141 +124,144 @@ Route::prefix('v2')->group(function () {
                 });
             });
 
-            // endpoint: /age_brackets
-            Route::get('/get-age-brackets', [AnalyticsDataController::class, 'getAgeBrackets'])->name('api-v2-analytics-get-age-brackets');
+            // Data
+            Route::prefix('data')->group(function () {
+                // endpoint: /age_brackets
+                Route::get('/get-age-brackets', [AnalyticsDataController::class, 'getAgeBrackets'])->name('api-v2-analytics-get-age-brackets');
 
-            // endpoint : /patient_summary
-            Route::get('/get-patient-summary', [AnalyticsDataController::class, 'getPatientSummary'])->name('api-v2-analytics-get-patient-summary');
+                // endpoint : /patient_summary
+                Route::get('/get-patient-summary', [AnalyticsDataController::class, 'getPatientSummary'])->name('api-v2-analytics-get-patient-summary');
 
-            // endpoint : /age_group_summary
-            Route::get('/get-age-group-summary', [AnalyticsDataController::class, 'getAgeGroupSummary'])->name('api-v2-analytics-get-age-group-summary');
+                // endpoint : /age_group_summary
+                Route::get('/get-age-group-summary', [AnalyticsDataController::class, 'getAgeGroupSummary'])->name('api-v2-analytics-get-age-group-summary');
 
-            // endpoint : /age_range_summary
-            Route::get('/get-age-range-summary', [AnalyticsDataController::class, 'getAgeRangeSummary'])->name('api-v2-analytics-get-age-range-summary');
+                // endpoint : /age_range_summary
+                Route::get('/get-age-range-summary', [AnalyticsDataController::class, 'getAgeRangeSummary'])->name('api-v2-analytics-get-age-range-summary');
 
-            // endpoint : /month_year_summary
-            Route::get('/get-month-year-summary-patient-data', [AnalyticsDataController::class, 'getMonthYearSummaryPatientData'])
-                ->name('api-v2-analytics-get-month-year-summary-patient-data');
+                // endpoint : /month_year_summary
+                Route::get('/get-month-year-summary-patient-data', [AnalyticsDataController::class, 'getMonthYearSummaryPatientData'])
+                    ->name('api-v2-analytics-get-month-year-summary-patient-data');
 
-            // endpoint: /morbidity_summary
-            Route::get('/get-morbidity-summary-patient-data', [AnalyticsDataController::class, 'getMorbiditySummaryPatientData'])
-                ->name('api-v2-analytics-get-morbidity-summary-patient-data');
+                // endpoint: /morbidity_summary
+                Route::get('/get-morbidity-summary-patient-data', [AnalyticsDataController::class, 'getMorbiditySummaryPatientData'])
+                    ->name('api-v2-analytics-get-morbidity-summary-patient-data');
 
-            // endpoint: /monthly_summary   
-            Route::get('/get-monthly-summary-patient-data', [AnalyticsDataController::class, 'getMonthlySummaryPatientData'])
-                ->name('api-v2-analytics-get-monthly-summary-patient-data');
-            Route::get('/get-monthly-summary-risk-profile-by-facility', [AnalyticsDataController::class, 'getMonthlySummaryRiskProfileByFacility'])
-                ->name('api-v2-analytics-get-monthly-summary-risk-profile-by-facility');
+                // endpoint: /monthly_summary   
+                Route::get('/get-monthly-summary-patient-data', [AnalyticsDataController::class, 'getMonthlySummaryPatientData'])
+                    ->name('api-v2-analytics-get-monthly-summary-patient-data');
+                Route::get('/get-monthly-summary-risk-profile-by-facility', [AnalyticsDataController::class, 'getMonthlySummaryRiskProfileByFacility'])
+                    ->name('api-v2-analytics-get-monthly-summary-risk-profile-by-facility');
 
-            // endpoint: /clinical_complaints_summary
-            Route::get('/get-clinical-complaints-ar-records', [AnalyticsDataController::class, 'getClinicalComplaintsArRecords'])
-                ->name('api-v2-get-clinical-complaints-ar-records');
-            Route::get('/get-clinical-complaints-risk-profile', [AnalyticsDataController::class, 'getClinicalComplaintsRiskProfile'])
-                ->name('api-v2-analytics-get-clinical-complaints-risk-profile');
+                // endpoint: /clinical_complaints_summary
+                Route::get('/get-clinical-complaints-ar-records', [AnalyticsDataController::class, 'getClinicalComplaintsArRecords'])
+                    ->name('api-v2-get-clinical-complaints-ar-records');
+                Route::get('/get-clinical-complaints-risk-profile', [AnalyticsDataController::class, 'getClinicalComplaintsRiskProfile'])
+                    ->name('api-v2-analytics-get-clinical-complaints-risk-profile');
 
-            // endpoint: /tobacco_summary
-            Route::get('/get-tobacco-summary-data', [AnalyticsDataController::class, 'getTobaccoSummaryData'])
-                ->name('api-v2-analytics-get-tobacco-summary-data');
-            Route::get('/get-tobacco-summary-patient-info', [AnalyticsDataController::class, 'getTobaccoSummaryPatientInfo'])
-                ->name('api-v2-analytics-tobacco-summary-patient-info');
-            Route::get('/get-tobacco-summary-risk-profile', [AnalyticsDataController::class, 'getTobaccoSummaryRiskProfile'])
-                ->name('api-v2-analytics-get-tobacco-summary-risk-profile');
+                // endpoint: /tobacco_summary
+                Route::get('/get-tobacco-summary-data', [AnalyticsDataController::class, 'getTobaccoSummaryData'])
+                    ->name('api-v2-analytics-get-tobacco-summary-data');
+                Route::get('/get-tobacco-summary-patient-info', [AnalyticsDataController::class, 'getTobaccoSummaryPatientInfo'])
+                    ->name('api-v2-analytics-tobacco-summary-patient-info');
+                Route::get('/get-tobacco-summary-risk-profile', [AnalyticsDataController::class, 'getTobaccoSummaryRiskProfile'])
+                    ->name('api-v2-analytics-get-tobacco-summary-risk-profile');
 
-            // endpoint: /alcohol_intake_summary
-            Route::get('/get-alcohol-intake-summary-data', [AnalyticsDataController::class, 'getAlcoholIntakeSummaryData'])
-                ->name('api-v2-analytics-get-alcohol-intake-summary-data');
-            Route::get('/get-alcohol-intake-summary-patient-info', [AnalyticsDataController::class, 'getAlcoholIntakeSummaryPatientInfo'])
-                ->name('api-v2-analytics-get-alcohol-intake-summary-patient-info');
-            Route::get('/get-alcohol-intake-summary-risk-profile', [AnalyticsDataController::class, 'getAlcoholIntakeSummaryRiskProfile'])
-                ->name('api-v2-analytics-get-alcohol-intake-summary-risk-profile');
+                // endpoint: /alcohol_intake_summary
+                Route::get('/get-alcohol-intake-summary-data', [AnalyticsDataController::class, 'getAlcoholIntakeSummaryData'])
+                    ->name('api-v2-analytics-get-alcohol-intake-summary-data');
+                Route::get('/get-alcohol-intake-summary-patient-info', [AnalyticsDataController::class, 'getAlcoholIntakeSummaryPatientInfo'])
+                    ->name('api-v2-analytics-get-alcohol-intake-summary-patient-info');
+                Route::get('/get-alcohol-intake-summary-risk-profile', [AnalyticsDataController::class, 'getAlcoholIntakeSummaryRiskProfile'])
+                    ->name('api-v2-analytics-get-alcohol-intake-summary-risk-profile');
 
-            // endpoint: /alcohol_binge_drinker_summary
-            Route::get('/get-alcohol-binge-drinker-summary-data', [AnalyticsDataController::class, 'getAlcoholBingeDrinkerSummaryData'])
-                ->name('api-v2-analytics-get-alcohol-binge-drinker-summary-data');
-            Route::get('/get-alcohol-binge-drinker-summary-patient-info', [AnalyticsDataController::class, 'getAlcoholBingeDrinkerSummaryPatientInfo'])
-                ->name('api-v2-analytics-get-alcohol-binge-drinker-summary-patient-info');
-            Route::get('/get-alcohol-binge-drinker-summary-risk-profile', [AnalyticsDataController::class, 'getAlcoholBingeDrinkerSummaryRiskProfile'])
-                ->name('api-v2-analytics-get-alcohol-binge-drinker-summary-risk-profile');
+                // endpoint: /alcohol_binge_drinker_summary
+                Route::get('/get-alcohol-binge-drinker-summary-data', [AnalyticsDataController::class, 'getAlcoholBingeDrinkerSummaryData'])
+                    ->name('api-v2-analytics-get-alcohol-binge-drinker-summary-data');
+                Route::get('/get-alcohol-binge-drinker-summary-patient-info', [AnalyticsDataController::class, 'getAlcoholBingeDrinkerSummaryPatientInfo'])
+                    ->name('api-v2-analytics-get-alcohol-binge-drinker-summary-patient-info');
+                Route::get('/get-alcohol-binge-drinker-summary-risk-profile', [AnalyticsDataController::class, 'getAlcoholBingeDrinkerSummaryRiskProfile'])
+                    ->name('api-v2-analytics-get-alcohol-binge-drinker-summary-risk-profile');
 
-            // endpoint: /physical_activity_summary
-            Route::get('/get-physical-activity-summary-data', [AnalyticsDataController::class, 'getPhysicalActivitySummaryData'])
-                ->name('api-v2-analytics-get-physical-activity-summary-data');
-            Route::get('/get-physical-activity-summary-patient-info', [AnalyticsDataController::class, 'getPhysicalActivitySummaryPatientInfo'])
-                ->name('api-v2-analytics-get-physical-activity-summary-patient-info');
-            Route::get('/get-physical-activity-summary-risk-profile', [AnalyticsDataController::class, 'getPhysicalActivitySummaryRiskProfile'])
-                ->name('api-v2-analytics-get-physical-activity-summary-risk-profile');
+                // endpoint: /physical_activity_summary
+                Route::get('/get-physical-activity-summary-data', [AnalyticsDataController::class, 'getPhysicalActivitySummaryData'])
+                    ->name('api-v2-analytics-get-physical-activity-summary-data');
+                Route::get('/get-physical-activity-summary-patient-info', [AnalyticsDataController::class, 'getPhysicalActivitySummaryPatientInfo'])
+                    ->name('api-v2-analytics-get-physical-activity-summary-patient-info');
+                Route::get('/get-physical-activity-summary-risk-profile', [AnalyticsDataController::class, 'getPhysicalActivitySummaryRiskProfile'])
+                    ->name('api-v2-analytics-get-physical-activity-summary-risk-profile');
 
-            // endpoint: /nutrition_summary
-            Route::get('/get-nutrition-summary-data', [AnalyticsDataController::class, 'getNutritionSummaryData'])
-                ->name('api-v2-analytics-get-nutrition-summary-data');
-            Route::get('/get-nutrition-summary-patient-info', [AnalyticsDataController::class, 'getNutritionSummaryPatientInfo'])
-                ->name('api-v2-analytics-get-nutrition-summary-patient-info');
-            Route::get('/get-nutrition-summary-risk-profile', [AnalyticsDataController::class, 'getNutritionSummaryRiskProfile'])
-                ->name('api-v2-analytics-get-nutrition-summary-risk-profile');
+                // endpoint: /nutrition_summary
+                Route::get('/get-nutrition-summary-data', [AnalyticsDataController::class, 'getNutritionSummaryData'])
+                    ->name('api-v2-analytics-get-nutrition-summary-data');
+                Route::get('/get-nutrition-summary-patient-info', [AnalyticsDataController::class, 'getNutritionSummaryPatientInfo'])
+                    ->name('api-v2-analytics-get-nutrition-summary-patient-info');
+                Route::get('/get-nutrition-summary-risk-profile', [AnalyticsDataController::class, 'getNutritionSummaryRiskProfile'])
+                    ->name('api-v2-analytics-get-nutrition-summary-risk-profile');
 
-            // endpoint: /prev_med_history_summary
-            Route::get('/get-prev-med-history-summary-data', [AnalyticsDataController::class, 'getPrevMedHistorySummaryData'])
-                ->name('api-v2-analytics-get-prev-med-history-summary-data');
-            Route::get('/get-prev-med-history-summary-patient-info', [AnalyticsDataController::class, 'getPrevMedHistorySummaryRiskProfile'])
-                ->name('api-v2-analytics-get-prev-med-history-summary-patient-info');
-            Route::get('/get-prev-med-history-summary-risk-profile', [AnalyticsDataController::class, 'getPrevMedHistorySummaryPatientInfo'])
-                ->name('api-v2-analytics-get-prev-med-history-summary-risk-profile');
+                // endpoint: /prev_med_history_summary
+                Route::get('/get-prev-med-history-summary-data', [AnalyticsDataController::class, 'getPrevMedHistorySummaryData'])
+                    ->name('api-v2-analytics-get-prev-med-history-summary-data');
+                Route::get('/get-prev-med-history-summary-patient-info', [AnalyticsDataController::class, 'getPrevMedHistorySummaryRiskProfile'])
+                    ->name('api-v2-analytics-get-prev-med-history-summary-patient-info');
+                Route::get('/get-prev-med-history-summary-risk-profile', [AnalyticsDataController::class, 'getPrevMedHistorySummaryPatientInfo'])
+                    ->name('api-v2-analytics-get-prev-med-history-summary-risk-profile');
 
-            // endpoint: /family_history_summary
-            Route::get('/get-family-history-summary-data', [AnalyticsDataController::class, 'getFamilyHistorySummaryData'])
-                ->name('api-v2-analytics-get-family-history-summary-data');
-            Route::get('/get-family-history-summary-patient-info', [AnalyticsDataController::class, 'getFamilyHistorySummaryRiskProfile'])
-                ->name('api-v2-analytics-get-family-history-summary-patient-info');
-            Route::get('/get-family-history-summary-risk-profile', [AnalyticsDataController::class, 'getFamilyHistorySummaryPatientInfo'])
-                ->name('api-v2-analytics-get-family-history-summary-risk-profile');
+                // endpoint: /family_history_summary
+                Route::get('/get-family-history-summary-data', [AnalyticsDataController::class, 'getFamilyHistorySummaryData'])
+                    ->name('api-v2-analytics-get-family-history-summary-data');
+                Route::get('/get-family-history-summary-patient-info', [AnalyticsDataController::class, 'getFamilyHistorySummaryRiskProfile'])
+                    ->name('api-v2-analytics-get-family-history-summary-patient-info');
+                Route::get('/get-family-history-summary-risk-profile', [AnalyticsDataController::class, 'getFamilyHistorySummaryPatientInfo'])
+                    ->name('api-v2-analytics-get-family-history-summary-risk-profile');
 
-            // endpoint: /bp1_summary
-            Route::get('/get-bp1-summary-data', [AnalyticsDataController::class, 'getBp1SummaryData'])
-                ->name('api-v2-analytics-get-bp1-summary-data');
-            Route::get('/get-bp1-summary-patient-info', [AnalyticsDataController::class, 'getBp1SummaryRiskProfile'])
-                ->name('api-v2-analytics-get-bp1-summary-patient-info');
-            Route::get('/get-bp1-summary-risk-profile', [AnalyticsDataController::class, 'getBp1SummaryPatientInfo'])
-                ->name('api-v2-analytics-get-bp1-summary-risk-profile');
+                // endpoint: /bp1_summary
+                Route::get('/get-bp1-summary-data', [AnalyticsDataController::class, 'getBp1SummaryData'])
+                    ->name('api-v2-analytics-get-bp1-summary-data');
+                Route::get('/get-bp1-summary-patient-info', [AnalyticsDataController::class, 'getBp1SummaryRiskProfile'])
+                    ->name('api-v2-analytics-get-bp1-summary-patient-info');
+                Route::get('/get-bp1-summary-risk-profile', [AnalyticsDataController::class, 'getBp1SummaryPatientInfo'])
+                    ->name('api-v2-analytics-get-bp1-summary-risk-profile');
 
-            // endpoint: /hypertension_summary
-            Route::get('/get-hypertension-summary-data', [AnalyticsDataController::class, 'getBp2SummaryData'])
-                ->name('api-v2-analytics-get-hypertension-summary-data');
-            Route::get('/get-hypertension-summary-patient-info', [AnalyticsDataController::class, 'getBp2SummaryRiskProfile'])
-                ->name('api-v2-analytics-get-hypertension-summary-patient-info');
-            Route::get('/get-hypertension-summary-risk-profile', [AnalyticsDataController::class, 'getBp2SummaryPatientInfo'])
-                ->name('api-v2-analytics-get-hypertension-summary-risk-profile');
+                // endpoint: /hypertension_summary
+                Route::get('/get-hypertension-summary-data', [AnalyticsDataController::class, 'getBp2SummaryData'])
+                    ->name('api-v2-analytics-get-hypertension-summary-data');
+                Route::get('/get-hypertension-summary-patient-info', [AnalyticsDataController::class, 'getBp2SummaryRiskProfile'])
+                    ->name('api-v2-analytics-get-hypertension-summary-patient-info');
+                Route::get('/get-hypertension-summary-risk-profile', [AnalyticsDataController::class, 'getBp2SummaryPatientInfo'])
+                    ->name('api-v2-analytics-get-hypertension-summary-risk-profile');
 
-            // endpoint: /diabetes_summary
-            Route::get('/get-diabetes-summary-data', [AnalyticsDataController::class, 'getDiabetesSummaryData'])
-                ->name('api-v2-analytics-get-diabetes-summary-data');
-            Route::get('/get-diabetes-summary-patient-info', [AnalyticsDataController::class, 'getDiabetesSummaryRiskProfile'])
-                ->name('api-v2-analytics-get-diabetes-summary-patient-info');
-            Route::get('/get-diabetes-summary-risk-profile', [AnalyticsDataController::class, 'getDiabetesSummaryPatientInfo'])
-                ->name('api-v2-analytics-get-diabetes-summary-risk-profile');
+                // endpoint: /diabetes_summary
+                Route::get('/get-diabetes-summary-data', [AnalyticsDataController::class, 'getDiabetesSummaryData'])
+                    ->name('api-v2-analytics-get-diabetes-summary-data');
+                Route::get('/get-diabetes-summary-patient-info', [AnalyticsDataController::class, 'getDiabetesSummaryRiskProfile'])
+                    ->name('api-v2-analytics-get-diabetes-summary-patient-info');
+                Route::get('/get-diabetes-summary-risk-profile', [AnalyticsDataController::class, 'getDiabetesSummaryPatientInfo'])
+                    ->name('api-v2-analytics-get-diabetes-summary-risk-profile');
 
-            // endpoint: /hypercholesterolemia_summary
-            Route::get('/get-hypercholesterolemia-summary-data', [AnalyticsDataController::class, 'getHypercholesterolemiaSummaryData'])
-                ->name('api-v2-analytics-get-hypercholesterolemia-summary-data');
-            Route::get('/get-hypercholesterolemia-summary-patient-info', [AnalyticsDataController::class, 'getHypercholesterolemiaSummaryRiskProfile'])
-                ->name('api-v2-analytics-get-hypercholesterolemia-summary-patient-info');
-            Route::get('/get-hypercholesterolemia-summary-risk-profile', [AnalyticsDataController::class, 'getHypercholesterolemiaSummaryPatientInfo'])
-                ->name('api-v2-analytics-get-hypercholesterolemia-summary-risk-profile');
+                // endpoint: /hypercholesterolemia_summary
+                Route::get('/get-hypercholesterolemia-summary-data', [AnalyticsDataController::class, 'getHypercholesterolemiaSummaryData'])
+                    ->name('api-v2-analytics-get-hypercholesterolemia-summary-data');
+                Route::get('/get-hypercholesterolemia-summary-patient-info', [AnalyticsDataController::class, 'getHypercholesterolemiaSummaryRiskProfile'])
+                    ->name('api-v2-analytics-get-hypercholesterolemia-summary-patient-info');
+                Route::get('/get-hypercholesterolemia-summary-risk-profile', [AnalyticsDataController::class, 'getHypercholesterolemiaSummaryPatientInfo'])
+                    ->name('api-v2-analytics-get-hypercholesterolemia-summary-risk-profile');
 
-            // endpoint: /respiratory_summary
-            Route::get('/get-respiratory-summary-data', [AnalyticsDataController::class, 'getRespiratorySummaryData'])
-                ->name('api-v2-analytics-get-respiratory-summary-data');
-            Route::get('/get-respiratory-summary-patient-info', [AnalyticsDataController::class, 'getRespiratorySummaryRiskProfile'])
-                ->name('api-v2-analytics-get-respiratory-summary-patient-info');
-            Route::get('/get-respiratory-summary-risk-profile', [AnalyticsDataController::class, 'getRespiratorySummaryPatientInfo'])
-                ->name('api-v2-analytics-get-respiratory-summary-risk-profile');
+                // endpoint: /respiratory_summary
+                Route::get('/get-respiratory-summary-data', [AnalyticsDataController::class, 'getRespiratorySummaryData'])
+                    ->name('api-v2-analytics-get-respiratory-summary-data');
+                Route::get('/get-respiratory-summary-patient-info', [AnalyticsDataController::class, 'getRespiratorySummaryRiskProfile'])
+                    ->name('api-v2-analytics-get-respiratory-summary-patient-info');
+                Route::get('/get-respiratory-summary-risk-profile', [AnalyticsDataController::class, 'getRespiratorySummaryPatientInfo'])
+                    ->name('api-v2-analytics-get-respiratory-summary-risk-profile');
 
-            // endpoint: /probable_summary
-            Route::get('/get-probable-summary-data', [AnalyticsDataController::class, 'getProbableSummaryData'])
-                ->name('api-v2-analytics-get-probable-summary-data');
-            Route::get('/get-probable-summary-patient-info', [AnalyticsDataController::class, 'getProbableSummaryRiskProfile'])
-                ->name('api-v2-analytics-get-probable-summary-patient-info');
-            Route::get('/get-probable-summary-risk-profile', [AnalyticsDataController::class, 'getProbableSummaryPatientInfo'])
-                ->name('api-v2-analytics-get-probable-summary-risk-profile');
+                // endpoint: /probable_summary
+                Route::get('/get-probable-summary-data', [AnalyticsDataController::class, 'getProbableSummaryData'])
+                    ->name('api-v2-analytics-get-probable-summary-data');
+                Route::get('/get-probable-summary-patient-info', [AnalyticsDataController::class, 'getProbableSummaryRiskProfile'])
+                    ->name('api-v2-analytics-get-probable-summary-patient-info');
+                Route::get('/get-probable-summary-risk-profile', [AnalyticsDataController::class, 'getProbableSummaryPatientInfo'])
+                    ->name('api-v2-analytics-get-probable-summary-risk-profile');
+            });
         });
 
         // session validator
