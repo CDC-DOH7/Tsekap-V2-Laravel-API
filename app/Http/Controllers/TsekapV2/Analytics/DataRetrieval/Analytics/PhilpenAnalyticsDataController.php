@@ -57,23 +57,16 @@ class PhilpenAnalyticsDataController extends Controller
     public function getClinicalComplaintsRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
-        $form_type = $request->query('form');
 
         if (!$hf_id) {
             return response()->json(['error' => 'hf_id is required.'], 400);
         }
 
-        if (!in_array($form_type, ['pch', 'raf'])) {
-            return response()->json(['error' => 'Form type unsupported.'], 400);
-        }
-
         try {
             // Philpen Risk Assessment Form
-            if ($form_type === 'raf') {
-                $results = DB::table('risk_profile')
-                    ->where('facility_id_updated', "=", $hf_id)
-                    ->get();
-            }
+            $results = DB::table('risk_profile')
+                ->where('facility_id_updated', "=", $hf_id)
+                ->get();
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -342,7 +335,6 @@ class PhilpenAnalyticsDataController extends Controller
     public function getPhysicalActivitySummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
-        $form_type = $request->query('form');
 
         if (!$hf_id) {
             return response()->json([
@@ -350,26 +342,11 @@ class PhilpenAnalyticsDataController extends Controller
             ], 400);
         }
 
-        if (!in_array($form_type, ['pch', 'raf'])) {
-            return response()->json(['error' => 'Form type unsupported.'], 400);
-        }
-
         try {
-            // Philpen Risk Assessment Form
-            if ($form_type === 'raf') {
-                $results = DB::table('risk_profile')
-                    ->select('id', 'sex', 'age_bracket_id')
-                    ->where('facility_id_updated', "=", $hf_id)
-                    ->get();
-            }
-
-            // PCHRAT Form
-            if ($form_type === 'pch') {
-                $results = DB::table('pch_risk_assessment_tool_profile')
-                    ->select('id', 'sex', 'age_bracket_id')
-                    ->where('facility_id_updated', "=", $hf_id)
-                    ->get();
-            }
+            $results = DB::table('risk_profile')
+                ->select('id', 'sex', 'age_bracket_id')
+                ->where('facility_id_updated', "=", $hf_id)
+                ->get();
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -383,30 +360,15 @@ class PhilpenAnalyticsDataController extends Controller
     public function getPhysicalActivitySummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
-        $form_type = $request->query('form');
 
         if (!$hf_id) {
             return response()->json(['error' => 'hf_id is required.'], 400);
         }
 
-        if (!in_array($form_type, ['pch', 'raf'])) {
-            return response()->json(['error' => 'Form type unsupported.'], 400);
-        }
-
         try {
-            // Philpen Risk Assessment Form
-            if ($form_type === 'raf') {
-                $results = DB::table('risk_profile')
-                    ->where('facility_id_updated', "=", $hf_id)
-                    ->get();
-            }
-
-            // PCHRAT Form 
-            if ($form_type === 'pch') {
-                $results = DB::table('pch_risk_assessment_tool_profile')
-                    ->where('facility_id_updated', "=", $hf_id)
-                    ->get();
-            }
+            $results = DB::table('risk_profile')
+                ->where('facility_id_updated', "=", $hf_id)
+                ->get();
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -542,30 +504,15 @@ class PhilpenAnalyticsDataController extends Controller
     public function getPrevMedHistorySummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
-        $form_type = $request->query('form');
 
         if (!$hf_id) {
             return response()->json(['error' => 'hf_id is required.'], 400);
         }
 
-        if (!in_array($form_type, ['pch', 'raf'])) {
-            return response()->json(['error' => 'Form type unsupported.'], 400);
-        }
-
         try {
-            // Philpen Risk Assessment Form
-            if ($form_type === 'raf') {
-                $results = DB::table('risk_profile')
-                    ->where('facility_id_updated', "=", $hf_id)
-                    ->get();
-            }
-
-            // PCHRAT Form 
-            if ($form_type === 'pch') {
-                $results = DB::table('pch_risk_assessment_tool_profile')
-                    ->where('facility_id_updated', "=", $hf_id)
-                    ->get();
-            }
+            $results = DB::table('risk_profile')
+                ->where('facility_id_updated', "=", $hf_id)
+                ->get();
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -577,23 +524,15 @@ class PhilpenAnalyticsDataController extends Controller
     public function getPrevMedHistorySummaryPatientInfo(Request $request)
     {
         $hf_id = $request->query('hf_id');
-        $form_type = $request->query('form');
 
         if (!$hf_id) {
             return response()->json(['error' => 'hf_id is required.'], 400);
         }
 
-        if (!in_array($form_type, ['pch', 'raf'])) {
-            return response()->json(['error' => 'Form type unsupported.'], 400);
-        }
-
         try {
-            // Philpen Risk Assessment Form
-            if ($form_type === 'raf') {
-                $results = DB::table('risk_profile')
-                    ->where('facility_id_updated', "=", $hf_id)
-                    ->get();
-            }
+            $results = DB::table('risk_profile')
+                ->where('facility_id_updated', "=", $hf_id)
+                ->get();
 
             return response()->json($results);
         } catch (Exception $e) {
@@ -881,14 +820,9 @@ class PhilpenAnalyticsDataController extends Controller
     public function getDiabetesSummaryRiskProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
-        $form_type = $request->query('form');
 
         if (!$hf_id) {
             return response()->json(['error' => 'hf_id is required.'], 400);
-        }
-
-        if (!in_array($form_type, ['pch', 'raf'])) {
-            return response()->json(['error' => 'Form type unsupported.'], 400);
         }
 
         try {
