@@ -18,7 +18,6 @@ use App\Http\Controllers\TsekapV2\Websockets\NotificationController;
 use App\Http\Controllers\TsekapV2\Forms\GeneralDataController;
 use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController as PhilpenRiskDataController;
 use App\Http\Controllers\TsekapV2\Forms\PchRiskAssessmentForm\DataController as PchRiskDataController;
-use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\AnalyticsDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics\PhilpenAnalyticsDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics\GeneralAnalyticsDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics\PchratAnalyticsDataController;
