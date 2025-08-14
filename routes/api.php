@@ -158,6 +158,12 @@ Route::prefix('v2')->group(function () {
 
                 // pchrat analytics
                 Route::prefix('pchrat')->group(function () {
+                    // endpoint: /nature_of_visit_summary
+                    Route::get('/get-nature-of-visit-records', [PchratAnalyticsDataController::class, 'getNatureOfVisitRecords'])
+                        ->name('api-v2-get-nature-of-visit-records');
+                    Route::get('/get-nature-of-visit-risk-profile', [PchratAnalyticsDataController::class, 'getNatureOfVisitRiskProfile'])
+                        ->name('api-v2-analytics-get-nature-of-visit-risk-profile');
+
                     // endpoint: /family_history_summary
                     Route::get('/get-pchrat-family-history-summary-data', [PchratAnalyticsDataController::class, 'getFamilyHistorySummaryData'])
                         ->name('api-v2-analytics-pchrat-get-family-history-summary-data');

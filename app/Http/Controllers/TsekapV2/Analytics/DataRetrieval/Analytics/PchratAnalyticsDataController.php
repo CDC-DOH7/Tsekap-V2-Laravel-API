@@ -13,6 +13,56 @@ class PchratAnalyticsDataController extends Controller
 {
     // ================== 1. VISIT INFO SUMMARY FUNCTIONS (/visit_info_summary) ==================
     // Controller Count: 3
+    public function getNatureOfVisitRecords(Request $request)
+    {
+        $hf_id = $request->query('hf_id');
+        $start_date = $request->query('start_date');
+        $end_date = $request->query('end_date');
+
+        if (!$hf_id || !$start_date || !$end_date) {
+            return response()->json(['error' => 'hf_id, start_date, and end_date are required.'], 400);
+        }
+
+        try {
+            // Only fetching the single AR complaints column with multiple answers
+            $records = DB::table('pch_risk_assessment_tool_form as f')
+                ->join('pch_risk_assessment_tool_profile as p', 'f.pch_profile_id', '=', 'p.id')
+                ->select(
+                    'f.pch_profile_id',
+                    'f.nature_of_visit', // your new column containing multiple values like "SC, MV, DH, BE"
+                    'f.created_at'
+                )
+                ->where('p.facility_id_updated', '=', $hf_id)
+                ->whereBetween('f.created_at', [$start_date, $end_date])
+                ->get();
+
+            return response()->json($records);
+        } catch (Exception $e) {
+            Log::error("Error fetching nature of visit records: " . $e->getMessage());
+            return response()->json(['error' => 'Failed to retrieve nature of visit data.'], 500);
+        }
+    }
+        public function getNatureOfVisitRiskProfile(Request $request)
+    {
+        $hf_id = $request->query('hf_id');
+
+        if (!$hf_id) {
+            return response()->json(['error' => 'hf_id is required.'], 400);
+        }
+
+        try {
+            // PCHRAT Risk Assessment Form
+            $results = DB::table('pch_risk_assessment_tool_profile')
+                ->where('facility_id_updated', "=", $hf_id)
+                ->get();
+
+            return response()->json($results);
+        } catch (Exception $e) {
+            Log::error("Error fetching pch risk profiles: " . $e->getMessage() . ".");
+            return response()->json(['error' => 'Failed to fetch data.'], 500);
+        }
+    }
+
     public function getVisitInfoSummaryData(Request $request)
     {
         $hf_id = $request->query('hf_id');
@@ -48,7 +98,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getVisitInfoSummaryRiskProfile(Request $request)
+    public function getVisitInfoSummaryProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
 
@@ -137,7 +187,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getVitalSignsSummaryRiskProfile(Request $request)
+    public function getVitalSignsSummaryProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
 
@@ -220,7 +270,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getPhysicalExamSummaryRiskProfile(Request $request)
+    public function getPhysicalExamSummaryProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
 
@@ -304,7 +354,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getAnimalBiteSummaryRiskProfile(Request $request)
+    public function getAnimalBiteSummaryProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
 
@@ -382,7 +432,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getRiskAssessmentSummaryRiskProfile(Request $request)
+    public function getRiskAssessmentSummaryProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
 
@@ -463,7 +513,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getPersonalHistorySummaryRiskProfile(Request $request)
+    public function getPersonalHistorySummaryProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
 
@@ -541,7 +591,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getFamilyHistorySummaryRiskProfile(Request $request)
+    public function getFamilyHistorySummaryProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
 
@@ -620,7 +670,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getSmokingHistorySummaryRiskProfile(Request $request)
+    public function getSmokingHistorySummaryProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
 
@@ -702,7 +752,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getSocialHistorySummaryRiskProfile(Request $request)
+    public function getSocialHistorySummaryProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
 
@@ -783,7 +833,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getLifestyleSummaryRiskProfile(Request $request)
+    public function getLifestyleSummaryProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
 
@@ -867,7 +917,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getQuestionnaireSummaryRiskProfile(Request $request)
+    public function getQuestionnaireSummaryProfile(Request $request)
     {
         $hf_id = $request->query('hf_id');
 
