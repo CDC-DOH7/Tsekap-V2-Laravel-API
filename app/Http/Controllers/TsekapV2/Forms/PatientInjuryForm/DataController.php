@@ -46,7 +46,7 @@ class DataController extends Controller
         $userHealthFacilityMapping = UserHealthFacility::where('user_id', $user->id)->first();
         if ($userHealthFacilityMapping) {
             return Facilities::select('id', 'name', 'address', 'hospital_type')
-                ->where('id', $userHealthFacilityMapping->getAttribute('facility_id'))
+                ->where('id', $userHealthFacilityMapping->getAttribute('facility_id_updated'))
                 ->first();
         }
         return null;
@@ -79,7 +79,7 @@ class DataController extends Controller
             'patient_injury_form_general_data.id',
             'patient_injury_form_general_data.profile_id',
 
-            'patient_injury_form_general_data.facility_id',
+            'patient_injury_form_general_data.facility_id_updated',
             'patient_injury_form_general_data.name_of_reporting_facility',
             'patient_injury_form_general_data.address_of_reporting_facility',
             'patient_injury_form_general_data.type_of_dru',
@@ -122,7 +122,7 @@ class DataController extends Controller
             $query->where(function ($q) use ($filter, $keyword) {
                 $columns = [
                     'id' => 'patient_injury_form_general_data.id', // included for filtering of ID also
-                    'facility_id' => 'patient_injury_form_general_data.facility_id',
+                    'facility_id_updated' => 'patient_injury_form_general_data.facility_id_updated',
                     'fname' => 'patient_injury_form_general_data.fname',
                     'lname' => 'patient_injury_form_general_data.lname',
                     'dob' => 'patient_injury_form_general_data.dob'
@@ -139,7 +139,7 @@ class DataController extends Controller
                         ->orWhere('patient_injury_form_general_data.lname', 'like', "%$keyword%")
                         ->orWhere('patient_injury_form_general_data.dob', 'like', "%$keyword%")
                         ->orWhere('patient_injury_form_general_data.id', '=', $keyword) // included for filtering of ID also
-                        ->orWhere('patient_injury_form_general_data.facility_id', '=', $keyword);
+                        ->orWhere('patient_injury_form_general_data.facility_id_updated', '=', $keyword);
                 }
             });
         }
@@ -183,7 +183,7 @@ class DataController extends Controller
             'patient_injury_form_general_data.id',
             'patient_injury_form_general_data.profile_id',
 
-            'patient_injury_form_general_data.facility_id',
+            'patient_injury_form_general_data.facility_id_updated',
             'patient_injury_form_general_data.name_of_reporting_facility',
             'patient_injury_form_general_data.address_of_reporting_facility',
             'patient_injury_form_general_data.type_of_dru',
@@ -219,14 +219,14 @@ class DataController extends Controller
         if ($user->getAttribute('user_priv') === 3) {
             $query->where('patient_injury_form_general_data.province_id', $user->getAttribute('province'));
         } elseif ($user->getAttribute('user_priv') === 6 && $facility) {
-            $query->where('patient_injury_form_general_data.facility_id', $facility->id);
+            $query->where('patient_injury_form_general_data.facility_id_updated', $facility->id);
         }
 
         // Apply keyword filter
         if ($keyword) {
             $query->where(function ($q) use ($filter, $keyword) {
                 $columns = [
-                    'facility_id_updated' => 'patient_injury_form_general_data.facility_id',
+                    'facility_id_updated_updated' => 'patient_injury_form_general_data.facility_id_updated',
                     'fname' => 'patient_injury_form_general_data.fname',
                     'lname' => 'patient_injury_form_general_data.lname',
                     'dob' => 'patient_injury_form_general_data.dob'
@@ -242,7 +242,7 @@ class DataController extends Controller
                     $q->where('patient_injury_form_general_data.fname', 'like', "%$keyword%")
                         ->orWhere('patient_injury_form_general_data.lname', 'like', "%$keyword%")
                         ->orWhere('patient_injury_form_general_data.dob', 'like', "%$keyword%")
-                        ->orWhere('patient_injury_form_general_data.facility_id', '=', $keyword);
+                        ->orWhere('patient_injury_form_general_data.facility_id_updated', '=', $keyword);
                 }
             });
         }
@@ -426,7 +426,7 @@ class DataController extends Controller
             'fields.profile_id' => 'nullable|integer',
 
             // dru metadata
-            'fields.facility_id' => 'required|integer',
+            'fields.facility_id_updated' => 'required|integer',
             'fields.name_of_reporting_facility' => 'required|string|max:255',
             'fields.address_of_reporting_facility' => 'required|string|max:255',
             'fields.type_of_dru' => 'required|string|max:50',
@@ -459,17 +459,11 @@ class DataController extends Controller
             return response()->json(['error' => $validator->errors()], 422);
         }
 
-        // ---- Redacted ----
-        // Check for malformed parameters
-        if ($fields['offline_entry'] === false && empty($fields['profile_id'])) {
-            return response()->json(['error' => 'Malformed parameter. Please recheck request.'], 403);
-        }
-
         // Check for duplicates
         $existingPatientInjuryGeneralData = PatientInjuryGeneralData::where('fname', $fields['fname'])
             ->where('lname', $fields['lname'])
             ->where('dob', $fields['dob'])
-            ->where('facility_id', $fields['facility_id'])
+            ->where('facility_id_updated', $fields['facility_id_updated'])
             ->whereDate('created_at', '!=', now()->toDateString()); // Exclude records created today
 
         if (!empty($fields['mname'])) {
@@ -738,7 +732,7 @@ class DataController extends Controller
             'fields.profile_id' => 'sometimes|integer',
 
             // dru metadata
-            'fields.facility_id' => 'sometimes|integer',
+            'fields.facility_id_updated' => 'sometimes|integer',
             'fields.name_of_reporting_facility' => 'sometimes|string|max:255',
             'fields.address_of_reporting_facility' => 'sometimes|string|max:255',
             'fields.type_of_dru' => 'sometimes|string|max:50',

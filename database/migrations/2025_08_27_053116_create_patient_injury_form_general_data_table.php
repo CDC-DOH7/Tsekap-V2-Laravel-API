@@ -18,7 +18,7 @@ return new class extends Migration
                 $table->unsignedInteger('profile_id')->nullable();
 
                 // Disease Reporting Unit (DRU Data)
-                $table->unsignedInteger('facility_id')->index();
+                $table->unsignedInteger('facility_id_updated')->index();
                 $table->string('name_of_reporting_facility', 255);
                 $table->string('address_of_reporting_facility', 255)->nullable();
                 $table->string('type_of_dru', 50);
@@ -48,7 +48,7 @@ return new class extends Migration
                 $table->timestamps();
 
                 // Foreign key constraints
-                $table->foreign('facility_id')->references('id')->on('facilities')->onDelete('restrict');
+                $table->foreign('facility_id_updated')->references('id')->on('facilities')->onDelete('restrict');
                 $table->foreign('age_bracket_id')->references('id')->on('new_age_brackets')->onDelete('restrict');
                 $table->foreign('province_id')->references('id')->on('province')->onDelete('restrict');
                 $table->foreign('municipal_id')->references('id')->on('muncity')->onDelete('restrict');
@@ -70,7 +70,7 @@ return new class extends Migration
     {
         try {
             Schema::table('patient_injury_form_general_data', function (Blueprint $table) {
-                $table->dropForeign(['facility_id']);
+                $table->dropForeign(['facility_id_updated']);
                 $table->dropForeign(['age_bracket_id']);
                 $table->dropForeign(['province_id']);
                 $table->dropForeign(['municipal_id']);
