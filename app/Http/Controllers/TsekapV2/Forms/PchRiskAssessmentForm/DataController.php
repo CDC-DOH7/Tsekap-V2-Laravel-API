@@ -36,7 +36,7 @@ class DataController extends Controller
 
         // do not authorize update unless 1, 3, 10
         if ((!$queryUser || !in_array($queryUser->getAttribute('user_priv'), [1, 3, 10])) || ($queryUser->getAttribute('verified') !== 1)) {
-            Log::error('Denied administrative access to (PCH Risk Assessment, DataController) for: ' + $queryUser->getAttribute('id'));
+            Log::error('Denied administrative access to (PCH Risk Assessment, DataController) for: ' . $queryUser->getAttribute('id'));
             return response()->json(['error' => 'Unauthorized'], 401);
         }
     }
