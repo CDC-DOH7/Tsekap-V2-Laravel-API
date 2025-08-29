@@ -18,6 +18,8 @@ use App\Http\Controllers\TsekapV2\Websockets\NotificationController;
 use App\Http\Controllers\TsekapV2\Forms\GeneralDataController;
 use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController as PhilpenRiskDataController;
 use App\Http\Controllers\TsekapV2\Forms\PchRiskAssessmentForm\DataController as PchRiskDataController;
+use App\Http\Controllers\TsekapV2\Forms\PatientInjuryForm\DataController as PatientInjuryDataController;
+
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics\PhilpenAnalyticsDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics\GeneralAnalyticsDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics\PchratAnalyticsDataController;
@@ -416,6 +418,21 @@ Route::prefix('v2')->group(function () {
                 Route::post('/pch-update-risk-form', [PchRiskDataController::class, 'updatePchRiskForm'])->name('api-v2-update-pch-risk-form');
                 Route::post('/pch-delete-risk-profile', [PchRiskDataController::class, 'deletePchRiskProfile'])->name('api-v2-delete-pch-risk-profile');
                 Route::post('/pch-delete-risk-form', [PchRiskDataController::class, 'deletePchRiskForm'])->name('api-v2-delete-pch-risk-form');
+            });
+
+            // Forms - Patient Injury Routes
+            Route::prefix('/patient-injury')->group(function () {
+                // ---- Converted to GET Statements ---- //
+                Route::get('/retrieve-patient-injury-preadmission-data', [PatientInjuryDataController::class, 'retrievePatientInjuryPreadmissionData'])->name('api-v2-retrieve-patient-injury-preadmission-data');
+                Route::get('/retrieve-patient-injury-data-by-facility', [PatientInjuryDataController::class, 'retrievePatientInjuryGeneralDataByFacility'])->name('api-v2-retrieve-patient-injury-data-by-facility');
+                Route::get('/retrieve-patient-injury-data-without-facility', [PatientInjuryDataController::class, 'retrievePatientInjuryGeneralDataWithoutFacility'])->name('api-v2-retrieve-patient-injury-data-without-facility');
+
+                Route::post('/patient-injury-add-general-data', [PatientInjuryDataController::class, 'addPatientInjuryGeneralData'])->name('api-v2-add-patient-injury-general-data');
+                Route::post('/patient-injury-add-preadmission-data', [PatientInjuryDataController::class, 'addPatientInjuryPreadmissionData'])->name('api-v2-add-patient-injury-preadmission-data');
+                Route::post('/patient-injury-update-general-data', [PatientInjuryDataController::class, 'updatePatientInjuryGeneralData'])->name('api-v2-update-patient-injury-general-data');
+                Route::post('/patient-injury-update-preadmission-data', [PatientInjuryDataController::class, 'updatePatientInjuryPreadmissionData'])->name('api-v2-update-patient-injury-preadmission-data');
+                Route::post('/patient-injury-delete-general-data', [PatientInjuryDataController::class, 'deletePatientInjuryGeneralData'])->name('api-v2-delete-patient-injury-general-data');
+                Route::post('/patient-injury-delete-preadmission-data', [PatientInjuryDataController::class, 'deletePatientInjuryPreadmissionData'])->name('api-v2-delete-patient-injury-preadmission-data');
             });
         });
     });

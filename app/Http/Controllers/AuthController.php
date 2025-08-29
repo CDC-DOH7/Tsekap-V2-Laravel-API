@@ -121,6 +121,12 @@ class AuthController extends Controller
             'facilities.name as facility_name',
             'facilities.province as facility_province_id',
             'facilities.muncity as facility_muncity_id',
+            'facilities.brgy as facility_barangay_id',
+            'facilities.facility_code as facility_code',
+            'facilities.address as facility_address',
+            'facilities.hospital_type as facility_hospital_type',
+            'facilities.level as facility_level',
+            'facilities.abbr as facility_abbr',
             'user_health_facility.user_designation as user_designation'
         )
             ->where('username', '=', $validatedFields['user'])
@@ -156,12 +162,38 @@ class AuthController extends Controller
 
             return response()->json([
                 'data' => [
-                    'user' => $user,
+                    'user' => [
+                        'id' => $user->id,
+                        'fname' => $user->fname,
+                        'mname' => $user->mname,
+                        'lname' => $user->lname,
+                        'username' => $user->username,
+                        'contact' => $user->contact,
+                        'type_rdu' => $user->type_rdu,
+                        'email' => $user->email,
+                        'user_priv' => $user->user_priv,
+                        'verified' => $user->verified,
+                        'muncity' => $user->muncity,
+                        'muncity_name' => $user->muncity_name,
+                        'province' => $user->province,
+                        'province_name' => $user->province_name,
+                        'user_designation' => $user->user_designation,
+                        'facility_id' => $user->facility_id,
+                        'facility_name' => $user->facility_name,
+                        'created_at' => $user->created_at,
+                        'updated_at' => $user->updated_at,
+                    ],
                     'facility' => $user->facility_id ? [
                         'id' => $user->facility_id,
+                        'facility_code' => $user->facility_code,
                         'name' => $user->facility_name,
+                        'level' => $user->facility_level,
+                        'abbr' => $user->facility_abbr,
+                        'hospital_type' => $user->facility_hospital_type,
                         'province_id' => $user->facility_province_id,
-                        'muncity_id' => $user->facility_muncity_id
+                        'muncity_id' => $user->facility_muncity_id,
+                        'barangay_id' => $user->facility_barangay_id,
+                        'address' => $user->facility_address,
                     ] : null,
                     'token' => $token, // Return Bearer token
                 ],
