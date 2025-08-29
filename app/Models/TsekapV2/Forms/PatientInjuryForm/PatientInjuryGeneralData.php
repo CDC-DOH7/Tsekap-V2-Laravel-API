@@ -39,10 +39,14 @@ class PatientInjuryGeneralData extends Model
         'age_in_days',
         'age_bracket_id',
 
-        'purok_sitio',
-        'province_id',
-        'municipal_id',
-        'barangay_id',
+        'perm_province_id',
+        'perm_municipal_id',
+        'perm_barangay_id',
+
+        'temp_province_id',
+        'temp_municipal_id',
+        'temp_barangay_id',
+
         'phic_id',
         'created_at',
         'updated_at'
@@ -53,19 +57,34 @@ class PatientInjuryGeneralData extends Model
         return $this->belongsTo(Profile::class, 'profile_id', 'id');
     }
 
-    public function province()
+    public function permProvince()
     {
-        return $this->belongsTo(Province::class, 'province_id');
+        return $this->belongsTo(Province::class, 'perm_province_id');
     }
 
-    public function muncity()
+    public function permMuncity()
     {
-        return $this->belongsTo(Muncity::class, 'municipal_id');
+        return $this->belongsTo(Muncity::class, 'perm_municipal_id');
     }
 
-    public function barangay()
+    public function permBarangay()
     {
-        return $this->belongsTo(Barangay::class, 'barangay_id');
+        return $this->belongsTo(Barangay::class, 'perm_barangay_id');
+    }
+
+    public function tempProvince()
+    {
+        return $this->belongsTo(Province::class, 'temp_province_id');
+    }
+
+    public function tempMuncity()
+    {
+        return $this->belongsTo(Muncity::class, 'temp_municipal_id');
+    }
+
+    public function tempBarangay()
+    {
+        return $this->belongsTo(Barangay::class, 'temp_barangay_id');
     }
 
     public function facility()
