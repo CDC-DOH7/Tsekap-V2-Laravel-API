@@ -100,6 +100,38 @@ class GeneralDataController extends Controller
                     ]
                 ],
 
+                // Patient Injury Form
+                'PatientInjuryGeneralData' => [
+                    'table' => 'patient_injury_form_general_data',
+                    'columns' => [
+                        'id',
+                        'profile_id',
+                        'facility_id_updated',
+                        'encoded_by',
+                        'offline_entry',
+                        'lname',
+                        'fname',
+                        'mname',
+                        'sex',
+                        'dob',
+                        'age',
+                        'age_bracket_id',
+                        'phic_id as philhealth_number',
+                        'created_at',
+                        'updated_at',
+                    ],
+                    'joins' => [
+                        ['users', 'patient_injury_form_general_data.encoded_by', '=', 'users.id'],
+                        ['muncity', 'patient_injury_form_general_data.municipal_id', '=', 'muncity.id'],
+                        ['province', 'patient_injury_form_general_data.province_id', '=', 'province.id']
+                    ],
+                    'additional_columns' => [
+                        'muncity.description as municipal_name',
+                        'province.description as province_name',
+                        DB::raw('CONCAT(users.fname, " ", users.mname, " ", users.lname) as encoder')
+                    ]
+                ],
+
                 // Primary Care Health Risk Assessment Form
                 'PchRiskProfile' => [
                     'table' => 'pch_risk_assessment_tool_profile',
@@ -283,6 +315,38 @@ class GeneralDataController extends Controller
                     'additional_columns' => [
                         'muncity.description as municipal_name',
                         'province.description as province_name'
+                    ]
+                ],
+
+                // Patient Injury Form
+                'PatientInjuryGeneralData' => [
+                    'table' => 'patient_injury_form_general_data',
+                    'columns' => [
+                        'id',
+                        'profile_id',
+                        'facility_id_updated',
+                        'encoded_by',
+                        'offline_entry',
+                        'lname',
+                        'fname',
+                        'mname',
+                        'sex',
+                        'dob',
+                        'age',
+                        'age_bracket_id',
+                        'phic_id as philhealth_number',
+                        'created_at',
+                        'updated_at',
+                    ],
+                    'joins' => [
+                        ['users', 'patient_injury_form_general_data.encoded_by', '=', 'users.id'],
+                        ['muncity', 'patient_injury_form_general_data.municipal_id', '=', 'muncity.id'],
+                        ['province', 'patient_injury_form_general_data.province_id', '=', 'province.id']
+                    ],
+                    'additional_columns' => [
+                        'muncity.description as municipal_name',
+                        'province.description as province_name',
+                        DB::raw('CONCAT(users.fname, " ", users.mname, " ", users.lname) as encoder')
                     ]
                 ],
 

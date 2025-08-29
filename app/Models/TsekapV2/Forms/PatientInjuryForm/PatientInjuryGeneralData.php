@@ -20,7 +20,7 @@ class PatientInjuryGeneralData extends Model
         'id',
         'profile_id',
 
-        'facility_id',
+        'facility_id_updated',
         'name_of_reporting_facility',
         'address_of_reporting_facility',
         'type_of_dru',
