@@ -80,7 +80,7 @@ return new class extends Migration
     {
         try {
             Schema::table('patient_injury_form_general_data', function (Blueprint $table) {
-                $table->dropForeign(['facility_id_updated']);
+                $table->dropForeign(index: ['facility_id_updated']);
                 $table->dropForeign(['age_bracket_id']);
 
                 $table->dropForeign(['perm_province_id']);

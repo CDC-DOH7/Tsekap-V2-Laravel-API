@@ -16,14 +16,13 @@ class UserHealthFacilityController extends Controller
     {
         $queryUser = User::where('username', '=', $username)->first();
 
-        if (!$queryUser) {
+        if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
             Log::error('Denied access for: ' . " " . $queryUser->getAttribute('id'));
-            return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
         return $queryUser;
     }
-
     public function retrieveUserHealthFacility(Request $request)
     {
         $fields = $request->input('fields');
@@ -66,17 +65,20 @@ class UserHealthFacilityController extends Controller
     {
         $fields = $request->input('fields');
 
-        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
-            return $user;
-        }
-
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
             'fields.user_id' => 'required|integer',
             'fields.facility_id' => 'required|integer',
             'fields.user_designation' => 'nullable|string|max:255',
         ]);
+
+        $username = User::where('id', '=', $fields['user_id'])->first()->getAttribute('username');
+
+        $user = $this->getAuthenticatedUser($username);
+
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
+        }
 
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
