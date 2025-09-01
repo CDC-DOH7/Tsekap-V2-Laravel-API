@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\TsekapV2\Analytics\DataRetrieval;
 
 use App\Http\Controllers\Controller;
+use App\Models\TsekapV2\Forms\PatientInjuryForm\PatientInjuryGeneralData;
 use App\Models\TsekapV2\Forms\RiskAssessment\RiskProfile;
 use App\Models\TsekapV2\Forms\PchRiskAssessment\PchRiskProfile;
 use App\Models\TsekapV2\UserHealthFacility;
@@ -45,11 +46,23 @@ class AdministrativeAnalyticsDataController extends Controller
             }
 
             $form_type = $request->query('form');
-            if (!in_array($form_type, ['pch', 'raf'])) {
+            if (!in_array($form_type, ['pch', 'raf', 'pif'])) {
                 return response()->json(['error' => 'Form type unsupported'], 400);
             }
 
-            $model = $form_type === 'pch' ? PchRiskProfile::class : RiskProfile::class;
+            $model = null;
+
+            switch ($form_type) {
+                case 'pch':
+                    $model = PchRiskProfile::class;
+                    break;
+                case 'raf':
+                    $model = RiskProfile::class;
+                    break;
+                case 'pif':
+                    $model = PatientInjuryGeneralData::class;
+                    break;
+            }
 
             $entries = $model::where('facility_id_updated', $hf->getAttribute('facility_id'))
                 ->selectRaw('encoded_by as id, COUNT(*) as total_entries, MAX(created_at) as last_entry_date')

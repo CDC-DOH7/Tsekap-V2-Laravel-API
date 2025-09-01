@@ -98,10 +98,12 @@ class DataController extends Controller
             'patient_injury_form_general_data.age_in_days',
             'patient_injury_form_general_data.age_bracket_id',
 
-            'patient_injury_form_general_data.purok_sitio',
-            'patient_injury_form_general_data.province_id',
-            'patient_injury_form_general_data.municipal_id',
-            'patient_injury_form_general_data.barangay_id',
+            'patient_injury_form_general_data.perm_province_id',
+            'patient_injury_form_general_data.perm_municipal_id',
+            'patient_injury_form_general_data.perm_barangay_id',
+            'patient_injury_form_general_data.temp_province_id',
+            'patient_injury_form_general_data.temp_municipal_id',
+            'patient_injury_form_general_data.temp_barangay_id',
             'patient_injury_form_general_data.phic_id',
             'patient_injury_form_general_data.created_at',
             'patient_injury_form_general_data.updated_at',
@@ -202,10 +204,13 @@ class DataController extends Controller
             'patient_injury_form_general_data.age_in_days',
             'patient_injury_form_general_data.age_bracket_id',
 
-            'patient_injury_form_general_data.purok_sitio',
-            'patient_injury_form_general_data.province_id',
-            'patient_injury_form_general_data.municipal_id',
-            'patient_injury_form_general_data.barangay_id',
+            'patient_injury_form_general_data.perm_province_id',
+            'patient_injury_form_general_data.perm_municipal_id',
+            'patient_injury_form_general_data.perm_barangay_id',
+            'patient_injury_form_general_data.temp_province_id',
+            'patient_injury_form_general_data.temp_municipal_id',
+            'patient_injury_form_general_data.temp_barangay_id',
+
             'patient_injury_form_general_data.phic_id',
             'patient_injury_form_general_data.created_at',
             'patient_injury_form_general_data.updated_at',
@@ -446,10 +451,12 @@ class DataController extends Controller
             'fields.age_in_days' => 'sometimes|numeric|min:0|max:31',
             'fields.age_bracket_id' => 'required|integer',
 
-            'fields.purok_sitio' => 'sometimes|nullable|string|max:255',
-            'fields.province_id' => 'required|integer',
-            'fields.municipal_id' => 'required|integer',
-            'fields.barangay_id' => 'required|integer',
+            'fields.temp_province_id' => 'required|integer',
+            'fields.temp_municipal_id' => 'required|integer',
+            'fields.temp_barangay_id' => 'required|integer',
+            'fields.perm_province_id' => 'required|integer',
+            'fields.perm_municipal_id' => 'required|integer',
+            'fields.perm_barangay_id' => 'required|integer',
             'fields.phic_id' => 'sometimes|nullable|string|max:50',
         ];
 
@@ -752,10 +759,12 @@ class DataController extends Controller
             'fields.age_in_days' => 'sometimes|numeric|min:0|max:31',
             'fields.age_bracket_id' => 'sometimes|integer',
 
-            'fields.purok_sitio' => 'sometimes|nullable|string|max:255',
-            'fields.province_id' => 'sometimes|integer',
-            'fields.municipal_id' => 'sometimes|integer',
-            'fields.barangay_id' => 'sometimes|integer',
+            'fields.perm_province_id' => 'sometimes|integer',
+            'fields.perm_municipal_id' => 'sometimes|integer',
+            'fields.perm_barangay_id' => 'sometimes|integer',
+            'fields.temp_province_id' => 'sometimes|integer',
+            'fields.temp_municipal_id' => 'sometimes|integer',
+            'fields.temp_barangay_id' => 'sometimes|integer',
             'fields.phic_id' => 'sometimes|nullable|string|max:50',
         ];
 

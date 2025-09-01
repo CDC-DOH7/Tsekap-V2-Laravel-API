@@ -38,10 +38,13 @@ return new class extends Migration
                 $table->unsignedInteger('age_in_days')->nullable();
                 $table->integer('age_bracket_id')->index();
 
-                $table->text('purok_sitio')->nullable();
-                $table->unsignedInteger('province_id')->index();
-                $table->unsignedInteger('municipal_id')->index();
-                $table->unsignedInteger('barangay_id')->index();
+                $table->unsignedInteger('temp_province_id')->index();
+                $table->unsignedInteger('temp_municipal_id')->index();
+                $table->unsignedInteger('temp_barangay_id')->index();
+
+                $table->unsignedInteger('perm_province_id')->index();
+                $table->unsignedInteger('perm_municipal_id')->index();
+                $table->unsignedInteger('perm_barangay_id')->index();
                 $table->string('phic_id', 50)->nullable();
 
                 // system metadata
@@ -50,9 +53,16 @@ return new class extends Migration
                 // Foreign key constraints
                 $table->foreign('facility_id_updated')->references('id')->on('facilities')->onDelete('restrict');
                 $table->foreign('age_bracket_id')->references('id')->on('new_age_brackets')->onDelete('restrict');
-                $table->foreign('province_id')->references('id')->on('province')->onDelete('restrict');
-                $table->foreign('municipal_id')->references('id')->on('muncity')->onDelete('restrict');
-                $table->foreign('barangay_id')->references('id')->on('barangay')->onDelete('restrict');
+
+                // temp
+                $table->foreign('temp_province_id')->references('id')->on('province')->onDelete('restrict');
+                $table->foreign('temp_municipal_id')->references('id')->on('muncity')->onDelete('restrict');
+                $table->foreign('temp_barangay_id')->references('id')->on('barangay')->onDelete('restrict');
+
+                // perm
+                $table->foreign('perm_province_id')->references('id')->on('province')->onDelete('restrict');
+                $table->foreign('perm_municipal_id')->references('id')->on('muncity')->onDelete('restrict');
+                $table->foreign('perm_barangay_id')->references('id')->on('barangay')->onDelete('restrict');
 
                 $table->foreign('profile_id')->references('id')->on('profile')->onDelete('set null');
                 $table->foreign('encoded_by')->references('id')->on('users')->onDelete('set null');
@@ -70,11 +80,17 @@ return new class extends Migration
     {
         try {
             Schema::table('patient_injury_form_general_data', function (Blueprint $table) {
-                $table->dropForeign(['facility_id_updated']);
+                $table->dropForeign(index: ['facility_id_updated']);
                 $table->dropForeign(['age_bracket_id']);
-                $table->dropForeign(['province_id']);
-                $table->dropForeign(['municipal_id']);
-                $table->dropForeign(['barangay_id']);
+
+                $table->dropForeign(['perm_province_id']);
+                $table->dropForeign(['perm_municipal_id']);
+                $table->dropForeign(['perm_barangay_id']);
+
+                $table->dropForeign(['temp_province_id']);
+                $table->dropForeign(['temp_municipal_id']);
+                $table->dropForeign(['temp_barangay_id']);
+
                 $table->dropForeign(['profile_id']);
                 $table->dropForeign(['encoded_by']);
             });

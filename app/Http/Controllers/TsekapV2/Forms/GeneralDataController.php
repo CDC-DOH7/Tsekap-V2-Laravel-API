@@ -122,8 +122,8 @@ class GeneralDataController extends Controller
                     ],
                     'joins' => [
                         ['users', 'patient_injury_form_general_data.encoded_by', '=', 'users.id'],
-                        ['muncity', 'patient_injury_form_general_data.municipal_id', '=', 'muncity.id'],
-                        ['province', 'patient_injury_form_general_data.province_id', '=', 'province.id']
+                        ['muncity', 'patient_injury_form_general_data.perm_municipal_id', '=', 'muncity.id'],
+                        ['province', 'patient_injury_form_general_data.perm_province_id', '=', 'province.id']
                     ],
                     'additional_columns' => [
                         'muncity.description as municipal_name',
@@ -340,8 +340,8 @@ class GeneralDataController extends Controller
                     ],
                     'joins' => [
                         ['users', 'patient_injury_form_general_data.encoded_by', '=', 'users.id'],
-                        ['muncity', 'patient_injury_form_general_data.municipal_id', '=', 'muncity.id'],
-                        ['province', 'patient_injury_form_general_data.province_id', '=', 'province.id']
+                        ['muncity', 'patient_injury_form_general_data.perm_municipal_id', '=', 'muncity.id'],
+                        ['province', 'patient_injury_form_general_data.perm_province_id', '=', 'province.id']
                     ],
                     'additional_columns' => [
                         'muncity.description as municipal_name',
