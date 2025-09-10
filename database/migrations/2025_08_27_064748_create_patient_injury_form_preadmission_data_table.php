@@ -149,17 +149,20 @@ return new class extends Migration
                 $table->string('hfd_referred_by_other_other_facility_yes_no', 10)->nullable();
                 $table->text('hfd_originating_facility')->nullable();
                 $table->string('hfd_status_on_arrival', 50)->nullable();
+                $table->string('hfd_status_on_arrival_conscious', 50)->nullable();
                 $table->string('hfd_transport_mode', 50)->nullable();
                 $table->text('hfd_transport_mode_specify_others')->nullable();
                 $table->text('hfd_initial_impression')->nullable();
                 $table->string('hfd_icd10_code_nature_of_injury', 100)->nullable();
                 $table->string('hfd_icd10_code_external_cause_of_injury', 100)->nullable();
                 $table->string('hfd_disposition', 100)->nullable();
+                $table->string('hfd_disposition_specify', 100)->nullable();
                 $table->string('hfd_outcome', 50)->nullable();
 
                 $table->string('hfd_in_patient_admitted_yes_no', 10)->nullable();
                 $table->text('hfd_in_patient_complete_final_diagnosis')->nullable();
                 $table->string('hfd_in_patient_disposition', 100)->nullable();
+                $table->string('hfd_in_patient_disposition_specify', 100)->nullable();
                 $table->string('hfd_in_patient_outcome', 50)->nullable();
                 $table->string('hfd_in_patient_icd10_code_nature_of_injury', 100)->nullable();
                 $table->string('hfd_in_patient_icd10_code_external_cause_of_injury', 100)->nullable();

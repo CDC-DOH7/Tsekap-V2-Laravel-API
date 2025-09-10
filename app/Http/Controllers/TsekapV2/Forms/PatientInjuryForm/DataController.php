@@ -449,7 +449,7 @@ class DataController extends Controller
             'fields.age' => 'sometimes|numeric|min:0|max:120',
             'fields.age_in_months' => 'sometimes|numeric|min:0|max:12',
             'fields.age_in_days' => 'sometimes|numeric|min:0|max:31',
-            'fields.age_bracket_id' => 'required|integer',
+            // 'fields.age_bracket_id' => 'required|integer',
 
             'fields.temp_province_id' => 'required|integer',
             'fields.temp_municipal_id' => 'required|integer',
@@ -540,7 +540,7 @@ class DataController extends Controller
         // Define validation rules
         $rules = [
             'fields' => 'required|array',
-            'fields.id' => 'required|integer|min:0',
+            // 'fields.id' => 'required|integer|min:0',
             'fields.general_data_id' => 'required|integer|min:0',
 
             'fields.poi_province_id' => 'required|integer|min:0',
@@ -669,17 +669,20 @@ class DataController extends Controller
             'fields.hfd_referred_by_other_other_facility_yes_no' => 'sometimes|nullable|string|max:10',
             'fields.hfd_originating_facility' => 'sometimes|nullable|string',
             'fields.hfd_status_on_arrival' => 'sometimes|nullable|string|max:50',
+            'fields.hfd_status_on_arrival_conscious' => 'sometimes|nullable|string|max:50',
             'fields.hfd_transport_mode' => 'sometimes|nullable|string|max:50',
             'fields.hfd_transport_mode_specify_others' => 'sometimes|nullable|string',
             'fields.hfd_initial_impression' => 'sometimes|nullable|string',
             'fields.hfd_icd10_code_nature_of_injury' => 'sometimes|nullable|string|max:100',
             'fields.hfd_icd10_code_external_cause_of_injury' => 'sometimes|nullable|string|max:100',
             'fields.hfd_disposition' => 'sometimes|nullable|string|max:100',
+            'fields.hfd_disposition_specify' => 'sometimes|nullable|string|max:100',
             'fields.hfd_outcome' => 'sometimes|nullable|string|max:50',
 
             'fields.hfd_in_patient_admitted_yes_no' => 'sometimes|nullable|string|max:10',
             'fields.hfd_in_patient_complete_final_diagnosis' => 'sometimes|nullable|string',
             'fields.hfd_in_patient_disposition' => 'sometimes|nullable|string|max:100',
+            'fields.hfd_in_patient_disposition_specify' => 'sometimes|nullable|string|max:100',
             'fields.hfd_in_patient_outcome' => 'sometimes|nullable|string|max:50',
             'fields.hfd_in_patient_icd10_code_nature_of_injury' => 'sometimes|nullable|string|max:100',
             'fields.hfd_in_patient_icd10_code_external_cause_of_injury' => 'sometimes|nullable|string|max:100',
