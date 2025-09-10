@@ -435,6 +435,7 @@ Route::prefix('v2')->group(function () {
 
                 Route::post('/patient-injury-add-general-data', [PatientInjuryDataController::class, 'addPatientInjuryGeneralData'])->name('api-v2-add-patient-injury-general-data');
                 Route::post('/patient-injury-add-preadmission-data', [PatientInjuryDataController::class, 'addPatientInjuryPreadmissionData'])->name('api-v2-add-patient-injury-preadmission-data');
+                
                 Route::post('/patient-injury-update-general-data', [PatientInjuryDataController::class, 'updatePatientInjuryGeneralData'])->name('api-v2-update-patient-injury-general-data');
                 Route::post('/patient-injury-update-preadmission-data', [PatientInjuryDataController::class, 'updatePatientInjuryPreadmissionData'])->name('api-v2-update-patient-injury-preadmission-data');
                 Route::post('/patient-injury-delete-general-data', [PatientInjuryDataController::class, 'deletePatientInjuryGeneralData'])->name('api-v2-delete-patient-injury-general-data');

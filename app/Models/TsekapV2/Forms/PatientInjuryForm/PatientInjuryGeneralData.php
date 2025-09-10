@@ -13,7 +13,7 @@ use App\Models\TsekapV2\Profile;
 class PatientInjuryGeneralData extends Model
 {
     protected $connection = 'mysql';
-    protected $table = 'patient_injury_form_general_data';
+    protected $table = 'patient_injury_form_general_data'; //table database
     protected $guarded = array();
 
     protected $fillable = [
@@ -59,7 +59,7 @@ class PatientInjuryGeneralData extends Model
 
     public function permProvince()
     {
-        return $this->belongsTo(Province::class, 'perm_province_id');
+        return $this->belongsTo(Province::class, 'perm_province_id'); //foreign relationship
     }
 
     public function permMuncity()
