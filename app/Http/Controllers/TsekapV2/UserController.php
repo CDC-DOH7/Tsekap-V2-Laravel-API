@@ -113,8 +113,8 @@ class UserController extends Controller
             if (isset($fields['fname'])) {
                 $queryUser->fname = $fields['fname'];
             }
-            if (isset($fields['mname'])) {
-                $queryUser->mname = $fields['mname'];
+            if (array_key_exists('mname', $fields)) { // allow empty string
+                $queryUser->mname = $fields['mname'] === '' ? null : $fields['mname'];
             }
             if (isset($fields['lname'])) {
                 $queryUser->lname = $fields['lname'];
@@ -180,7 +180,7 @@ class UserController extends Controller
 
         $rules = [
             'fields' => 'required|array',
-            'fields.email' => 'required|string|email|max:50',
+            'fields.email' => 'nullable|string|email|max:50',
         ];
 
         $fieldsValidator = Validator::make($request->all(), $rules);
