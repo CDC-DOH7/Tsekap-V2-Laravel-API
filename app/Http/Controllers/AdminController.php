@@ -181,7 +181,7 @@ class AdminController extends Controller
     // verify a user
     public function verifyUser(Request $request)
     {
-        $admin = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
+        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
         if ($admin instanceof \Illuminate\Http\JsonResponse) {
             return $admin; // Return the unauthorized response
@@ -353,6 +353,7 @@ class AdminController extends Controller
             // Join users with the user_health_facility table, exclude user_priv = 1
             $users = DB::table('users')
                 ->join('user_health_facility', 'users.id', '=', 'user_health_facility.user_id')
+                ->where('users.id', '!=', $admin->getAttribute('id'))
                 ->where('user_health_facility.facility_id', $adminFacilityId)
                 ->where('users.user_priv', '!=', 1)
                 ->select('users.id', 'users.fname', 'users.mname', 'users.lname', 'users.username', 'users.user_priv', 'users.verified', 'users.created_at')
