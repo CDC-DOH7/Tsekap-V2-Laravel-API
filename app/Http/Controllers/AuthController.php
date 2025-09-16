@@ -160,6 +160,24 @@ class AuthController extends Controller
             $csrfCookie = Cookie::make('X-CSRF-TOKEN', $csrfToken, 60);
             */
 
+            // Old backend return
+            /*
+            return response()->json([
+                'data' => [
+                    'user' => $user,
+                    'facility' => $user->facility_id ? [
+                        'id' => $user->facility_id,
+                        'name' => $user->facility_name,
+                        'province_id' => $user->facility_province_id,
+                        'muncity_id' => $user->facility_muncity_id
+                    ] : null,
+                    'token' => $token, // Return Bearer token
+                ],
+                'status' => 'success',
+            ])->withCookie($cookie);
+            
+            */
+
             return response()->json([
                 'data' => [
                     'user' => [

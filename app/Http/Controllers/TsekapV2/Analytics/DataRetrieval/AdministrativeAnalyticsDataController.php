@@ -18,7 +18,7 @@ class AdministrativeAnalyticsDataController extends Controller
     private function getAuthenticatedUser($username)
     {
         $user = User::where('username', $username)
-            ->whereIn('user_priv', [1, 3, 10])
+            ->whereIn('user_priv', [1, 3, 5, 10])
             ->where('verified', 1)
             ->first();
 
