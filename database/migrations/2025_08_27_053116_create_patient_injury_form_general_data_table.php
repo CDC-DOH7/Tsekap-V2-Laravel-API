@@ -33,7 +33,7 @@ return new class extends Migration
                 $table->string('mname', 255)->nullable();
                 $table->string('sex', 10);
                 $table->date('dob');
-                $table->unsignedInteger('age'); // in years this may be applicable
+                $table->unsignedInteger('age')->nullable(); // in years this may be applicable
                 $table->unsignedInteger('age_in_months')->nullable();
                 $table->unsignedInteger('age_in_days')->nullable();
                 $table->integer('age_bracket_id')->index();
