@@ -738,7 +738,7 @@ class DataController extends Controller
         $rules = [
             // profile metadata
             'fields' => 'required|array',
-            'fields.id' => 'sometimes|integer',
+            // 'fields.id' => 'sometimes|integer',
             'fields.profile_id' => 'sometimes|integer',
 
             // dru metadata
