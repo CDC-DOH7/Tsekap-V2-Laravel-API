@@ -28,8 +28,8 @@ class NotificationController extends Controller
     {
         $queryUser = User::where('username', '=', $username)->first();
 
-        // do not authorize update unless 1, 3, 10
-        if ((!$queryUser || !in_array($queryUser->getAttribute('user_priv'), [1, 3, 10])) || ($queryUser->getAttribute('verified') !== 1)) {
+        // do not authorize update unless 1, 3, 5, and 10
+        if ((!$queryUser || !in_array($queryUser->getAttribute('user_priv'), [1, 3, 5, 10])) || ($queryUser->getAttribute('verified') !== 1)) {
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 

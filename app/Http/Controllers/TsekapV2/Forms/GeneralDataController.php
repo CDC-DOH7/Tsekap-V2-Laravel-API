@@ -219,7 +219,7 @@ class GeneralDataController extends Controller
                 }
 
                 // Apply user privilege filters
-                if (!in_array($user->getAttribute('user_priv'), [1, 3, 10])) {
+                if (!in_array($user->getAttribute('user_priv'), [1, 3, 5, 10])) {
                     $query->where("{$config['table']}.facility_id_updated", "=", $user->getAttribute('facility_id'));
                 }
 
@@ -430,7 +430,7 @@ class GeneralDataController extends Controller
                 }
 
                 // Apply user privilege filters
-                if (!in_array($user->getAttribute('user_priv'), [1, 3, 10])) {
+                if (!in_array($user->getAttribute('user_priv'), [1, 3, 5, 10])) {
                     $query->where("{$config['table']}.facility_id_updated", "=", $user->getAttribute('facility_id'));
                 }
 

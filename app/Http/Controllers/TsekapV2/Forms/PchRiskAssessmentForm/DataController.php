@@ -29,13 +29,13 @@ class DataController extends Controller
         return $queryUser;
     }
 
-    // for users with privilege of 1,3,and 10
+    // for users with privilege of 1,3, 5, and 10
     private function getAuthenticatedAdmin($username)
     {
         $queryUser = User::where('username', '=', $username)->first();
 
         // do not authorize update unless 1, 3, 10
-        if ((!$queryUser || !in_array($queryUser->getAttribute('user_priv'), [1, 3, 10])) || ($queryUser->getAttribute('verified') !== 1)) {
+        if ((!$queryUser || !in_array($queryUser->getAttribute('user_priv'), [1, 3, 5, 10])) || ($queryUser->getAttribute('verified') !== 1)) {
             Log::error('Denied administrative access to (PCH Risk Assessment, DataController) for: ' . $queryUser->getAttribute('id'));
             return response()->json(['error' => 'Unauthorized'], 401);
         }

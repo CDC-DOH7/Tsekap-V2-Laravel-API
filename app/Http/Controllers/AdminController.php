@@ -33,7 +33,7 @@ class AdminController extends Controller
 
         if (
             !$queryUser ||
-            !in_array($queryUser->getAttribute('user_priv'), [1, 3, 10]) ||
+            !in_array($queryUser->getAttribute('user_priv'), [1, 3, 5, 10]) ||
             $queryUser->getAttribute('verified') !== 1
         ) {
             Log::error('Denied administrative access for: ' . ($queryUser->getAttribute('id') ?? 'unknown'));
@@ -181,7 +181,7 @@ class AdminController extends Controller
     // verify a user
     public function verifyUser(Request $request)
     {
-        $admin = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
+        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
         if ($admin instanceof \Illuminate\Http\JsonResponse) {
             return $admin; // Return the unauthorized response
@@ -224,7 +224,7 @@ class AdminController extends Controller
     // unverify a user
     public function unverifyUser(Request $request)
     {
-        $admin = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
+        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
         if ($admin instanceof \Illuminate\Http\JsonResponse) {
             return $admin; // Return the unauthorized response
@@ -267,7 +267,7 @@ class AdminController extends Controller
     // list unverified users
     public function listUnverifiedUsers(Request $request)
     {
-        $admin = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
+        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
         if ($admin instanceof \Illuminate\Http\JsonResponse) {
             return $admin; // Return the unauthorized response
@@ -330,8 +330,8 @@ class AdminController extends Controller
         }
 
         try {
-            // Only allow access if user_priv is 3 or 10
-            if (!in_array($admin->getAttribute('user_priv'), [3, 10])) {
+            // Only allow access if user_priv is 3, 5, or 10
+            if (!in_array($admin->getAttribute('user_priv'), [3, 5, 10])) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Unauthorized to view users by facility.',
@@ -350,10 +350,12 @@ class AdminController extends Controller
                 ], 404);
             }
 
-            // Join users with the user_health_facility table
+            // Join users with the user_health_facility table, exclude user_priv = 1
             $users = DB::table('users')
                 ->join('user_health_facility', 'users.id', '=', 'user_health_facility.user_id')
+                ->where('users.id', '!=', $admin->getAttribute('id'))
                 ->where('user_health_facility.facility_id', $adminFacilityId)
+                ->where('users.user_priv', '!=', 1)
                 ->select('users.id', 'users.fname', 'users.mname', 'users.lname', 'users.username', 'users.user_priv', 'users.verified', 'users.created_at')
                 ->orderBy('users.created_at', 'desc')
                 ->get();
