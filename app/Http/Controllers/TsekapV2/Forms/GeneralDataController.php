@@ -24,6 +24,45 @@ class GeneralDataController extends Controller
         return $queryUser;
     }
 
+    private function getMuncityId($muncity_name)
+    {
+        $muncity = DB::table('muncity')->where('description', $muncity_name)->first();
+        return $muncity?->id;
+    }
+
+    private function getBarangayId(Request $request, $barangay_name)
+    {
+        function getUserHealthFacility($user_id)
+        {
+            $userHealthFacility = DB::table('user_health_facility')
+                ->where('user_id', $user_id)
+                ->first();
+
+            return $userHealthFacility;
+        }
+        function getFacilityMuncity($facility_id)
+        {
+            $facility = DB::table('facilities')
+                ->where('id', $facility_id)
+                ->first();
+
+            return $facility?->muncity;
+        }
+
+        $user_hf = getUserHealthFacility($request->user()->getAttribute('id'));
+        if (!$user_hf) {
+            return null;
+        }
+
+        $muncity_id = getFacilityMuncity($user_hf->facility_id);
+        if (!$muncity_id) {
+            return null;
+        }
+
+        $barangay = DB::table('barangay')->where('muncity_id', $muncity_id)->where('description', $barangay_name)->first();
+        return $barangay?->id;
+    }
+
     public function retrieveAllForms(Request $request)
     {
         try {
@@ -38,7 +77,7 @@ class GeneralDataController extends Controller
                 'keyword' => $request->query('keyword', null),
                 'start_date' => $request->query('start_date', null),
                 'end_date' => $request->query('end_date', null),
-                'form_type' => $request->query('form_type', null)
+                'form_type' => $request->query('form_type', null),
             ];
 
             $filter = $fields['filter'];
@@ -90,12 +129,14 @@ class GeneralDataController extends Controller
                     ],
                     'joins' => [
                         ['users', 'risk_profile.encoded_by', '=', 'users.id'],
+                        ['barangay', 'risk_profile.barangay_id', '=', 'barangay.id'],
                         ['muncity', 'risk_profile.municipal_id', '=', 'muncity.id'],
                         ['province', 'risk_profile.province_id', '=', 'province.id']
                     ],
                     'additional_columns' => [
                         'muncity.description as municipal_name',
                         'province.description as province_name',
+                        'barangay.description as barangay_name',
                         DB::raw('CONCAT(users.fname, " ", users.mname, " ", users.lname) as encoder')
                     ]
                 ],
@@ -122,12 +163,14 @@ class GeneralDataController extends Controller
                     ],
                     'joins' => [
                         ['users', 'patient_injury_form_general_data.encoded_by', '=', 'users.id'],
+                        ['barangay', 'patient_injury_form_general_data.perm_barangay_id', '=', 'barangay.id'],
                         ['muncity', 'patient_injury_form_general_data.perm_municipal_id', '=', 'muncity.id'],
                         ['province', 'patient_injury_form_general_data.perm_province_id', '=', 'province.id']
                     ],
                     'additional_columns' => [
                         'muncity.description as municipal_name',
                         'province.description as province_name',
+                        'barangay.description as barangay_name',
                         DB::raw('CONCAT(users.fname, " ", users.mname, " ", users.lname) as encoder')
                     ]
                 ],
@@ -187,12 +230,14 @@ class GeneralDataController extends Controller
                     ],
                     'joins' => [
                         ['users', 'pch_risk_assessment_tool_profile.encoded_by', '=', 'users.id'],
+                        ['barangay', 'pch_risk_assessment_tool_profile.barangay_id', '=', 'barangay.id'],
                         ['muncity', 'pch_risk_assessment_tool_profile.muncity_id', '=', 'muncity.id'],
                         ['province', 'pch_risk_assessment_tool_profile.province_id', '=', 'province.id']
                     ],
                     'additional_columns' => [
                         'muncity.description as municipal_name',
                         'province.description as province_name',
+                        'barangay.description as barangay_name',
                         DB::raw('CONCAT(users.fname, " ", users.mname, " ", users.lname) as encoder')
                     ]
                 ],
@@ -225,15 +270,49 @@ class GeneralDataController extends Controller
 
                 // Apply keyword filter
                 if ($keyword) {
-                    $query->where(function ($q) use ($filter, $keyword, $config) {
-                        $columns = array_combine($config['columns'], $config['columns']);
+                    $query->where(function ($q) use ($filter, $keyword, $config, $request) {
+                        // Remove aliases for filtering
+                        $columns = array_map(
+                            fn($col) => trim(preg_replace('/\s+as\s+\w+$/i', '', $col)),
+                            $config['columns']
+                        );
+                        $columns = array_values($columns);
 
-                        if ($filter === 'all') {
-                            foreach ($columns as $column) {
-                                $q->orWhere("{$config['table']}.{$column}", 'like', "%$keyword%");
+                        if ($filter === 'barangay') {
+                            $barangay_id = $this->getBarangayId($request, $keyword);
+                            if ($barangay_id) {
+                                if (strcmp($config['table'], "patient_injury_form_general_data") === 0) { // handle for patient injury form
+                                    $q->where("{$config['table']}.perm_barangay_id", "=", $barangay_id);
+                                } else {
+                                    $q->where("{$config['table']}.barangay_id", "=", $barangay_id);
+                                }
+                            } else {
+                                // If barangay not found, ensure no results are returned
+                                $q->whereRaw('1 = 0');
                             }
-                        } elseif ($filter && isset($columns[$filter])) {
-                            $q->where("{$config['table']}.{$filter}", 'like', "%$keyword%");
+                        } elseif ($filter === 'muncity' || $filter === 'municipal') {
+                            $muncity_id = $this->getMuncityId($keyword);
+                            if ($muncity_id) {
+                                if (strcmp($config['table'], "pch_risk_assessment_tool_profile") === 0) {
+                                    $q->where("{$config['table']}.muncity_id", "=", $muncity_id);
+                                } elseif (strcmp($config['table'], "patient_injury_form_general_data") === 0) { // handle for patient injury form
+                                    $q->where("{$config['table']}.perm_municipal_id", "=", $muncity_id);
+                                } else {
+                                    $q->where("{$config['table']}.municipal_id", "=", $muncity_id);
+                                }
+                            } else {
+                                // If muncity not found, ensure no results are returned
+                                $q->whereRaw('1 = 0');
+                            }
+                        } elseif ($filter === 'all' || !$filter) {
+                            foreach ($columns as $column) {
+                                // Only filter on real column names, not expressions
+                                if (strpos($column, '(') === false && strpos($column, '.') === false) {
+                                    $q->orWhere("{$config['table']}.$column", 'like', "%$keyword%");
+                                }
+                            }
+                        } elseif ($filter && in_array($filter, $columns)) {
+                            $q->where("{$config['table']}.$filter", 'like', "%$keyword%");
                         }
                     });
                 }
@@ -247,10 +326,13 @@ class GeneralDataController extends Controller
                     $query->whereDate("{$config['table']}.created_at", '<=', "$endDate 23:59:59");
                 }
 
-                // Paginate and collect results
-                $results[$profileType] = $query->simplePaginate(30);
-            }
+                // Sort by date of assessment (created_at) descending
+                $query->orderBy("{$config['table']}.created_at", 'desc');
+                // Get total count (without pagination)
 
+                // Paginate and collect results
+                $results[$profileType] = $query->paginate(10, ['*'], 'page')->appends($request->except('page'));
+            }
             return response()->json($results, 200);
         } catch (Exception $e) {
             Log::error('Error retrieving all forms: ' . $e->getMessage(), ['exception' => $e]);
@@ -310,10 +392,12 @@ class GeneralDataController extends Controller
                     ],
                     'joins' => [
                         ['muncity', 'risk_profile.municipal_id', '=', 'muncity.id'],
+                        ['barangay', 'risk_profile.barangay_id', '=', 'barangay.id'],
                         ['province', 'risk_profile.province_id', '=', 'province.id']
                     ],
                     'additional_columns' => [
                         'muncity.description as municipal_name',
+                        'barangay.description as barangay_name',
                         'province.description as province_name'
                     ]
                 ],
@@ -341,6 +425,7 @@ class GeneralDataController extends Controller
                     'joins' => [
                         ['users', 'patient_injury_form_general_data.encoded_by', '=', 'users.id'],
                         ['muncity', 'patient_injury_form_general_data.perm_municipal_id', '=', 'muncity.id'],
+                        ['barangay', 'patient_injury_form_general_data.perm_barangay_id', '=', 'barangay.id'],
                         ['province', 'patient_injury_form_general_data.perm_province_id', '=', 'province.id']
                     ],
                     'additional_columns' => [
@@ -404,11 +489,13 @@ class GeneralDataController extends Controller
                         'updated_at',
                     ],
                     'joins' => [
-                        ['muncity', 'pch_risk_assessment_tool_profile.municipal_id', '=', 'muncity.id'],
+                        ['muncity', 'pch_risk_assessment_tool_profile.muncity_id', '=', 'muncity.id'],
+                        ['barangay', 'pch_risk_assessment_tool_profile.barangay_id', '=', 'barangay.id'],
                         ['province', 'pch_risk_assessment_tool_profile.province_id', '=', 'province.id']
                     ],
                     'additional_columns' => [
                         'muncity.description as municipal_name',
+                        'barangay.description as barangay_name',
                         'province.description as province_name',
                     ]
                 ],
@@ -453,7 +540,7 @@ class GeneralDataController extends Controller
                 $query->whereDate("{$config['table']}.created_at", '=', $today);
 
                 // Paginate and collect results
-                $results[$profileType] = $query->simplePaginate(30);
+                $results[$profileType] = $query->paginate(50); // fetch top 50 records per page
             }
             return response()->json($results, 200);
         } catch (Exception $e) {

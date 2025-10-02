@@ -52,6 +52,34 @@ class DataController extends Controller
         return null;
     }
 
+    private function checkDuplicateEntries($fields)
+    {
+        $query = RiskProfile::where('fname', $fields['fname'])
+            ->where('lname', $fields['lname'])
+            ->where('dob', $fields['dob'])
+            ->where('barangay_id', $fields['barangay_id'])
+            ->where('municipal_id', $fields['municipal_id'])
+            ->where('facility_id_updated', $fields['facility_id_updated']);
+
+        if (!empty($fields['mname'])) {
+            $query->where('mname', $fields['mname']);
+        } else {
+            $query->whereNull('mname');
+        }
+
+        if (!empty($fields['profile_id'])) {
+            $query->where('profile_id', $fields['profile_id']);
+        }
+
+        if (!empty($fields['suffix'])) {
+            $query->where('suffix', $fields['suffix']);
+        } else {
+            $query->whereNull('suffix');
+        }
+
+        return $query->exists();
+    }
+
     // retrieval without facility
 
     // ---- !!! ACTUAL WORKING FUNCTION !!! ----// 
@@ -519,28 +547,9 @@ class DataController extends Controller
         }
 
         // Check for duplicates
-        $existingRiskProfile = RiskProfile::where('fname', $fields['fname'])
-            ->where('lname', $fields['lname'])
-            ->where('dob', $fields['dob'])
-            ->where('facility_id_updated', $fields['facility_id_updated']);
+        $existingRiskProfile = $this->checkDuplicateEntries($fields);
 
-        if (!empty($fields['mname'])) {
-            $existingRiskProfile->where('mname', $fields['mname']);
-        } else {
-            $existingRiskProfile->whereNull('mname');
-        }
-
-        if (!empty($fields['profile_id'])) {
-            $existingRiskProfile->where('profile_id', $fields['profile_id']);
-        }
-
-        if (!empty($fields['suffix'])) {
-            $existingRiskProfile->where('suffix', $fields['suffix']);
-        } else {
-            $existingRiskProfile->whereNull('suffix');
-        }
-
-        if ($existingRiskProfile->exists()) {
+        if ($existingRiskProfile) {
             return response()->json(['error' => 'Duplicate in entered data. Please recheck.'], 409);
         }
 
