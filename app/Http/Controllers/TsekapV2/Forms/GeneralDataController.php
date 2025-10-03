@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Support\Facades\Redis;
 
 class GeneralDataController extends Controller
 {
