@@ -10,6 +10,7 @@ use App\Http\Controllers\TsekapV2\Misc\MiscDataController;
 use App\Http\Controllers\TsekapV2\FacilityController;
 use App\Http\Controllers\TsekapV2\ProfileController;
 use App\Http\Controllers\TsekapV2\UserHealthFacilityController;
+use App\Http\Controllers\AppVersionController;
 
 // Websockets Controllers
 use App\Http\Controllers\TsekapV2\Websockets\NotificationController;
@@ -56,6 +57,11 @@ Route::prefix('v2')->group(function () {
         Route::get('/get-province-by-id', [MiscDataController::class, 'getProvinceById'])->name('api-v2-get-province-by-id');
         Route::get('/get-muncity-by-id', [MiscDataController::class, 'getMuncityById'])->name('api-v2-get-muncity-by-id');
         Route::get('/get-barangay-by-id', [MiscDataController::class, 'getBarangayById'])->name('api-v2-get-barangay-by-id');
+    
+    
+        // Get Mobile App Version
+        Route::get('/get-mobile-version', [MiscDataController::class, 'getMobileVersion'])->name('api-v2-get-mobile-version');
+    
     });
 
     Route::prefix('facility')->group(function () {

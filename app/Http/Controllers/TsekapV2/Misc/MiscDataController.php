@@ -13,6 +13,7 @@ use App\Models\TsekapV2\Province;
 use App\Models\TsekapV2\Barangay;
 use App\Models\TsekapV2\Country;
 use App\Models\TsekapV2\Region;
+use App\Models\AppVersion;
 use Illuminate\Support\Facades\Validator;
 use Exception;
 
@@ -321,5 +322,55 @@ class MiscDataController extends Controller
             Log::error('Error in retrieving citizenships.' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => 'Error in retrieving citizenships.'], 500);
         }
+    }
+
+    // get mobile app version
+    /**
+     * Check the latest version for a given platform (android/ios)
+     */
+    public function getMobileVersion(Request $request)
+    {
+        $platform = $request->query('platform', 'android');
+
+        // Get the latest record for that platform
+        $version = AppVersion::where('platform', $platform)
+            ->latest('created_at')
+            ->first();
+
+        if (!$version) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No version data found for this platform.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'latest_version' => $version->latest_version,
+            'download_url' => $version->download_url,
+            'is_force_update' => $version->is_force_update,
+            'release_notes' => $version->release_notes,
+        ]);
+    }
+    /**
+     * (Optional) Admin endpoint to update or create a new version record
+     */
+    public function storeMobileVersion(Request $request)
+    {
+        $validated = $request->validate([
+            'platform' => 'required|string|in:android,ios',
+            'latest_version' => 'required|string',
+            'download_url' => 'nullable|string',
+            'is_force_update' => 'boolean',
+            'release_notes' => 'nullable|string',
+        ]);
+
+        $version = AppVersion::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Version record created successfully.',
+            'data' => $version,
+        ]);
     }
 }
