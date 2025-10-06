@@ -52,106 +52,38 @@ class DataController extends Controller
         return null;
     }
 
+    private function checkDuplicateEntries($fields)
+    {
+        $query = RiskProfile::where('fname', $fields['fname'])
+            ->where('lname', $fields['lname'])
+            ->where('dob', $fields['dob'])
+            ->where('barangay_id', $fields['barangay_id'])
+            ->where('municipal_id', $fields['municipal_id'])
+            ->where('facility_id_updated', $fields['facility_id_updated']);
+
+        if (!empty($fields['mname'])) {
+            $query->where('mname', $fields['mname']);
+        } else {
+            $query->whereNull('mname');
+        }
+
+        if (!empty($fields['profile_id'])) {
+            $query->where('profile_id', $fields['profile_id']);
+        }
+
+        if (!empty($fields['suffix'])) {
+            $query->where('suffix', $fields['suffix']);
+        } else {
+            $query->whereNull('suffix');
+        }
+
+        return $query->exists();
+    }
+
     // retrieval without facility
 
-    // ---- !!! ACTUAL WORKING FUNCTION !!! ----// 
-    // public function retrievePatientRiskProfileWithoutFacility(Request $request)
-    // {
-    //     // Ensure the user is authenticated via Sanctum
-    //     $user = $this->getAuthenticatedUser($request->user()->username); // This replaces Auth::check()
 
-    //     if ($user instanceof \Illuminate\Http\JsonResponse) {
-    //         return $user;
-    //     }
-
-    //     // Validate the request
-    //     $validator = Validator::make($request->all(), [
-    //         'fields.filter' => 'required|string',
-    //         'fields.keyword' => 'nullable|string|max:255',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json(['error' => 'Invalid input'], 400);
-    //     }
-
-    //     $fields = $request->input('fields', []);
-
-    //     $filter = isset($fields['filter']) ? $fields['filter'] : null;
-    //     $keyword = isset($fields['keyword']) ? $fields['keyword'] : null;
-
-    //     // Base query for risk profiles
-    //     $query = RiskProfile::select(
-    //         'risk_profile.id',
-    //         'risk_profile.fname',
-    //         'risk_profile.mname',
-    //         'risk_profile.lname',
-    //         'risk_profile.dob',
-    //         'risk_profile.sex',
-    //         'risk_profile.age',
-    //         'risk_profile.religion',
-    //         'risk_profile.other_religion',
-    //         'risk_profile.citizenship',
-    //         'risk_profile.other_citizenship',
-    //         'risk_profile.indigenous_person',
-    //         'risk_profile.employment_status',
-    //         'risk_profile.contact',
-    //         'risk_profile.civil_status',
-    //         'risk_profile.barangay_id',
-    //         'risk_profile.municipal_id',
-    //         'risk_profile.province_id',
-    //         'risk_profile.street',
-    //         'risk_profile.purok',
-    //         'risk_profile.sitio',
-    //         'risk_profile.phic_id',
-    //         'risk_profile.pwd_id',
-    //         'risk_profile.facility_id_updated',
-    //         'risk_profile.offline_entry',
-    //         'risk_profile.encoded_by',
-    //         'risk_profile.created_at',
-    //         'risk_profile.updated_at',
-    //         'muncity.description as municipal_name',
-    //         'province.description as province_name'
-    //     )
-    //         ->join('muncity', 'risk_profile.municipal_id', '=', 'muncity.id')
-    //         ->join('province', 'risk_profile.province_id', '=', 'province.id');
-
-    //     // Apply user privilege filters
-    //     if ($user->user_priv === 3) {
-    //         $query->where('risk_profile.province_id', $user->province);
-    //     }
-
-    //     // Apply keyword filter
-    //     if ($keyword) {
-    //         $query->where(function ($q) use ($filter, $keyword) {
-    //             $columns = [
-    //                 'facility_id_updated' => 'risk_profile.facility_id_updated',
-    //                 'fname' => 'risk_profile.fname',
-    //                 'lname' => 'risk_profile.lname',
-    //                 'dob' => 'risk_profile.dob'
-    //             ];
-
-    //             if ($filter === 'dob') {
-    //                 // Parse keyword as date
-    //                 $parsedDate = date('Y-m-d', strtotime($keyword));
-    //                 $q->where($columns['dob'], $parsedDate);
-    //             } elseif (isset($columns[$filter])) {
-    //                 $q->where($columns[$filter], 'like', "%$keyword%");
-    //             } else {
-    //                 $q->where('risk_profile.fname', 'like', "%$keyword%")
-    //                     ->orWhere('risk_profile.lname', 'like', "%$keyword%")
-    //                     ->orWhere('risk_profile.dob', 'like', "%$keyword%")
-    //                     ->orWhere('risk_profile.facility_id_updated', '=', $keyword);
-    //             }
-    //         });
-    //     }
-
-    //     // Paginate and return results
-    //     $results = $query->simplePaginate(30);
-
-    //     return response()->json($results, 200);
-    // }
-
-    //---- !!! EXPERIMENTAL FUNCTION !!! ----//
+    //---- !!! WORKING FUNCTION !!! ----//
     public function retrievePatientRiskProfileWithoutFacility(Request $request)
     {
         // Ensure the user is authenticated via Sanctum
@@ -519,28 +451,9 @@ class DataController extends Controller
         }
 
         // Check for duplicates
-        $existingRiskProfile = RiskProfile::where('fname', $fields['fname'])
-            ->where('lname', $fields['lname'])
-            ->where('dob', $fields['dob'])
-            ->where('facility_id_updated', $fields['facility_id_updated']);
+        $existingRiskProfile = $this->checkDuplicateEntries($fields);
 
-        if (!empty($fields['mname'])) {
-            $existingRiskProfile->where('mname', $fields['mname']);
-        } else {
-            $existingRiskProfile->whereNull('mname');
-        }
-
-        if (!empty($fields['profile_id'])) {
-            $existingRiskProfile->where('profile_id', $fields['profile_id']);
-        }
-
-        if (!empty($fields['suffix'])) {
-            $existingRiskProfile->where('suffix', $fields['suffix']);
-        } else {
-            $existingRiskProfile->whereNull('suffix');
-        }
-
-        if ($existingRiskProfile->exists()) {
+        if ($existingRiskProfile) {
             return response()->json(['error' => 'Duplicate in entered data. Please recheck.'], 409);
         }
 
