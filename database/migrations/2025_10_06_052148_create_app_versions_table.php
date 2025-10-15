@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 
 return new class extends Migration
 {
@@ -11,15 +12,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('app_versions', function (Blueprint $table) {
-            $table->id();
-            $table->string('platform'); // e.g., "android" or "ios"
-            $table->string('latest_version'); // e.g., "2.6.0"
-            $table->string('download_url')->nullable(); // APK download URL
-            $table->boolean('is_force_update')->default(false); // true = must update
-            $table->text('release_notes')->nullable(); // optional: changelog or release notes
-            $table->timestamps();
-        });
+        try {
+            Schema::create('app_versions', function (Blueprint $table) {
+                $table->id();
+                $table->string('platform'); // e.g., "android" or "ios"
+                $table->string('latest_version'); // e.g., "2.6.0"
+                $table->string('download_url')->nullable(); // APK download URL
+                $table->boolean('is_force_update')->default(false); // true = must update
+                $table->text('release_notes')->nullable(); // optional: changelog or release notes
+
+                // timestamps
+                $table->timestamps();
+            });
+        } catch (\Exception $e) {
+            Log::error('Migration failed (up): ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     /**
@@ -27,6 +35,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('app_versions');
+        try {
+            Schema::dropIfExists('app_versions');
+        } catch (\Exception $e) {
+            Log::error("Migration failed (down): " . $e->getMessage());
+            throw $e;
+        }
     }
 };
