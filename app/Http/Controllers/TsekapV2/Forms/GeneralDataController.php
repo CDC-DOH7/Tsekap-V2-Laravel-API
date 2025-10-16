@@ -131,6 +131,9 @@ class GeneralDataController extends Controller
                     ],
                     'joins' => [
                         ['users', 'risk_profile.encoded_by', '=', 'users.id'],
+                        ['user_health_facility', 'users.id', '=', 'user_health_facility.user_id'],
+                        ['facilities', 'facilities.id', '=', 'user_health_facility.facility_id'],
+
                         ['barangay', 'risk_profile.barangay_id', '=', 'barangay.id'],
                         ['muncity', 'risk_profile.municipal_id', '=', 'muncity.id'],
                         ['province', 'risk_profile.province_id', '=', 'province.id']
@@ -139,6 +142,8 @@ class GeneralDataController extends Controller
                         'muncity.description as municipal_name',
                         'province.description as province_name',
                         'barangay.description as barangay_name',
+                        'facilities.id as encoder_hf_id',
+                        'facilities.name as encoder_hf_name',
                         DB::raw('CONCAT(users.fname, " ", users.mname, " ", users.lname) as encoder')
                     ]
                 ],
@@ -165,6 +170,9 @@ class GeneralDataController extends Controller
                     ],
                     'joins' => [
                         ['users', 'patient_injury_form_general_data.encoded_by', '=', 'users.id'],
+                        ['user_health_facility', 'users.id', '=', 'user_health_facility.user_id'],
+                        ['facilities', 'facilities.id', '=', 'user_health_facility.facility_id'],
+
                         ['barangay', 'patient_injury_form_general_data.perm_barangay_id', '=', 'barangay.id'],
                         ['muncity', 'patient_injury_form_general_data.perm_municipal_id', '=', 'muncity.id'],
                         ['province', 'patient_injury_form_general_data.perm_province_id', '=', 'province.id']
@@ -173,6 +181,8 @@ class GeneralDataController extends Controller
                         'muncity.description as municipal_name',
                         'province.description as province_name',
                         'barangay.description as barangay_name',
+                        'facilities.id as encoder_hf_id',
+                        'facilities.name as encoder_hf_name',
                         DB::raw('CONCAT(users.fname, " ", users.mname, " ", users.lname) as encoder')
                     ]
                 ],
@@ -232,6 +242,9 @@ class GeneralDataController extends Controller
                     ],
                     'joins' => [
                         ['users', 'pch_risk_assessment_tool_profile.encoded_by', '=', 'users.id'],
+                        ['user_health_facility', 'users.id', '=', 'user_health_facility.user_id'],
+                        ['facilities', 'facilities.id', '=', 'user_health_facility.facility_id'],
+
                         ['barangay', 'pch_risk_assessment_tool_profile.barangay_id', '=', 'barangay.id'],
                         ['muncity', 'pch_risk_assessment_tool_profile.muncity_id', '=', 'muncity.id'],
                         ['province', 'pch_risk_assessment_tool_profile.province_id', '=', 'province.id']
@@ -240,6 +253,8 @@ class GeneralDataController extends Controller
                         'muncity.description as municipal_name',
                         'province.description as province_name',
                         'barangay.description as barangay_name',
+                        'facilities.id as encoder_hf_id',
+                        'facilities.name as encoder_hf_name',
                         DB::raw('CONCAT(users.fname, " ", users.mname, " ", users.lname) as encoder')
                     ]
                 ],
