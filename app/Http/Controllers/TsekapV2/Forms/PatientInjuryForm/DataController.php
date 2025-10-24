@@ -514,7 +514,8 @@ class DataController extends Controller
 
         // Save the record
         try {
-            $patientInjuryGeneralData = new PatientInjuryGeneralData($fields);
+            $patientInjuryGeneralData = new PatientInjuryGeneralData();
+            $patientInjuryGeneralData->fill($fields);
             $patientInjuryGeneralData->save();
 
             return response()->json([

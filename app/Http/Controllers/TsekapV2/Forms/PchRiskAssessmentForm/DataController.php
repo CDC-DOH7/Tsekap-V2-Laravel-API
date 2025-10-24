@@ -588,7 +588,8 @@ class DataController extends Controller
 
         // Save the record
         try {
-            $pchRiskProfile = new PchRiskProfile($fields);
+            $pchRiskProfile = new PchRiskProfile();
+            $pchRiskProfile->fill($fields);
             $pchRiskProfile->save();
 
             return response()->json([

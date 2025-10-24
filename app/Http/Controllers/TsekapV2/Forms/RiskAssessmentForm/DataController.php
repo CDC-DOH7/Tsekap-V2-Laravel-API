@@ -488,7 +488,8 @@ class DataController extends Controller
 
         // Save the record
         try {
-            $riskProfile = new RiskProfile($fields);
+            $riskProfile = new RiskProfile();
+            $riskProfile->fill($fields);
             $riskProfile->save();
 
             return response()->json([

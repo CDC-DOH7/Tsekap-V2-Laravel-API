@@ -10,7 +10,6 @@ use App\Http\Controllers\TsekapV2\Misc\MiscDataController;
 use App\Http\Controllers\TsekapV2\FacilityController;
 use App\Http\Controllers\TsekapV2\ProfileController;
 use App\Http\Controllers\TsekapV2\UserHealthFacilityController;
-use App\Http\Controllers\AppVersionController;
 
 // Websockets Controllers
 use App\Http\Controllers\TsekapV2\Websockets\NotificationController;
@@ -24,7 +23,6 @@ use App\Http\Controllers\TsekapV2\Forms\PatientInjuryForm\DataController as Pati
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics\PhilpenAnalyticsDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics\GeneralAnalyticsDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics\PchratAnalyticsDataController;
-
 
 // Total Population and Target Setting Controllers
 use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\Muncity\ProfilingTotalPerMuncityController;
@@ -57,11 +55,10 @@ Route::prefix('v2')->group(function () {
         Route::get('/get-province-by-id', [MiscDataController::class, 'getProvinceById'])->name('api-v2-get-province-by-id');
         Route::get('/get-muncity-by-id', [MiscDataController::class, 'getMuncityById'])->name('api-v2-get-muncity-by-id');
         Route::get('/get-barangay-by-id', [MiscDataController::class, 'getBarangayById'])->name('api-v2-get-barangay-by-id');
-    
-    
+
+
         // Get Mobile App Version
         Route::get('/get-mobile-version', [MiscDataController::class, 'getMobileVersion'])->name('api-v2-get-mobile-version');
-    
     });
 
     Route::prefix('facility')->group(function () {
@@ -390,6 +387,7 @@ Route::prefix('v2')->group(function () {
         Route::prefix('system')->group(function () {
             Route::prefix('notifications')->group(function () {
                 Route::get('/retrieve-notification-by-facility', [NotificationController::class, 'retrieveNotificationsByFacility'])->name('api-v2-retrieve-notifications-by-facility');
+                Route::get('/retrieve-notification-count-by-facility', [NotificationController::class, 'retrieveNotificationsCountByFacility'])->name('api-v2-retrieve-notifications-count-by-facility');
                 Route::post('/add-notification', [NotificationController::class, 'addNotification'])->name('api-v2-add-notification');
                 Route::post('/mark-notification-as-read', [NotificationController::class, 'markNotificationAsRead'])->name('api-v2-mark-notification-as-read');
                 Route::post('/delete-notification', [NotificationController::class, 'deleteNotification'])->name('api-v2-delete-notification');
@@ -441,7 +439,7 @@ Route::prefix('v2')->group(function () {
 
                 Route::post('/patient-injury-add-general-data', [PatientInjuryDataController::class, 'addPatientInjuryGeneralData'])->name('api-v2-add-patient-injury-general-data');
                 Route::post('/patient-injury-add-preadmission-data', [PatientInjuryDataController::class, 'addPatientInjuryPreadmissionData'])->name('api-v2-add-patient-injury-preadmission-data');
-                
+
                 Route::post('/patient-injury-update-general-data', [PatientInjuryDataController::class, 'updatePatientInjuryGeneralData'])->name('api-v2-update-patient-injury-general-data');
                 Route::post('/patient-injury-update-preadmission-data', [PatientInjuryDataController::class, 'updatePatientInjuryPreadmissionData'])->name('api-v2-update-patient-injury-preadmission-data');
                 Route::post('/patient-injury-delete-general-data', [PatientInjuryDataController::class, 'deletePatientInjuryGeneralData'])->name('api-v2-delete-patient-injury-general-data');

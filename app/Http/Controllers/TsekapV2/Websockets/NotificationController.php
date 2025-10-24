@@ -45,8 +45,7 @@ class NotificationController extends Controller
         }
 
         $rules = [
-            'fields' => 'required|array',
-            'fields.facility_id' => 'required|string|max:100',
+            'facility_id' => 'required|integer',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -55,18 +54,49 @@ class NotificationController extends Controller
             return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
         }
 
-        $fields = $request->input('fields');
+        // Prefer query parameter for GET, fallback to input()
+        $facilityId = $request->query('facility_id', $request->input('facility_id'));
 
         try {
-            $notification = NotificationModel::where('destination_facility_id', "=", $fields['facility_id'])->first();
+            $notifications = NotificationModel::where('facility_id', $facilityId)->where('is_read', 0)->get();
 
-            if (!$notification) {
-                return response()->json(['status' => 'error', 'message' => 'No notifications not found'], 404);
+            if ($notifications->isEmpty()) {
+                return response()->json(['status' => 'error', 'message' => 'No notifications found'], 404);
             }
 
-            return response()->json(['status' => 'success', 'data' => $notification], 200);
+            return response()->json(['status' => 'success', 'data' => $notifications], 200);
         } catch (\Exception $e) {
             Log::error('Error retrieving notifications: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['status' => 'error', 'message' => 'An error occurred. Please try again later.'], 500);
+        }
+    }
+
+    public function retrieveNotificationsCountByFacility(Request $request)
+    {
+        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
+        }
+
+        $rules = [
+            'facility_id' => 'required|integer',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
+        }
+
+        // Prefer query parameter for GET, fallback to input()
+        $facilityId = $request->query('facility_id', $request->input('facility_id'));
+
+        try {
+            $notificationsCount = NotificationModel::where('facility_id', $facilityId)->where('is_read', 0)->count();
+
+            return response()->json(['status' => 'success', 'data' => ['unread_count' => $notificationsCount]], 200);
+        } catch (\Exception $e) {
+            Log::error('Error retrieving notifications count: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json(['status' => 'error', 'message' => 'An error occurred. Please try again later.'], 500);
         }
     }
@@ -84,13 +114,12 @@ class NotificationController extends Controller
 
         $rules = [
             'fields' => 'required|array',
-            'fields.origin_facility_id' => 'required|integer',
-            'fields.destination_facility_id' => 'required|integer',
-            'fields.sent_by_user_id' => 'required|integer',
-            'fields.sent_to_user_id' => 'sometimes|nullable|integer',
+            'fields.facility_id' => 'required|integer',
+            'fields.user_id' => 'required|integer',
             'fields.title' => 'required|string|max:255',
             'fields.message' => 'required|string|max:1000',
             'fields.is_read' => 'required|boolean',
+            'fields.data' => 'sometimes|nullable|array',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -120,7 +149,7 @@ class NotificationController extends Controller
 
         $rules = [
             'fields' => 'required|array',
-            'fields.id' => 'required|string|max:100',
+            'fields.id' => 'required|integer',
             'fields.is_read' => 'required|boolean',
         ];
 
