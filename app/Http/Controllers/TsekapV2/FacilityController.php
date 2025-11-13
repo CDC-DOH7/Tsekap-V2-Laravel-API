@@ -45,7 +45,8 @@ class FacilityController extends Controller
 
         $rules = [
             'fields' => 'required|array',
-            'fields.facility_code' => 'required|string|max:100',
+            'fields.id' => 'sometimes|required_without:fields.facility_code|integer',
+            'fields.facility_code' => 'sometimes|required_without:fields.id|string|max:100',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -57,7 +58,11 @@ class FacilityController extends Controller
         $fields = $request->input('fields');
 
         try {
-            $facility = Facilities::where('facility_code', $fields['facility_code'])->first();
+            if (isset($fields['id']) && $fields['id'] !== null) {
+                $facility = Facilities::where('id', $fields['id'])->first();
+            } else {
+                $facility = Facilities::where('facility_code', $fields['facility_code'])->first();
+            }
 
             if (!$facility) {
                 return response()->json(['status' => 'error', 'message' => 'Facility not found'], 404);
