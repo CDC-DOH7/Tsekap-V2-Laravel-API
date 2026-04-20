@@ -143,22 +143,13 @@ Route::prefix('v2')->group(function () {
                     // endpoint : /age_group_summary
                     Route::get('/get-age-group-summary', [GeneralAnalyticsDataController::class, 'getAgeGroupSummary'])->name('api-v2-analytics-get-age-group-summary');
 
-                    // endpoint : /age_range_summary
-                    Route::get('/get-age-range-summary', [GeneralAnalyticsDataController::class, 'getAgeRangeSummary'])->name('api-v2-analytics-get-age-range-summary');
-
-                    // endpoint : /month_year_summary
-                    Route::get('/get-month-year-summary-patient-data', [GeneralAnalyticsDataController::class, 'getMonthYearSummaryPatientData'])
+                    // endpoint : /month_year_summary 
+                    Route::get('/get-month-year-summary-patient-data', [GeneralAnalyticsDataController::class, 'getMonthlySummaryPatientData'])
                         ->name('api-v2-analytics-get-month-year-summary-patient-data');
 
-                    // endpoint: /morbidity_summary
-                    Route::get('/get-morbidity-summary-patient-data', [GeneralAnalyticsDataController::class, 'getMorbiditySummaryPatientData'])
-                        ->name('api-v2-analytics-get-morbidity-summary-patient-data');
-
-                    // endpoint: /monthly_summary
-                    Route::get('/get-monthly-summary-patient-data', [GeneralAnalyticsDataController::class, 'getMonthlySummaryPatientData'])
-                        ->name('api-v2-analytics-get-monthly-summary-patient-data');
-                    Route::get('/get-monthly-summary-risk-profile-by-facility', [GeneralAnalyticsDataController::class, 'getMonthlySummaryRiskProfileByFacility'])
-                        ->name('api-v2-analytics-get-monthly-summary-risk-profile-by-facility');
+                    // endpoint: /barangay_summary
+                    Route::get('/get-barangay-summary-patient-data', [GeneralAnalyticsDataController::class, 'getBarangaySummaryPatientData'])
+                        ->name('api-v2-analytics-get-barangay-summary-patient-data');
                 });
 
                 // pchrat analytics
