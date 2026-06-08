@@ -9,12 +9,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Exception;
 
 class UserController extends Controller
 {
-    private function getAuthenticatedUser($username)
+    private function getAuthenticatedUser(?string $username): User
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -26,7 +27,7 @@ class UserController extends Controller
         return $queryUser;
     }
 
-    public function updateUserPassword(Request $request)
+    public function updateUserPassword(Request $request): JsonResponse
     {
         $fields = $request->input('fields');
         $user = $request->user();
@@ -36,7 +37,7 @@ class UserController extends Controller
         }
 
         $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -78,7 +79,7 @@ class UserController extends Controller
         return response()->json(['status' => 'success', 'message' => 'Password changed successfully'], 200);
     }
 
-    public function updateUserFullName(Request $request)
+    public function updateUserFullName(Request $request): JsonResponse
     {
         $fields = $request->input('fields');
         $user = $request->user();
@@ -88,7 +89,7 @@ class UserController extends Controller
         }
 
         $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -128,7 +129,7 @@ class UserController extends Controller
         return response()->json(['status' => 'success', 'message' => 'Names updated successfully'], 200);
     }
 
-    public function updateUserContact(Request $request)
+    public function updateUserContact(Request $request): JsonResponse
     {
         $fields = $request->input('fields');
         $user = $request->user();
@@ -138,7 +139,7 @@ class UserController extends Controller
         }
 
         $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -164,7 +165,7 @@ class UserController extends Controller
         return response()->json(['status' => 'success', 'message' => 'Contact updated successfully'], 200);
     }
 
-    public function updateUserEmail(Request $request)
+    public function updateUserEmail(Request $request): JsonResponse
     {
         $fields = $request->input('fields');
         $user = $request->user();
@@ -174,7 +175,7 @@ class UserController extends Controller
         }
 
         $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -252,7 +253,7 @@ class UserController extends Controller
         return response()->json(['status' => 'success', 'message' => 'User account deactivated and tokens revoked.'], 200);
     }
 
-    public function storeUserRemarks(Request $request)
+    public function storeUserRemarks(Request $request): JsonResponse
     {
         $user = $request->user();
 

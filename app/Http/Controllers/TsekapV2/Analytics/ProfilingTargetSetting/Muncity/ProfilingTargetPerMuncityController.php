@@ -7,13 +7,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
 use App\Models\User;
 use App\Models\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTargetPerMuncityModel;
 use Exception;
 
 class ProfilingTargetPerMuncityController extends Controller
 {
-    private function getAuthenticatedAdmin($username)
+    private function getAuthenticatedAdmin(?string $username): JsonResponse
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -26,7 +27,7 @@ class ProfilingTargetPerMuncityController extends Controller
         return $queryUser;
     }
 
-    private function getAuthenticatedUser($username)
+    private function getAuthenticatedUser(?string $username): JsonResponse
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -38,11 +39,11 @@ class ProfilingTargetPerMuncityController extends Controller
         return $queryUser;
     }
 
-    public function checkTargetMappingPerMuncityExists(Request $request)
+    public function checkTargetMappingPerMuncityExists(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -71,12 +72,12 @@ class ProfilingTargetPerMuncityController extends Controller
         ], 200);
     }
 
-    public function createTargetPerMuncity(Request $request)
+    public function createTargetPerMuncity(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
 
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -130,11 +131,11 @@ class ProfilingTargetPerMuncityController extends Controller
         return response()->json(['status' => 'success', 'message' => $message], 200);
     }
 
-    public function retrieveTargetPerMuncity(Request $request)
+    public function retrieveTargetPerMuncity(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -177,12 +178,12 @@ class ProfilingTargetPerMuncityController extends Controller
         ], 200);
     }
 
-    public function updateTargetPerMuncity(Request $request)
+    public function updateTargetPerMuncity(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
 
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -236,12 +237,12 @@ class ProfilingTargetPerMuncityController extends Controller
         return response()->json(['status' => 'success', 'message' => $message], 200);
     }
 
-    public function deleteTargetPerMuncity(Request $request)
+    public function deleteTargetPerMuncity(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
 
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 

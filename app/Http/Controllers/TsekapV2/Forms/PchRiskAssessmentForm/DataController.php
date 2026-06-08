@@ -9,7 +9,7 @@ use App\Models\TsekapV2\Facilities;
 use App\Models\TsekapV2\Forms\PchRiskAssessment\PchRiskAssessmentForm;
 use App\Models\TsekapV2\Forms\PchRiskAssessment\PchRiskProfile;
 use App\Http\Controllers\Controller;
-
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Http\Request;
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 
 class DataController extends Controller
 {
-    private function getAuthenticatedUser($username)
+    private function getAuthenticatedUser(?string $username): JsonResponse
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -30,7 +30,7 @@ class DataController extends Controller
     }
 
     // for users with privilege of 1,3, 5, and 10
-    private function getAuthenticatedAdmin($username)
+    private function getAuthenticatedAdmin(?string $username): User | JsonResponse | null
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -39,9 +39,10 @@ class DataController extends Controller
             Log::error('Denied administrative access to (PCH Risk Assessment, DataController) for: ' . $queryUser->getAttribute('id'));
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+        return null;
     }
 
-    private function getHealthFacilityForUser($user)
+    private function getHealthFacilityForUser(?User $user): Facilities | null
     {
         $userHealthFacilityMapping = UserHealthFacility::where('user_id', $user->id)->first();
         if ($userHealthFacilityMapping) {
@@ -53,11 +54,11 @@ class DataController extends Controller
     }
 
     //---- !!! ADAPTED FUNCTION !!! ----//
-    public function retrievePchRiskProfileWithoutFacility(Request $request)
+    public function retrievePchRiskProfileWithoutFacility(Request $request): JsonResponse | null
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -167,11 +168,11 @@ class DataController extends Controller
     }
 
     // retrieval by facility using GET parameters
-    public function retrievePchRiskProfileByFacility(Request $request)
+    public function retrievePchRiskProfileByFacility(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -287,11 +288,11 @@ class DataController extends Controller
         return response()->json($results, 200);
     }
 
-    public function retrievePchRiskAssessmentForm(Request $request)
+    public function retrievePchRiskAssessmentForm(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -428,7 +429,7 @@ class DataController extends Controller
         return response()->json($query->simplePaginate(30), 200);
     }
 
-    private function calculateAge($dob, $asOfDate = null)
+    private function calculateAge(string $dob, ?string $asOfDate = null): ?int
     {
         try {
             $dob = new \DateTime($dob);
@@ -441,11 +442,11 @@ class DataController extends Controller
         }
     }
 
-    public function addPchRiskProfile(Request $request)
+    public function addPchRiskProfile(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -602,11 +603,11 @@ class DataController extends Controller
         }
     }
 
-    public function addPchRiskForm(Request $request)
+    public function addPchRiskForm(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -777,11 +778,11 @@ class DataController extends Controller
     }
 
     // update risk profile
-    public function updatePchRiskProfile(Request $request)
+    public function updatePchRiskProfile(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -869,11 +870,11 @@ class DataController extends Controller
     }
 
     // update risk form
-    public function updatePchRiskForm(Request $request)
+    public function updatePchRiskForm(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -1033,11 +1034,11 @@ class DataController extends Controller
     }
 
     // delete risk profile
-    public function deletePchRiskProfile(Request $request)
+    public function deletePchRiskProfile(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -1068,11 +1069,11 @@ class DataController extends Controller
     }
 
     // delete risk form
-    public function deletePchRiskForm(Request $request)
+    public function deletePchRiskForm(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()x
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 

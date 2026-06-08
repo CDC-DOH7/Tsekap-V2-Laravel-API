@@ -5,6 +5,7 @@ namespace App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Exception;
 
@@ -16,7 +17,7 @@ class GeneralAnalyticsDataController extends Controller
 
     // ###########################################################################################
     // ================== GENERAL CONTROLLERS (/age_brackets) ==================
-    public function getAgeBrackets(Request $request)
+    public function getAgeBrackets(Request $request): JsonResponse
     {
         try {
             $ageBrackets = DB::table('new_age_brackets')->get();
@@ -28,10 +29,11 @@ class GeneralAnalyticsDataController extends Controller
     }
 
     // ================== 1. PATIENT SUMMARY FUNCTIONS (/patient_summary) ==================
-    public function getPatientSummary(Request $request)
+    public function getPatientSummary(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $form_type = $request->query('form');
+        $patients = null;
 
         if (!$hf_id) {
             return response()->json(['error' => 'hf_id is required.'], 400);
@@ -65,10 +67,11 @@ class GeneralAnalyticsDataController extends Controller
     // ================== END PATIENT SUMMARY FUNCTIONS ==================
 
     // ================== 2. AGE GROUP SUMMARY FUNCTIONS  (/age_group_summary) ==================
-    public function getAgeGroupSummary(Request $request)
+    public function getAgeGroupSummary(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $form_type = $request->query('form');
+        $results = null;
 
         if (!$hf_id) {
             return response()->json(['error' => 'hf_id is required.'], 400);
@@ -108,10 +111,11 @@ class GeneralAnalyticsDataController extends Controller
     // ================== END AGE GROUP SUMMARY FUNCTIONS ==================
 
     // ================== 7. MONTHLY SUMMARY FUNCTIONS (/monthly_summary) ==================
-    public function getMonthlySummaryPatientData(Request $request)
+    public function getMonthlySummaryPatientData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $form_type = $request->query('form');
+        $patients = null;
 
         if (!$hf_id) {
             return response()->json(['error' => 'hf_id is required.'], 400);

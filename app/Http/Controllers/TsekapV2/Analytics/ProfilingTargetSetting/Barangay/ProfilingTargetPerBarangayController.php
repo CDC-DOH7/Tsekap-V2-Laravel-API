@@ -7,14 +7,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
 use App\Models\User;
 use App\Models\TsekapV2\Analytics\ProfilingTargetSetting\ProfilingTargetPerBarangayModel;
 
 use Exception;
+use Psy\Util\Json;
 
 class ProfilingTargetPerBarangayController extends Controller
 {
-    private function getAuthenticatedAdmin($username)
+    private function getAuthenticatedAdmin(?string $username): JsonResponse|null
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -23,9 +25,11 @@ class ProfilingTargetPerBarangayController extends Controller
             Log::error('Denied access to (ProfilingTargetPerBarangayController) for: ' . " " . ($queryUser ? $queryUser->getAttribute('id') : 'unknown'));
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
+        return null;
     }
 
-    private function getAuthenticatedUser($username)
+    private function getAuthenticatedUser(?string $username): JsonResponse
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -37,11 +41,11 @@ class ProfilingTargetPerBarangayController extends Controller
         return $queryUser;
     }
 
-    public function checkTargetMappingPerBarangayExists(Request $request)
+    public function checkTargetMappingPerBarangayExists(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -70,12 +74,12 @@ class ProfilingTargetPerBarangayController extends Controller
         ], 200);
     }
 
-    public function createTargetPerBarangay(Request $request)
+    public function createTargetPerBarangay(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
 
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -129,11 +133,11 @@ class ProfilingTargetPerBarangayController extends Controller
         return response()->json(['status' => 'success', 'message' => $message], 200);
     }
 
-    public function retrieveTargetPerBarangay(Request $request)
+    public function retrieveTargetPerBarangay(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -176,12 +180,12 @@ class ProfilingTargetPerBarangayController extends Controller
         ], 200);
     }
 
-    public function updateTargetPerBarangay(Request $request)
+    public function updateTargetPerBarangay(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
 
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -235,12 +239,12 @@ class ProfilingTargetPerBarangayController extends Controller
         return response()->json(['status' => 'success', 'message' => $message], 200);
     }
 
-    public function deleteTargetPerBarangay(Request $request)
+    public function deleteTargetPerBarangay(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
 
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 

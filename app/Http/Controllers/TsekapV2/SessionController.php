@@ -5,13 +5,13 @@ namespace App\Http\Controllers\TsekapV2;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
 use App\Models\User;
 use Exception;
-use App\Models\TsekapV2\UserHealthFacility;
 
 class SessionController extends Controller
 {
-    private function getAuthenticatedUser($username)
+    private function getAuthenticatedUser(?string $username)
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -34,7 +34,7 @@ class SessionController extends Controller
         try {
             // Check if the user is verified
             $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
-            if ($queryUser instanceof \Illuminate\Http\JsonResponse) {
+            if ($queryUser instanceof JsonResponse) {
                 return $queryUser;
             }
 

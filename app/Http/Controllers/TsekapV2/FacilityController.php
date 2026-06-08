@@ -6,12 +6,13 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\TsekapV2\Facilities;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 
 class FacilityController extends Controller
 {
-    private function getAuthenticatedUser($username)
+    private function getAuthenticatedUser(?string $username): JsonResponse
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -23,7 +24,7 @@ class FacilityController extends Controller
         return $queryUser;
     }
 
-    private function getAuthenticatedAdmin($username)
+    private function getAuthenticatedAdmin(?string $username): JsonResponse
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -36,10 +37,10 @@ class FacilityController extends Controller
     }
 
     // get a health facility
-    public function retrieveFacilityByCode(Request $request)
+    public function retrieveFacilityByCode(Request $request): JsonResponse
     {
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -76,11 +77,11 @@ class FacilityController extends Controller
     }
 
     // add a health facility
-    public function addFacility(Request $request)
+    public function addFacility(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -131,10 +132,10 @@ class FacilityController extends Controller
     }
 
     // update a health facility
-    public function updateFacility(Request $request)
+    public function updateFacility(Request $request): JsonResponse
     {
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -184,10 +185,10 @@ class FacilityController extends Controller
         }
     }
 
-    public function deleteFacility(Request $request)
+    public function deleteFacility(Request $request): JsonResponse
     {
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 

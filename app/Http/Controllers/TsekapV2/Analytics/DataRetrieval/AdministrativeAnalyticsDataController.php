@@ -8,6 +8,7 @@ use App\Models\TsekapV2\Forms\RiskAssessment\RiskProfile;
 use App\Models\TsekapV2\Forms\PchRiskAssessment\PchRiskProfile;
 use App\Models\TsekapV2\UserHealthFacility;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use Exception;
@@ -15,7 +16,7 @@ use Exception;
 class AdministrativeAnalyticsDataController extends Controller
 {
     // Get authenticated user or return unauthorized response
-    private function getAuthenticatedUser($username)
+    private function getAuthenticatedUser(?string $username): JsonResponse
     {
         $user = User::where('username', $username)
             ->whereIn('user_priv', [1, 3, 5, 10])
@@ -31,11 +32,11 @@ class AdministrativeAnalyticsDataController extends Controller
     }
 
     // ================== GENERAL CONTROLLERS (/admin_analytics) ==================
-    public function countNumberOfEntriesPerByUserPerFacility(Request $request)
+    public function countNumberOfEntriesPerByUserPerFacility(Request $request): JsonResponse
     {
         $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
-        if ($admin instanceof \Illuminate\Http\JsonResponse) {
+        if ($admin instanceof JsonResponse) {
             return $admin;
         }
 

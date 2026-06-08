@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\User;
 use App\Models\TsekapV2\UserHealthFacility;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 class AdminController extends Controller
 {
     // function used in getting authenticated admins
-    private function getAuthenticatedAdmin($username)
+    private function getAuthenticatedAdmin(?string $username): JsonResponse
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -27,7 +28,7 @@ class AdminController extends Controller
     }
 
     // function used in getting authenticated users
-    private function getAuthenticatedUser($username)
+    private function getAuthenticatedUser(?string $username): JsonResponse
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -45,12 +46,12 @@ class AdminController extends Controller
 
 
     // register a user
-    public function registerUser(Request $request)
+    public function registerUser(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
-        if ($admin instanceof \Illuminate\Http\JsonResponse) {
+        if ($admin instanceof JsonResponse) {
             return $admin; // Return the unauthorized response
         }
 
@@ -129,11 +130,11 @@ class AdminController extends Controller
     }
 
     // reset a user's password
-    public function resetUserPassword(Request $request)
+    public function resetUserPassword(Request $request): JsonResponse
     {
         $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
-        if ($admin instanceof \Illuminate\Http\JsonResponse) {
+        if ($admin instanceof JsonResponse) {
             return $admin; // Return the unauthorized response
         }
 
@@ -179,11 +180,11 @@ class AdminController extends Controller
     }
 
     // verify a user
-    public function verifyUser(Request $request)
+    public function verifyUser(Request $request): JsonResponse
     {
         $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
-        if ($admin instanceof \Illuminate\Http\JsonResponse) {
+        if ($admin instanceof JsonResponse) {
             return $admin; // Return the unauthorized response
         }
 
@@ -222,11 +223,11 @@ class AdminController extends Controller
     }
 
     // unverify a user
-    public function unverifyUser(Request $request)
+    public function unverifyUser(Request $request): JsonResponse
     {
         $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
-        if ($admin instanceof \Illuminate\Http\JsonResponse) {
+        if ($admin instanceof JsonResponse) {
             return $admin; // Return the unauthorized response
         }
 
@@ -265,11 +266,11 @@ class AdminController extends Controller
     }
 
     // list unverified users
-    public function listUnverifiedUsers(Request $request)
+    public function listUnverifiedUsers(Request $request): JsonResponse
     {
         $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
-        if ($admin instanceof \Illuminate\Http\JsonResponse) {
+        if ($admin instanceof JsonResponse) {
             return $admin; // Return the unauthorized response
         }
 
@@ -294,11 +295,11 @@ class AdminController extends Controller
     }
 
     // list all users, verified or not (priv 1)
-    public function listAllUsers(Request $request)
+    public function listAllUsers(Request $request): JsonResponse
     {
         $admin = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
 
-        if ($admin instanceof \Illuminate\Http\JsonResponse) {
+        if ($admin instanceof JsonResponse) {
             return $admin; // Return the unauthorized response
         }
 
@@ -321,11 +322,11 @@ class AdminController extends Controller
         }
     }
 
-    public function listAllUsersByFacility(Request $request)
+    public function listAllUsersByFacility(Request $request): JsonResponse
     {
         $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
 
-        if ($admin instanceof \Illuminate\Http\JsonResponse) {
+        if ($admin instanceof JsonResponse) {
             return $admin; // Return unauthorized
         }
 

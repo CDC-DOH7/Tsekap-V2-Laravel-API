@@ -7,12 +7,13 @@ use App\Models\User;
 use App\Models\TsekapV2\Facilities;
 use App\Models\TsekapV2\Websockets\NotificationModel;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 
 class NotificationController extends Controller
 {
-    private function getAuthenticatedUser($username)
+    private function getAuthenticatedUser(?string $username): User|JsonResponse|null
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -21,10 +22,10 @@ class NotificationController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        return $queryUser;
+        return null;
     }
 
-    private function getAuthenticatedAdmin($username)
+    private function getAuthenticatedAdmin(?string $username): User|JsonResponse|null
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -33,14 +34,14 @@ class NotificationController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        return $queryUser;
+        return null;
     }
 
     // get notifications by facility
-    public function retrieveNotificationsByFacility(Request $request)
+    public function retrieveNotificationsByFacility(Request $request): JsonResponse
     {
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -71,10 +72,10 @@ class NotificationController extends Controller
         }
     }
 
-    public function retrieveNotificationsCountByFacility(Request $request)
+    public function retrieveNotificationsCountByFacility(Request $request): JsonResponse
     {
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -102,11 +103,11 @@ class NotificationController extends Controller
     }
 
     // add notification
-    public function addNotification(Request $request)
+    public function addNotification(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -140,10 +141,10 @@ class NotificationController extends Controller
     }
 
     // mark notification as read (update)
-    public function markNotificationAsRead(Request $request)
+    public function markNotificationAsRead(Request $request): JsonResponse
     {
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -178,10 +179,10 @@ class NotificationController extends Controller
     }
 
     // delete notification
-    public function deleteNotification(Request $request)
+    public function deleteNotification(Request $request): JsonResponse
     {
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 

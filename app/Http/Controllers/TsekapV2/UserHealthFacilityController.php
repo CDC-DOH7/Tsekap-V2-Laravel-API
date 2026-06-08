@@ -6,13 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\TsekapV2\UserHealthFacility;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\JsonResponse;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
 class UserHealthFacilityController extends Controller
 {
-    private function getAuthenticatedUser($username)
+    private function getAuthenticatedUser(?User $username): JsonResponse
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -23,12 +24,13 @@ class UserHealthFacilityController extends Controller
 
         return $queryUser;
     }
-    public function retrieveUserHealthFacility(Request $request)
+
+    public function retrieveUserHealthFacility(Request $request): JsonResponse
     {
         $fields = $request->input('fields');
 
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -61,7 +63,7 @@ class UserHealthFacilityController extends Controller
         }
     }
 
-    public function addUserHealthFacility(Request $request)
+    public function addUserHealthFacility(Request $request): JsonResponse
     {
         $fields = $request->input('fields');
 
@@ -76,7 +78,7 @@ class UserHealthFacilityController extends Controller
 
         $user = $this->getAuthenticatedUser($username);
 
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -102,12 +104,12 @@ class UserHealthFacilityController extends Controller
         }
     }
 
-    public function updateUserHealthFacility(Request $request)
+    public function updateUserHealthFacility(Request $request): JsonResponse
     {
         $fields = $request->input('fields');
 
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -158,12 +160,12 @@ class UserHealthFacilityController extends Controller
         }
     }
 
-    public function deleteUserHealthFacility(Request $request)
+    public function deleteUserHealthFacility(Request $request): JsonResponse
     {
         $fields = $request->input('fields');
 
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 

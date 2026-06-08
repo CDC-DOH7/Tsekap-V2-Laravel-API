@@ -136,12 +136,16 @@ class AuthController extends Controller
             ->leftJoin('facilities', 'user_health_facility.facility_id', '=', 'facilities.id')
             ->first();
 
+        if (!$user) {
+            return response()->json(['status' => 'error', 'message' => 'Invalid credentials.'], 401);
+        }
+
         // Check if the user is verified
         if (!$user->verified) {
             return response()->json(['status' => 'error', 'message' => 'Your account is not yet verified. Please contact the administrator.'], 403);
         }
 
-        if ($user && Hash::check($validatedFields['pass'], strval($user->password))) {
+        if (Hash::check($validatedFields['pass'], strval($user->password))) {
 
             // Generate Sanctum token
             $token = $user->createToken('auth_token')->plainTextToken;

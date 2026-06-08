@@ -8,6 +8,7 @@ use App\Models\TsekapV2\Profile;
 use App\Models\TsekapV2\ProfileOtherDetails;
 use App\Jobs\RetrieveProfileJob;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User; // Import the User model
 use Illuminate\Support\Facades\Log; // Import the Log facade
@@ -15,7 +16,7 @@ use Exception;
 
 class ProfileController extends Controller
 {
-    private function getAuthenticatedUser($username)
+    private function getAuthenticatedUser(?string $username): JsonResponse
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -28,7 +29,7 @@ class ProfileController extends Controller
     }
 
     // for users with privilege of 1, 3, 5, and 10
-    private function getAuthenticatedAdmin($username)
+    private function getAuthenticatedAdmin(?string $username): JsonResponse
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -41,11 +42,11 @@ class ProfileController extends Controller
     }
 
     // generator functions 
-    private function generateFamilyId(Request $request)
+    private function generateFamilyId(Request $request): string
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -58,16 +59,16 @@ class ProfileController extends Controller
         return date('mdy') . '-' . $idNo . '-' . $ctrlNo;
     }
 
-    private function generateUniqueId($fname, $mname, $lname, $barangay_id, $muncity_id)
+    private function generateUniqueId(?string $fname, ?string $mname, ?string $lname, ?int $barangay_id, ?int $muncity_id)
     {
         return $fname . $mname . $lname . $barangay_id . $muncity_id;
     }
 
-    public function retrieveProfile(Request $request)
+    public function retrieveProfile(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -121,11 +122,11 @@ class ProfileController extends Controller
     }
 
 
-    public function addProfile(Request $request)
+    public function addProfile(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -265,8 +266,8 @@ class ProfileController extends Controller
 
         // Check for duplicate unique ID
         if (Profile::where('unique_id', '=', $profileData['unique_id'])->exists()) {
-            Log::notice('Attempted duplicate entry for record: ' + $profileData['fname'] + ' ' + $profileData['lname']);
-            Log::notice('Duplicate unique ID: ' + $profileData['unique_id']);
+            Log::notice('Attempted duplicate entry for record: ' . $profileData['fname'] . ' ' . $profileData['lname']);
+            Log::notice('Duplicate unique ID: ' . $profileData['unique_id']);
             return response()->json(['status' => 'error', 'message' => 'Profile with this unique ID already exists'], 400);
         }
 
@@ -301,11 +302,11 @@ class ProfileController extends Controller
         }
     }
 
-    public function updateProfile(Request $request)
+    public function updateProfile(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -430,11 +431,11 @@ class ProfileController extends Controller
     }
 
     // delete profile
-    public function deleteProfile(Request $request)
+    public function deleteProfile(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 

@@ -9,7 +9,7 @@ use App\Models\TsekapV2\Facilities;
 use App\Models\TsekapV2\Forms\RiskAssessment\RiskAssessmentForm;
 use App\Models\TsekapV2\Forms\RiskAssessment\RiskProfile;
 use App\Http\Controllers\Controller;
-
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Http\Request;
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 
 class DataController extends Controller
 {
-    private function getAuthenticatedUser($username)
+    private function getAuthenticatedUser(?string $username): User | JsonResponse | null
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -26,11 +26,11 @@ class DataController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        return $queryUser;
+        return null;
     }
 
     // for users with privilege of 1,3, 5, and 10
-    private function getAuthenticatedAdmin($username)
+    private function getAuthenticatedAdmin(?string $username): JsonResponse | null
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -39,20 +39,24 @@ class DataController extends Controller
             Log::error('Denied administrative access to (Risk Assessment, DataController) for: ' + $queryUser->getAttribute('id'));
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
+        return null;
     }
 
-    private function getHealthFacilityForUser($user)
+    private function getHealthFacilityForUser(?User $user): Facilities | null
     {
-        $userHealthFacilityMapping = UserHealthFacility::where('user_id', $user->id)->first();
+        $userHealthFacilityMapping = UserHealthFacility::where('user_id', $user?->id)->first();
+
         if ($userHealthFacilityMapping) {
             return Facilities::select('id', 'name', 'address', 'hospital_type')
                 ->where('id', $userHealthFacilityMapping->getAttribute('facility_id'))
                 ->first();
         }
+
         return null;
     }
 
-    private function checkDuplicateEntries($fields)
+    private function checkDuplicateEntries(?array $fields): bool
     {
         $query = RiskProfile::where('fname', $fields['fname'])
             ->where('lname', $fields['lname'])
@@ -84,11 +88,11 @@ class DataController extends Controller
 
 
     //---- !!! WORKING FUNCTION !!! ----//
-    public function retrievePatientRiskProfileWithoutFacility(Request $request)
+    public function retrievePatientRiskProfileWithoutFacility(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -181,11 +185,11 @@ class DataController extends Controller
     }
 
     // retrieval by facility using GET parameters
-    public function retrievePatientRiskProfileByFacility(Request $request)
+    public function retrievePatientRiskProfileByFacility(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -284,11 +288,11 @@ class DataController extends Controller
         return response()->json($results, 200);
     }
 
-    public function retrievePatientRiskAssessment(Request $request)
+    public function retrievePatientRiskAssessment(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -396,11 +400,11 @@ class DataController extends Controller
         return response()->json($query->simplePaginate(30), 200);
     }
 
-    public function addRiskProfile(Request $request)
+    public function addRiskProfile(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -446,7 +450,7 @@ class DataController extends Controller
         }
 
         // Check for malformed parameters
-        if (empty($fields['offline_entry']) && !empty($fields['profile_id'])) {
+        if (!empty($fields['offline_entry']) && !empty($fields['profile_id'])) {
             return response()->json(['error' => 'Malformed parameter. Please recheck request.'], 403);
         }
 
@@ -502,11 +506,11 @@ class DataController extends Controller
         }
     }
 
-    public function addRiskForm(Request $request)
+    public function addRiskForm(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -643,11 +647,11 @@ class DataController extends Controller
     }
 
     // update the entire risk profile
-    public function updateRiskProfile(Request $request)
+    public function updateRiskProfile(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -711,11 +715,11 @@ class DataController extends Controller
     }
 
     // update risk form
-    public function updateRiskForm(Request $request)
+    public function updateRiskForm(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -843,11 +847,11 @@ class DataController extends Controller
     }
 
     // delete risk profile
-    public function deleteRiskProfile(Request $request)
+    public function deleteRiskProfile(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
@@ -878,11 +882,11 @@ class DataController extends Controller
     }
 
     // delete risk form
-    public function deleteRiskForm(Request $request)
+    public function deleteRiskForm(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()x
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
