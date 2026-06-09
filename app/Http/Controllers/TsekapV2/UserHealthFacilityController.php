@@ -13,7 +13,7 @@ use Exception;
 
 class UserHealthFacilityController extends Controller
 {
-    private function getAuthenticatedUser(?User $username): JsonResponse
+    private function getAuthenticatedUser(?User $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 

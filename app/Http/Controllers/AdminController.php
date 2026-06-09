@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 class AdminController extends Controller
 {
     // function used in getting authenticated admins
-    private function getAuthenticatedAdmin(?string $username): JsonResponse
+    private function getAuthenticatedAdmin(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -28,7 +28,7 @@ class AdminController extends Controller
     }
 
     // function used in getting authenticated users
-    private function getAuthenticatedUser(?string $username): JsonResponse
+    private function getAuthenticatedUser(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 

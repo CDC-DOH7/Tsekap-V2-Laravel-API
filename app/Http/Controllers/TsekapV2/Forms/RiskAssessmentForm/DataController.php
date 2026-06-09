@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 
 class DataController extends Controller
 {
-    private function getAuthenticatedUser(?string $username): User | JsonResponse | null
+    private function getAuthenticatedUser(?string $username): JsonResponse | User
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -26,21 +26,21 @@ class DataController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        return null;
+        return $queryUser;
     }
 
     // for users with privilege of 1,3, 5, and 10
-    private function getAuthenticatedAdmin(?string $username): JsonResponse | null
+    private function getAuthenticatedAdmin(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 
         // do not authorize update unless 1, 3, 5, and 10
         if ((!$queryUser || !in_array($queryUser->getAttribute('user_priv'), [1, 3, 5, 10])) || ($queryUser->getAttribute('verified') !== 1)) {
-            Log::error('Denied administrative access to (Risk Assessment, DataController) for: ' + $queryUser->getAttribute('id'));
+            Log::error('Denied administrative access to (Risk Assessment, DataController) for: ' . $queryUser->getAttribute('id'));
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return null;
+        return $queryUser;
     }
 
     private function getHealthFacilityForUser(?User $user): Facilities | null

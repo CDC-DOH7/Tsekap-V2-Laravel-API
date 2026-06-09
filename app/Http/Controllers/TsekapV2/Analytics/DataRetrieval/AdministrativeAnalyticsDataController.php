@@ -16,7 +16,7 @@ use Exception;
 class AdministrativeAnalyticsDataController extends Controller
 {
     // Get authenticated user or return unauthorized response
-    private function getAuthenticatedUser(?string $username): JsonResponse
+    private function getAuthenticatedUser(?string $username): JsonResponse|User
     {
         $user = User::where('username', $username)
             ->whereIn('user_priv', [1, 3, 5, 10])

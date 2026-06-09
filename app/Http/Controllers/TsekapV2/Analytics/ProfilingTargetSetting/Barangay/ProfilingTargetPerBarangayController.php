@@ -16,7 +16,7 @@ use Psy\Util\Json;
 
 class ProfilingTargetPerBarangayController extends Controller
 {
-    private function getAuthenticatedAdmin(?string $username): JsonResponse|null
+    private function getAuthenticatedAdmin(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -26,10 +26,10 @@ class ProfilingTargetPerBarangayController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return null;
+        return $queryUser;
     }
 
-    private function getAuthenticatedUser(?string $username): JsonResponse
+    private function getAuthenticatedUser(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 

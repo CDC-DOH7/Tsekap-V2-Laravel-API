@@ -14,7 +14,7 @@ use Exception;
 
 class ProfilingTargetPerMuncityController extends Controller
 {
-    private function getAuthenticatedAdmin(?string $username): JsonResponse
+    private function getAuthenticatedAdmin(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -27,7 +27,7 @@ class ProfilingTargetPerMuncityController extends Controller
         return $queryUser;
     }
 
-    private function getAuthenticatedUser(?string $username): JsonResponse
+    private function getAuthenticatedUser(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 

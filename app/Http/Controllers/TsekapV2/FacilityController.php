@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class FacilityController extends Controller
 {
-    private function getAuthenticatedUser(?string $username): JsonResponse
+    private function getAuthenticatedUser(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -24,7 +24,7 @@ class FacilityController extends Controller
         return $queryUser;
     }
 
-    private function getAuthenticatedAdmin(?string $username): JsonResponse
+    private function getAuthenticatedAdmin(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 

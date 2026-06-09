@@ -16,7 +16,7 @@ use Exception;
 
 class ProfileController extends Controller
 {
-    private function getAuthenticatedUser(?string $username): JsonResponse
+    private function getAuthenticatedUser(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -29,7 +29,7 @@ class ProfileController extends Controller
     }
 
     // for users with privilege of 1, 3, 5, and 10
-    private function getAuthenticatedAdmin(?string $username): JsonResponse
+    private function getAuthenticatedAdmin(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 

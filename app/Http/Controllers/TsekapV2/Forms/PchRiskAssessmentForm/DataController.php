@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 
 class DataController extends Controller
 {
-    private function getAuthenticatedUser(?string $username): JsonResponse
+    private function getAuthenticatedUser(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -30,7 +30,7 @@ class DataController extends Controller
     }
 
     // for users with privilege of 1,3, 5, and 10
-    private function getAuthenticatedAdmin(?string $username): User | JsonResponse | null
+    private function getAuthenticatedAdmin(?string $username): JsonResponse | User
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -39,7 +39,8 @@ class DataController extends Controller
             Log::error('Denied administrative access to (PCH Risk Assessment, DataController) for: ' . $queryUser->getAttribute('id'));
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        return null;
+
+        return $queryUser;
     }
 
     private function getHealthFacilityForUser(?User $user): Facilities | null
