@@ -11,12 +11,13 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\JsonResponse;
 use Exception;
 
 class AuthController extends Controller
 {
     // self-registration functionality
-    public function selfRegisterUser(Request $request)
+    public function selfRegisterUser(Request $request): JsonResponse
     {
         // Validate the input
         $validator = Validator::make($request->all(), [
@@ -86,7 +87,7 @@ class AuthController extends Controller
     }
 
     // Used to login users
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         // Ensure that the request contains all fields
         $fields = $request->all();
@@ -226,7 +227,7 @@ class AuthController extends Controller
         return response()->json(['status' => 'error', 'message' => 'Invalid credentials'], 401);
     }
 
-    public function logoutAllSessions(Request $request)
+    public function logoutAllSessions(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $request->user(); // This replaces Auth::check()
@@ -242,7 +243,7 @@ class AuthController extends Controller
         return response()->json(['status' => 'success', 'message' => 'Logged out successfully'], 200);
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         // Ensure the user is authenticated via Sanctum
         $user = $request->user(); // This replaces Auth::check()

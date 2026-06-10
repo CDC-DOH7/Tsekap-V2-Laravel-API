@@ -15,12 +15,13 @@ use App\Models\TsekapV2\Country;
 use App\Models\TsekapV2\Region;
 use App\Models\AppVersion;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\JsonResponse;
 use Exception;
 
 class MiscDataController extends Controller
 {
     // get facilities
-    public function getAllFacility(Request $request)
+    public function getAllFacility(Request $request): JsonResponse
     {
         $validator = Validator::make($request->query(), [
             'province_id' => 'nullable|integer',
@@ -74,7 +75,7 @@ class MiscDataController extends Controller
     }
 
     // get all facilities in current muncity
-    public function getFacilitiesInCurrentMuncity(Request $request)
+    public function getFacilitiesInCurrentMuncity(Request $request): JsonResponse
     {
         $validator = Validator::make($request->query(), [
             'muncity_id' => 'required|integer',
@@ -97,7 +98,7 @@ class MiscDataController extends Controller
     }
 
     // get all countries
-    public function getCountries()
+    public function getCountries(): JsonResponse
     {
         try {
             $countries = Country::select(
@@ -113,7 +114,7 @@ class MiscDataController extends Controller
     }
 
     // get all regions
-    public function getRegions(Request $request)
+    public function getRegions(Request $request): JsonResponse
     {
         // optional field
         $validator = Validator::make($request->query(), [
@@ -140,7 +141,7 @@ class MiscDataController extends Controller
     }
 
     // get all provinces, optionally filtered by region_id
-    public function getProvinces(Request $request)
+    public function getProvinces(Request $request): JsonResponse
     {
         // optional field
         $validator = Validator::make($request->query(), [
@@ -167,7 +168,7 @@ class MiscDataController extends Controller
     }
 
     // get muncity/city by provinces
-    public function getMuncities(Request $request)
+    public function getMuncities(Request $request): JsonResponse
     {
         $validator = Validator::make($request->query(), [
             'province_id' => 'required|integer',
@@ -191,14 +192,14 @@ class MiscDataController extends Controller
     }
 
     // get all muncities
-    public function getAllMuncities(Request $request)
+    public function getAllMuncities(Request $request): JsonResponse
     {
         $muncities = Muncity::select('id', 'province_id', 'zip_code', 'description')->get();
         return response()->json($muncities);
     }
 
     // get barangay by muncity/cities
-    public function getBarangays(Request $request)
+    public function getBarangays(Request $request): JsonResponse
     {
         $validator = Validator::make($request->query(), [
             'muncity_id' => 'required|integer',
@@ -222,14 +223,14 @@ class MiscDataController extends Controller
     }
 
     // get all barangays
-    public function getAllBarangays(Request $request)
+    public function getAllBarangays(Request $request): JsonResponse
     {
         $barangays = Barangay::select('id', 'muncity_id', 'description')->get();
         return response()->json($barangays);
     }
 
     // get province by Id 
-    public function getProvinceById(Request $request)
+    public function getProvinceById(Request $request): JsonResponse
     {
         $validator = Validator::make($request->query(), [
             'province_id' => 'required|integer',
@@ -253,7 +254,7 @@ class MiscDataController extends Controller
     }
 
     // get muncity/city by Id
-    public function getMuncityById(Request $request)
+    public function getMuncityById(Request $request): JsonResponse
     {
         $validator = Validator::make($request->query(), [
             'muncity_id' => 'required|integer',
@@ -277,7 +278,7 @@ class MiscDataController extends Controller
     }
 
     // get barangay by Id
-    public function getBarangayById(Request $request)
+    public function getBarangayById(Request $request): JsonResponse
     {
         $validator = Validator::make($request->query(), [
             'barangay_id' => 'required|integer',
@@ -301,7 +302,7 @@ class MiscDataController extends Controller
     }
 
     // get all religion
-    public function getAllReligions()
+    public function getAllReligions(): JsonResponse
     {
         try {
             $religions = Religion::select('id', 'name')->get();
@@ -313,7 +314,7 @@ class MiscDataController extends Controller
     }
 
     // get all religion
-    public function getAllCitizenships()
+    public function getAllCitizenships(): JsonResponse
     {
         try {
             $citizenships = Citizenship::select('id', 'name')->get();
@@ -328,7 +329,7 @@ class MiscDataController extends Controller
     /**
      * Check the latest version for a given platform (android/ios)
      */
-    public function getMobileVersion(Request $request)
+    public function getMobileVersion(Request $request): JsonResponse
     {
         $platform = $request->query('platform', 'android');
 
@@ -355,7 +356,7 @@ class MiscDataController extends Controller
     /**
      * (Optional) Admin endpoint to update or create a new version record
      */
-    public function storeMobileVersion(Request $request)
+    public function storeMobileVersion(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'platform' => 'required|string|in:android,ios',

@@ -15,13 +15,13 @@ use Exception;
 
 class UserController extends Controller
 {
-    private function getAuthenticatedUser(?string $username): User
+    private function getAuthenticatedUser(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 
         if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
             Log::error('Denied access for: ' . " " . $queryUser->getAttribute('id'));
-            throw new Exception('User not found or not verified');
+            return response()->json(['status' => 'error', 'message' => 'User not found or not verified'], 404);
         }
 
         return $queryUser;
@@ -37,8 +37,8 @@ class UserController extends Controller
         }
 
         $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
-        if ($user instanceof JsonResponse) {
-            return $user;
+        if ($queryUser instanceof JsonResponse) {
+            return $queryUser;
         }
 
         $rules = [

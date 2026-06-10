@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Exception;
 
 class PhilpenAnalyticsDataController extends Controller
 {
     // ================== 1. CLINICAL COMPLAINTS SUMMARY FUNCTIONS (/clinical_complaints_summary) ==================
     // Controller Count: 2
-    public function getClinicalComplaintsArRecords(Request $request)
+    public function getClinicalComplaintsArRecords(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -54,7 +55,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getClinicalComplaintsRiskProfile(Request $request)
+    public function getClinicalComplaintsRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -78,7 +79,7 @@ class PhilpenAnalyticsDataController extends Controller
 
     // ================== 2. TOBACCO SUMMARY FUNCTIONS (/tobacco_summary) ==================
     // Controller Count: 3
-    public function getTobaccoSummaryData(Request $request)
+    public function getTobaccoSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -106,7 +107,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getTobaccoSummaryPatientInfo(Request $request)
+    public function getTobaccoSummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -128,7 +129,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getTobaccoSummaryRiskProfile(Request $request)
+    public function getTobaccoSummaryRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -151,7 +152,7 @@ class PhilpenAnalyticsDataController extends Controller
 
     // ================== 3. ALCOHOL INTAKE SUMMARY FUNCTIONS (/alcohol_intake_summary) ==================
     // Controller Count: 3
-    public function getAlcoholIntakeSummaryData(Request $request)
+    public function getAlcoholIntakeSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -179,7 +180,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getAlcoholIntakeSummaryPatientInfo(Request $request)
+    public function getAlcoholIntakeSummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -204,7 +205,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getAlcoholIntakeSummaryRiskProfile(Request $request)
+    public function getAlcoholIntakeSummaryRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -227,7 +228,7 @@ class PhilpenAnalyticsDataController extends Controller
 
     // ================== 4. ALCOHOL BINGE DRINKER SUMMARY FUNCTIONS (/alcohol_binge_drinker_summary) ==================
     // Controller Count: 4
-    public function getAlcoholBingeDrinkerSummaryData(Request $request)
+    public function getAlcoholBingeDrinkerSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -255,7 +256,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getAlcoholBingeDrinkerSummaryPatientInfo(Request $request)
+    public function getAlcoholBingeDrinkerSummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -280,7 +281,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getAlcoholBingeDrinkerSummaryRiskProfile(Request $request)
+    public function getAlcoholBingeDrinkerSummaryRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -303,7 +304,7 @@ class PhilpenAnalyticsDataController extends Controller
 
     // ================== 5. PHYSICAL ACTIVITY SUMMARY FUNCTIONS (/physical_activity_summary) ==================
     // Controller Count: 3
-    public function getPhysicalActivitySummaryData(Request $request)
+    public function getPhysicalActivitySummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -332,7 +333,7 @@ class PhilpenAnalyticsDataController extends Controller
             ], 500);
         }
     }
-    public function getPhysicalActivitySummaryPatientInfo(Request $request)
+    public function getPhysicalActivitySummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -357,7 +358,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getPhysicalActivitySummaryRiskProfile(Request $request)
+    public function getPhysicalActivitySummaryRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -380,7 +381,7 @@ class PhilpenAnalyticsDataController extends Controller
 
     // ================== 6. NUTRITION SUMMARY FUNCTIONS (/nutrition_summary) ==================
     // Controller Count: 3
-    public function getNutritionSummaryData(Request $request)
+    public function getNutritionSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -408,7 +409,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getNutritionSummaryPatientInfo(Request $request)
+    public function getNutritionSummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -433,7 +434,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getNutritionSummaryRiskProfile(Request $request)
+    public function getNutritionSummaryRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -456,7 +457,7 @@ class PhilpenAnalyticsDataController extends Controller
 
     // ================== 7. PREV MED HISTORY SUMMARY FUNCTIONS (/prev_med_history_summary) ==================
     // Controller Count: 3
-    public function getPrevMedHistorySummaryData(Request $request)
+    public function getPrevMedHistorySummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -501,7 +502,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getPrevMedHistorySummaryRiskProfile(Request $request)
+    public function getPrevMedHistorySummaryRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -521,7 +522,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getPrevMedHistorySummaryPatientInfo(Request $request)
+    public function getPrevMedHistorySummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -544,7 +545,7 @@ class PhilpenAnalyticsDataController extends Controller
 
     // ================== 8. FAMILY HISTORY SUMMARY FUNCTIONS (/family_history_summary) ==================
     // Controller Count: 3
-    public function getFamilyHistorySummaryData(Request $request)
+    public function getFamilyHistorySummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -586,7 +587,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getFamilyHistorySummaryRiskProfile(Request $request)
+    public function getFamilyHistorySummaryRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -606,7 +607,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getFamilyHistorySummaryPatientInfo(Request $request)
+    public function getFamilyHistorySummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -629,7 +630,7 @@ class PhilpenAnalyticsDataController extends Controller
 
     // ================== 9. BP1 SUMMARY FUNCTIONS (/bp1_summary) ==================
     // Controller Count: 3
-    public function getBp1SummaryData(Request $request)
+    public function getBp1SummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -683,7 +684,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getBp1SummaryPatientInfo(Request $request)
+    public function getBp1SummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -706,7 +707,7 @@ class PhilpenAnalyticsDataController extends Controller
 
     // ================== 10. HYPERTENSION/BP2 SUMMARY FUNCTIONS (/hypertension_summary) ==================
     // Controller Count: 3
-    public function getBp2SummaryData(Request $request)
+    public function getBp2SummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -741,7 +742,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getBp2SummaryRiskProfile(Request $request)
+    public function getBp2SummaryRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -761,7 +762,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getBp2SummaryPatientInfo(Request $request)
+    public function getBp2SummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -784,7 +785,7 @@ class PhilpenAnalyticsDataController extends Controller
 
     // ================== 11. DIABETES SUMMARY FUNCTIONS (/diabetes_summary) ==================
     // Controller Count: 3
-    public function getDiabetesSummaryData(Request $request)
+    public function getDiabetesSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -817,7 +818,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getDiabetesSummaryRiskProfile(Request $request)
+    public function getDiabetesSummaryRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -836,7 +837,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getDiabetesSummaryPatientInfo(Request $request)
+    public function getDiabetesSummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -859,7 +860,7 @@ class PhilpenAnalyticsDataController extends Controller
 
     // ================== 12. HYPERCHOLESTEROLEMIA SUMMARY FUNCTIONS (/hypercholesterolemia_summary) ==================
     // Controller Count: 3
-    public function getHypercholesterolemiaSummaryData(Request $request)
+    public function getHypercholesterolemiaSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -894,7 +895,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getHypercholesterolemiaSummaryRiskProfile(Request $request)
+    public function getHypercholesterolemiaSummaryRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -914,7 +915,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getHypercholesterolemiaSummaryPatientInfo(Request $request)
+    public function getHypercholesterolemiaSummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -937,7 +938,7 @@ class PhilpenAnalyticsDataController extends Controller
 
     // ================== 13. RESPIRATORY SUMMARY FUNCTIONS (/respiratory_summary) ==================
     // Controller Count: 3
-    public function getRespiratorySummaryData(Request $request)
+    public function getRespiratorySummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -970,7 +971,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getRespiratorySummaryRiskProfile(Request $request)
+    public function getRespiratorySummaryRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -990,7 +991,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getRespiratorySummaryPatientInfo(Request $request)
+    public function getRespiratorySummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -1012,7 +1013,7 @@ class PhilpenAnalyticsDataController extends Controller
 
     // ================== 14. PROBABLE SUMMARY FUNCTIONS (/probable_summary) ==================
     // Controller Count: 3
-    public function getProbableSummaryData(Request $request)
+    public function getProbableSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -1045,7 +1046,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getProbableSummaryRiskProfile(Request $request)
+    public function getProbableSummaryRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -1065,7 +1066,7 @@ class PhilpenAnalyticsDataController extends Controller
         }
     }
 
-    public function getProbableSummaryPatientInfo(Request $request)
+    public function getProbableSummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 

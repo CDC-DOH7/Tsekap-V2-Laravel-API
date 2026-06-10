@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Exception;
 
 class PchratAnalyticsDataController extends Controller
@@ -13,7 +14,7 @@ class PchratAnalyticsDataController extends Controller
 {
     // ================== 1. VISIT INFO SUMMARY FUNCTIONS (/visit_info_summary) ==================
     // Controller Count: 3
-    public function getNatureOfVisitRecords(Request $request)
+    public function getNatureOfVisitRecords(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -42,7 +43,7 @@ class PchratAnalyticsDataController extends Controller
             return response()->json(['error' => 'Failed to retrieve nature of visit data.'], 500);
         }
     }
-        public function getNatureOfVisitRiskProfile(Request $request)
+    public function getNatureOfVisitRiskProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -63,7 +64,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getVisitInfoSummaryData(Request $request)
+    public function getVisitInfoSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -98,7 +99,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getVisitInfoSummaryProfile(Request $request)
+    public function getVisitInfoSummaryProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -118,7 +119,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getVisitInfoSummaryPatientInfo(Request $request)
+    public function getVisitInfoSummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -142,7 +143,7 @@ class PchratAnalyticsDataController extends Controller
 
     // ================== 2. VITAL SIGNS SUMMARY FUNCTIONS (/vital_signs_summary) ==================
     // Controller Count: 3
-    public function getVitalSignsSummaryData(Request $request)
+    public function getVitalSignsSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -187,7 +188,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getVitalSignsSummaryProfile(Request $request)
+    public function getVitalSignsSummaryProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -207,7 +208,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getVitalSignsSummaryPatientInfo(Request $request)
+    public function getVitalSignsSummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -231,7 +232,7 @@ class PchratAnalyticsDataController extends Controller
 
     // ================== 3. PHYSICAL EXAMINATION SUMMARY FUNCTIONS (/physical_exam_summary) ==================
     // Controller Count: 3
-    public function getPhysicalExamSummaryData(Request $request)
+    public function getPhysicalExamSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -270,7 +271,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getPhysicalExamSummaryProfile(Request $request)
+    public function getPhysicalExamSummaryProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -290,7 +291,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getPhysicalExamSummaryPatientInfo(Request $request)
+    public function getPhysicalExamSummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -314,7 +315,7 @@ class PchratAnalyticsDataController extends Controller
 
     // ================== 4. ANIMAL BITE SUMMARY FUNCTIONS (/animal_bite_summary) ==================
     // Controller Count: 3
-    public function getAnimalBiteSummaryData(Request $request)
+    public function getAnimalBiteSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -354,7 +355,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getAnimalBiteSummaryProfile(Request $request)
+    public function getAnimalBiteSummaryProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -374,7 +375,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getAnimalBiteSummaryPatientInfo(Request $request)
+    public function getAnimalBiteSummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -398,7 +399,7 @@ class PchratAnalyticsDataController extends Controller
 
     // ================== 5. RISK ASSESSMENT SUMMARY FUNCTIONS (/risk_assessment_summary) ==================
     // Controller Count: 3
-    public function getRiskAssessmentSummaryData(Request $request)
+    public function getRiskAssessmentSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -432,7 +433,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getRiskAssessmentSummaryProfile(Request $request)
+    public function getRiskAssessmentSummaryProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -476,7 +477,7 @@ class PchratAnalyticsDataController extends Controller
 
     // ================== 6. PERSONAL HISTORY SUMMARY FUNCTIONS (/risk_assessment_summary) ==================
     // Controller Count: 3
-    public function getPersonalHistorySummaryData(Request $request)
+    public function getPersonalHistorySummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -513,7 +514,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getPersonalHistorySummaryProfile(Request $request)
+    public function getPersonalHistorySummaryProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -533,7 +534,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getPersonalHistorySummaryPatientInfo(Request $request)
+    public function getPersonalHistorySummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -557,7 +558,7 @@ class PchratAnalyticsDataController extends Controller
 
     // ================== 1. FAMILY HISTORY SUMMARY FUNCTIONS (/family_history_summary) ==================
     // Controller Count: 3
-    public function getFamilyHistorySummaryData(Request $request)
+    public function getFamilyHistorySummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -591,7 +592,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getFamilyHistorySummaryProfile(Request $request)
+    public function getFamilyHistorySummaryProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -611,7 +612,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getFamilyHistorySummaryPatientInfo(Request $request)
+    public function getFamilyHistorySummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -635,7 +636,7 @@ class PchratAnalyticsDataController extends Controller
 
     // ================== 2. SMOKING HISTORY (/smoking_history) ==================
     // Controller Count: 3
-    public function getSmokingHistorySummaryData(Request $request)
+    public function getSmokingHistorySummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -670,7 +671,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getSmokingHistorySummaryProfile(Request $request)
+    public function getSmokingHistorySummaryProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -714,7 +715,7 @@ class PchratAnalyticsDataController extends Controller
 
     // ================== 3. SOCIAL HISTORY (/social_history) ==================
     // Controller Count: 3
-    public function getSocialHistorySummaryData(Request $request)
+    public function getSocialHistorySummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -752,7 +753,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getSocialHistorySummaryProfile(Request $request)
+    public function getSocialHistorySummaryProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -772,7 +773,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getSocialHistorySummaryPatientInfo(Request $request)
+    public function getSocialHistorySummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -796,7 +797,7 @@ class PchratAnalyticsDataController extends Controller
 
     // ================== 4. LIFESTYLE (/lifestyle_summary) ==================
     // Controller Count: 3
-    public function getLifestyleSummaryData(Request $request)
+    public function getLifestyleSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -853,7 +854,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getLifestyleSummaryPatientInfo(Request $request)
+    public function getLifestyleSummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -877,7 +878,7 @@ class PchratAnalyticsDataController extends Controller
 
     // ================== 5. QUESTIONNAIRE (/questionnaire_summary) ==================
     // Controller Count: 3
-    public function getQuestionnaireSummaryData(Request $request)
+    public function getQuestionnaireSummaryData(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
         $start_date = $request->query('start_date');
@@ -917,7 +918,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getQuestionnaireSummaryProfile(Request $request)
+    public function getQuestionnaireSummaryProfile(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 
@@ -937,7 +938,7 @@ class PchratAnalyticsDataController extends Controller
         }
     }
 
-    public function getQuestionnaireSummaryPatientInfo(Request $request)
+    public function getQuestionnaireSummaryPatientInfo(Request $request): JsonResponse
     {
         $hf_id = $request->query('hf_id');
 

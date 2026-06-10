@@ -11,7 +11,7 @@ use Exception;
 
 class SessionController extends Controller
 {
-    private function getAuthenticatedUser(?string $username)
+    private function getAuthenticatedUser(?string $username): JsonResponse|User
     {
         $queryUser = User::where('username', '=', $username)->first();
 
@@ -23,7 +23,7 @@ class SessionController extends Controller
         return $queryUser;
     }
 
-    public function validate(Request $request)
+    public function validate(Request $request): JsonResponse
     {
         $user = $request->user();
 
