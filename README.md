@@ -1,66 +1,207 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Tsekap V2 — Laravel REST API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Backend REST API for the **Tsekap V2** health risk assessment and patient profiling system, developed for the Department of Health (DOH) Community Health program. Built with Laravel 11 and secured via Laravel Sanctum token-based authentication.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Overview
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Tsekap V2 is a digital health platform used by community health workers (CHWs) and facility-level staff to:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Profile patients and record demographic/health data
+- Conduct and track health risk assessments (PhilPEN and PCH-RAT tools)
+- Record patient injury form data (pre-admission)
+- Manage population totals and coverage targets per municipality/barangay
+- Generate analytics and reports across health facilities
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Tech Stack
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+| Layer | Technology |
+|-------|-----------|
+| Framework | Laravel 11 |
+| PHP | 8.2+ |
+| Auth | Laravel Sanctum |
+| Database | MySQL |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## Requirements
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- PHP 8.2+
+- Composer
+- MySQL 8+
+- Node.js (for development tooling)
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## Getting Started
 
-## Contributing
+```bash
+# Clone the repository
+git clone <repo-url>
+cd Tsekap-V2-Laravel-API
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Install dependencies
+composer install
 
-## Code of Conduct
+# Copy and configure environment
+cp .env.example .env
+php artisan key:generate
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Configure your database in .env, then run migrations and seeders
+php artisan migrate
+php artisan db:seed
 
-## Security Vulnerabilities
+# Start the development server
+php artisan serve
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+The API will be available at `http://localhost:8000/api/v2`.
+
+---
+
+## Authentication
+
+All protected routes require a Bearer token obtained from the login endpoint.
+
+```
+POST /api/v2/login
+POST /api/v2/register
+```
+
+Include the token in subsequent requests:
+```
+Authorization: Bearer <token>
+```
+
+---
+
+## API Reference
+
+All routes are prefixed with `/api/v2`.
+
+### Auth
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/login` | Authenticate and receive access token |
+| POST | `/register` | Self-register a new user account |
+
+### Miscellaneous / Address Data
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/misc/get-all-facility` | List all health facilities |
+| GET | `/misc/get-countries` | List countries |
+| GET | `/misc/get-regions` | List regions |
+| GET | `/misc/get-provinces` | List provinces |
+| GET | `/misc/get-muncities` | List municipalities/cities |
+| GET | `/misc/get-barangays` | List barangays |
+| GET | `/misc/get-all-citizenships` | List citizenships |
+| GET | `/misc/get-all-religions` | List religions |
+| GET | `/misc/get-mobile-version` | Get current mobile app version |
+
+### User & Facility Management _(auth required)_
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/facility/add-user-facility` | Assign user to a health facility |
+| GET | `/admin/list-users` | List all users |
+| GET | `/admin/list-users-by-facility` | List users by facility |
+| GET | `/admin/list-unverified-users` | List pending verification users |
+| POST | `/admin/verify-user` | Verify a user account |
+| POST | `/admin/unverify-user` | Revoke user verification |
+| POST | `/admin/register-user` | Admin-register a new user |
+| POST | `/admin/reset-user-password` | Reset a user's password |
+
+### Health Risk Assessment Forms _(auth required)_
+
+#### PhilPEN Risk Assessment
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/forms/philpen/...` | Create / update PhilPEN risk assessment entries |
+
+#### PCH Risk Assessment Tool (PCH-RAT)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/forms/pch/...` | Create / update PCH-RAT entries |
+
+#### Patient Injury Form
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/forms/injury/...` | Submit patient injury / pre-admission data |
+
+### Analytics _(auth required)_
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/analytics/admin-analytics/get-number-of-entries-by-user-per-facility` | Entry counts per user per facility |
+| GET | `/analytics/data/general_analytics/get-age-brackets` | Age bracket breakdown |
+| GET | `/analytics/data/philpen/...` | PhilPEN-specific analytics |
+| GET | `/analytics/data/pchrat/...` | PCH-RAT-specific analytics |
+
+### Profiling Target Setting _(auth required)_
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET/POST | `/analytics/target/muncity/...` | Manage coverage targets per municipality |
+| GET/POST | `/analytics/target/barangay/...` | Manage coverage targets per barangay |
+| GET/POST | `/analytics/population/muncity/...` | Manage population totals per municipality |
+| GET/POST | `/analytics/population/barangay/...` | Manage population totals per barangay |
+
+---
+
+## Project Structure
+
+```
+app/
+├── Http/
+│   └── Controllers/
+│       ├── AuthController.php
+│       ├── AdminController.php
+│       └── TsekapV2/
+│           ├── Forms/
+│           │   ├── RiskAssessmentForm/      # PhilPEN
+│           │   ├── PchRiskAssessmentForm/   # PCH-RAT
+│           │   └── PatientInjuryForm/       # PATIENT INJURY FORM
+│           ├── Analytics/
+│           │   ├── DataRetrieval/           # Analytics endpoints
+│           │   └── ProfilingTargetSetting/  # Population & targets
+│           ├── Misc/                        # Address/lookup data
+│           └── Websockets/                  # Push notifications
+├── Models/
+│   └── TsekapV2/                            # Eloquent models
+database/
+├── migrations/
+└── seeders/
+routes/
+└── api.php
+```
+
+---
+
+## Environment Variables
+
+Key `.env` values to configure:
+
+```env
+APP_NAME=TsekapV2
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=tsekap_v2
+DB_USERNAME=root
+DB_PASSWORD=
+
+SANCTUM_STATEFUL_DOMAINS=localhost
+```
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Internal use — Department of Health (DOH), Philippines.
