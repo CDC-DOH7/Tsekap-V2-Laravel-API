@@ -174,18 +174,6 @@ class GeneralDataController extends Controller
         ];
     }
 
-    private function getAuthenticatedUser(?string $username): User|JsonResponse
-    {
-        $queryUser = User::where('username', '=', $username)->first();
-
-        if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
-            Log::error('Denied access for: ' . $username);
-            return response()->json(['error' => 'User not found'], 404);
-        }
-
-        return $queryUser;
-    }
-
     private function getMuncityId(?string $muncity_name): ?int
     {
         if (empty($muncity_name)) {
@@ -336,10 +324,7 @@ class GeneralDataController extends Controller
     public function retrieveAllForms(Request $request): JsonResponse
     {
         try {
-            $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-            if ($user instanceof JsonResponse) {
-                return $user;
-            }
+            $user = $request->user();
 
             $formType  = $request->query('form_type');
             $startDate = $this->parseDate($request->query('start_date'));
@@ -378,10 +363,7 @@ class GeneralDataController extends Controller
     public function retrieveRecentlyUploadedForms(Request $request): JsonResponse
     {
         try {
-            $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-            if ($user instanceof JsonResponse) {
-                return $user;
-            }
+            $user = $request->user();
 
             $today   = now()->toDateString();
             $results = [];

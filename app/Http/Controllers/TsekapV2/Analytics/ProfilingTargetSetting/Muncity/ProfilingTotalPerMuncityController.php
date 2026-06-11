@@ -8,47 +8,14 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
-use App\Models\User;
 use App\Models\TsekapV2\Analytics\ProfilingPopulationSetting\ProfilingPopulationPerMuncityModel;
 
 use Exception;
 
 class ProfilingTotalPerMuncityController extends Controller
 {
-    private function getAuthenticatedAdmin(?string $username): JsonResponse|User
-    {
-        $queryUser = User::where('username', '=', $username)->first();
-
-        // do not authorize update unless 1, 3, 5, and 10
-        if ((!$queryUser || !in_array($queryUser->getAttribute('user_priv'), [1, 3, 5, 10])) || ($queryUser->getAttribute('verified') !== 1)) {
-            Log::error('Denied access to (ProfilingTotalPerMuncityController) for: ' . ($queryUser ? $queryUser->getAttribute('id') : 'unknown'));
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        return $queryUser;
-    }
-
-    private function getAuthenticatedUser(?string $username): JsonResponse|User
-    {
-        $queryUser = User::where('username', '=', $username)->first();
-
-        if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
-            Log::error('Denied access for: ' . ($queryUser ? $queryUser->getAttribute('id') : 'unknown'));
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        return $queryUser;
-    }
-
     public function checkPopulationMappingPerMuncityExists(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $validator = Validator::make($request->all(), [
             'province_id' => 'required|integer',
             'muncity_id' => 'required|integer',
@@ -75,13 +42,6 @@ class ProfilingTotalPerMuncityController extends Controller
 
     public function createTotalsPerMuncity(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
-
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $fields = $request->input('fields');
 
         if (!$fields) {
@@ -132,13 +92,6 @@ class ProfilingTotalPerMuncityController extends Controller
 
     public function retrieveTotalsPerMuncity(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $validator = Validator::make($request->query(), [
             'province_id' => 'required|integer',
             'muncity_id' => 'required|integer',
@@ -178,13 +131,6 @@ class ProfilingTotalPerMuncityController extends Controller
 
     public function updateTotalsPerMuncity(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
-
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $fields = $request->input('fields');
 
         if (!$fields) {
@@ -237,13 +183,6 @@ class ProfilingTotalPerMuncityController extends Controller
 
     public function deleteTotalsPerMuncity(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $fields = $request->input('fields');
 
         if (!$fields) {

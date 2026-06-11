@@ -154,35 +154,6 @@ class AuthController extends Controller
             // Store token in HTTP-only, secure cookie
             $cookie = Cookie::make('auth_token', $token, 60, '/', null, true, true);
 
-            /*
-            // OPTIONAL: Add XSRF and CSRF tokens
-
-            // Generate a CSRF token
-            $csrfToken = csrf_token();
-
-            // Set the XSRF-TOKEN and X-CSRF-TOKEN cookies
-            $xsrfCookie = Cookie::make('XSRF-TOKEN', $csrfToken, 60);
-            $csrfCookie = Cookie::make('X-CSRF-TOKEN', $csrfToken, 60);
-            */
-
-            // Old backend return
-            /*
-            return response()->json([
-                'data' => [
-                    'user' => $user,
-                    'facility' => $user->facility_id ? [
-                        'id' => $user->facility_id,
-                        'name' => $user->facility_name,
-                        'province_id' => $user->facility_province_id,
-                        'muncity_id' => $user->facility_muncity_id
-                    ] : null,
-                    'token' => $token, // Return Bearer token
-                ],
-                'status' => 'success',
-            ])->withCookie($cookie);
-            
-            */
-
             return response()->json([
                 'data' => [
                     'user' => [

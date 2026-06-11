@@ -11,18 +11,6 @@ use Exception;
 
 class SessionController extends Controller
 {
-    private function getAuthenticatedUser(?string $username): JsonResponse|User
-    {
-        $queryUser = User::where('username', '=', $username)->first();
-
-        if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
-            Log::error('Denied access for: ' . " " . $queryUser->getAttribute('id'));
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        return $queryUser;
-    }
-
     public function validate(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -32,12 +20,6 @@ class SessionController extends Controller
         }
 
         try {
-            // Check if the user is verified
-            $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
-            if ($queryUser instanceof JsonResponse) {
-                return $queryUser;
-            }
-
             // Fetch user details with related facility information
             $userDetails = User::select(
                 'users.id',
