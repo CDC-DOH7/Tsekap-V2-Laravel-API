@@ -12,38 +12,9 @@ use Illuminate\Support\Facades\Log;
 
 class FacilityController extends Controller
 {
-    private function getAuthenticatedUser(?string $username): JsonResponse|User
-    {
-        $queryUser = User::where('username', '=', $username)->first();
-
-        if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
-            Log::error('Denied access for: ' . " " . $queryUser->getAttribute('id'));
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        return $queryUser;
-    }
-
-    private function getAuthenticatedAdmin(?string $username): JsonResponse|User
-    {
-        $queryUser = User::where('username', '=', $username)->first();
-
-        // do not authorize update unless 1, 3, 5, 10
-        if ((!$queryUser || !in_array($queryUser->getAttribute('user_priv'), [1, 3, 5, 10])) || ($queryUser->getAttribute('verified') !== 1)) {
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        return $queryUser;
-    }
-
     // get a health facility
     public function retrieveFacilityByCode(Request $request): JsonResponse
     {
-        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $rules = [
             'fields' => 'required|array',
             'fields.id' => 'sometimes|required_without:fields.facility_code|integer',
@@ -79,12 +50,6 @@ class FacilityController extends Controller
     // add a health facility
     public function addFacility(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $fields = $request->input('fields');
 
         $rules = [
@@ -134,11 +99,6 @@ class FacilityController extends Controller
     // update a health facility
     public function updateFacility(Request $request): JsonResponse
     {
-        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $rules = [
             'fields' => 'required|array',
             'fields.facility_code' => 'required|string|max:100',
@@ -187,11 +147,6 @@ class FacilityController extends Controller
 
     public function deleteFacility(Request $request): JsonResponse
     {
-        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $rules = [
             'fields' => 'required|array',
             'fields.facility_code' => 'required|string|max:100',

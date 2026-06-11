@@ -8,47 +8,14 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
-use App\Models\User;
 use App\Models\TsekapV2\Analytics\ProfilingPopulationSetting\ProfilingPopulationPerBarangayModel;
 
 use Exception;
 
 class ProfilingTotalPerBarangayController extends Controller
 {
-    private function getAuthenticatedAdmin(?string $username): JsonResponse|User
-    {
-        $queryUser = User::where('username', '=', $username)->first();
-
-        // do not authorize update unless 1, 3, 5, and 10
-        if ((!$queryUser || !in_array($queryUser->getAttribute('user_priv'), [1, 3, 5, 10])) || ($queryUser->getAttribute('verified') !== 1)) {
-            Log::error('Denied access to (ProfilingTotalPerBarangayController) for: ' . ($queryUser ? $queryUser->getAttribute('id') : 'unknown'));
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        return $queryUser;
-    }
-
-    private function getAuthenticatedUser(?string $username): JsonResponse|User
-    {
-        $queryUser = User::where('username', '=', $username)->first();
-
-        if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
-            Log::error('Denied access for: ' . ($queryUser ? $queryUser->getAttribute('id') : 'unknown'));
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        return $queryUser;
-    }
-
     public function checkPopulationMappingPerBarangayExists(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $validator = Validator::make($request->all(), [
             'muncity_id' => 'required|integer',
             'barangay_id' => 'required|integer',
@@ -75,13 +42,6 @@ class ProfilingTotalPerBarangayController extends Controller
 
     public function createTotalsPerBarangay(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
-
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $fields = $request->input('fields');
 
         if (!$fields) {
@@ -132,13 +92,6 @@ class ProfilingTotalPerBarangayController extends Controller
 
     public function retrieveTotalsPerBarangay(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         // For GET requests, use query parameters
         $validator = Validator::make($request->query(), [
             'muncity_id' => 'required|integer',
@@ -179,13 +132,6 @@ class ProfilingTotalPerBarangayController extends Controller
 
     public function updateTotalsPerBarangay(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username')); // This replaces Auth::check()
-
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $fields = $request->input('fields');
 
         if (!$fields) {
@@ -238,13 +184,6 @@ class ProfilingTotalPerBarangayController extends Controller
 
     public function deleteTotalsPerBarangay(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $fields = $request->input('fields');
 
         if (!$fields) {

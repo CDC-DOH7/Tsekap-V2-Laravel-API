@@ -15,31 +15,11 @@ use Exception;
 
 class UserController extends Controller
 {
-    private function getAuthenticatedUser(?string $username): JsonResponse|User
-    {
-        $queryUser = User::where('username', '=', $username)->first();
-
-        if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
-            Log::error('Denied access for: ' . " " . $queryUser->getAttribute('id'));
-            return response()->json(['status' => 'error', 'message' => 'User not found or not verified'], 404);
-        }
-
-        return $queryUser;
-    }
-
     public function updateUserPassword(Request $request): JsonResponse
     {
         $fields = $request->input('fields');
         $user = $request->user();
-
-        if (!$user) {
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
-        if ($queryUser instanceof JsonResponse) {
-            return $queryUser;
-        }
+        $queryUser = $user; // Since we already have the authenticated user, we can use it directly
 
         $rules = [
             'fields' => 'required|array',
@@ -84,15 +64,7 @@ class UserController extends Controller
         $fields = $request->input('fields');
         $user = $request->user();
 
-        if (!$user) {
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
+        $queryUser = $user; // Since we already have the authenticated user, we can use it directly
         $rules = [
             'fields' => 'required|array',
             'fields.fname' => 'nullable|string|max:255',
@@ -134,14 +106,7 @@ class UserController extends Controller
         $fields = $request->input('fields');
         $user = $request->user();
 
-        if (!$user) {
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
+        $queryUser = $user; // Since we already have the authenticated user, we can use it directly
 
         $rules = [
             'fields' => 'required|array',
@@ -170,14 +135,7 @@ class UserController extends Controller
         $fields = $request->input('fields');
         $user = $request->user();
 
-        if (!$user) {
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        $queryUser = $this->getAuthenticatedUser($user->getAttribute('username'));
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
+        $queryUser = $user; // Since we already have the authenticated user, we can use it directly
 
         $rules = [
             'fields' => 'required|array',
@@ -205,10 +163,6 @@ class UserController extends Controller
     public function deactivateUserAccount(Request $request)
     {
         $authUser = $request->user();
-
-        if (!$authUser) {
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
 
         // Validate the input
         $validator = Validator::make($request->all(), [

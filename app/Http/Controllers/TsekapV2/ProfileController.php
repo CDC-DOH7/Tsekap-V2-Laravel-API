@@ -10,45 +10,15 @@ use App\Jobs\RetrieveProfileJob;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
-use App\Models\User; // Import the User model
 use Illuminate\Support\Facades\Log; // Import the Log facade
 use Exception;
 
 class ProfileController extends Controller
 {
-    private function getAuthenticatedUser(?string $username): JsonResponse|User
-    {
-        $queryUser = User::where('username', '=', $username)->first();
-
-        if (!$queryUser || $queryUser->getAttribute('verified') !== 1) {
-            Log::error('Denied access for: ' . " " . $queryUser->getAttribute('id'));
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        return $queryUser;
-    }
-
-    // for users with privilege of 1, 3, 5, and 10
-    private function getAuthenticatedAdmin(?string $username): JsonResponse|User
-    {
-        $queryUser = User::where('username', '=', $username)->first();
-
-        if ((!$queryUser || !in_array($queryUser->getAttribute('user_priv'), [1, 3, 5, 10])) || ($queryUser->getAttribute('verified') !== 1)) {
-            Log::error('Denied administrative access for: ' . " " . $queryUser->getAttribute('id'));
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        return $queryUser;
-    }
-
     // generator functions 
     private function generateFamilyId(Request $request): string
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
+        $user = $request->user(); // Get the authenticated user from the request
 
         // get formatted time to be used as metadata
         $getFormattedDate = date('His');
@@ -66,12 +36,6 @@ class ProfileController extends Controller
 
     public function retrieveProfile(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         // Validate request
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
@@ -124,12 +88,6 @@ class ProfileController extends Controller
 
     public function addProfile(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedUser($request->user()->getAttribute('username')); // This replaces Auth::check()
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
             'fields.lname' => 'required|string|max:255',
@@ -304,12 +262,6 @@ class ProfileController extends Controller
 
     public function updateProfile(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $fields = $request->input('fields', []);
 
         // Convert ISO 8601 date fields to YYYY-MM-DD format
@@ -433,12 +385,6 @@ class ProfileController extends Controller
     // delete profile
     public function deleteProfile(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $user = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-        if ($user instanceof JsonResponse) {
-            return $user;
-        }
-
         $fields = $request->input('fields');
 
         // Validate fields

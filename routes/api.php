@@ -31,12 +31,18 @@ use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\Barangay\Prof
 use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\Barangay\ProfilingTargetPerBarangayController;
 
 Route::prefix('v2')->group(function () {
-    // Non-authenticated Routes
-    Route::post('/login', [AuthController::class, 'login'])->name('api-v2-login');
-    Route::post('/register', [AuthController::class, 'selfRegisterUser'])->name('api-v2-register');
+    // Non-authenticated Routes 
+    Route::post('/register', [AuthController::class, 'selfRegisterUser'])->middleware('throttle:10,1')->name('api-v2-register');
+    Route::prefix('facility')->group(function () {
+        Route::post('/add-user-facility', [UserHealthFacilityController::class, 'addUserHealthFacility'])->name('api-v2-add-user-facility');
+    });
+
+    // Login Route
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('api-v2-login');
 
     // Misc Routes
     Route::prefix('misc')->group(function () {
+
         // For Addresses and Facilities
         Route::get('/get-all-facility', [MiscDataController::class, 'getAllFacility'])->name('api-v2-get-all-facility');
         Route::get('/get-countries', [MiscDataController::class, 'getCountries'])->name('api-v2-get-countries');
@@ -61,14 +67,10 @@ Route::prefix('v2')->group(function () {
         Route::get('/get-mobile-version', [MiscDataController::class, 'getMobileVersion'])->name('api-v2-get-mobile-version');
     });
 
-    Route::prefix('facility')->group(function () {
-        Route::post('/add-user-facility', [UserHealthFacilityController::class, 'addUserHealthFacility'])->name('api-v2-add-user-facility');
-    });
-
     // Protected Routes (Requires Authentication)
     Route::middleware('auth:sanctum')->group(function () {
         // Admin Routes
-        Route::prefix('admin')->group(function () {
+        Route::prefix('admin')->middleware('user.admin')->group(function () {
             Route::post('/reset-user-password', [AdminController::class, 'resetUserPassword'])->name('api-v2-reset-user-password');
             Route::post('/register-user', [AdminController::class, 'registerUser'])->name('api-v2-admin-register-user');
 
@@ -81,10 +83,10 @@ Route::prefix('v2')->group(function () {
         });
 
         // Analytics Routes
-        Route::prefix('analytics')->group(function () {
+        Route::prefix('analytics')->middleware('user.verified')->group(function () {
 
             // Administrative Analytics
-            Route::prefix('admin-analytics')->group(function () {
+            Route::prefix('admin-analytics')->middleware('user.admin')->group(function () {
                 Route::get('/get-number-of-entries-by-user-per-facility', [AdministrativeAnalyticsDataController::class, 'countNumberOfEntriesPerByUserPerFacility']);
             });
 
@@ -94,19 +96,23 @@ Route::prefix('v2')->group(function () {
                 // muncity
                 Route::prefix('muncity')->group(function () {
                     Route::get('/check-if-target-muncity-mapping-exists', [ProfilingTargetPerMuncityController::class, 'checkTargetMappingPerMuncityExists'])->name('api-v2-check-if-target-per-muncity-mapping-exists');
-                    Route::post('/create-target-per-muncity', [ProfilingTargetPerMuncityController::class, 'createTargetPerMuncity'])->name('api-v2-create-target-per-muncity');
                     Route::get('/retrieve-target-per-muncity', [ProfilingTargetPerMuncityController::class, 'retrieveTargetPerMuncity'])->name('api-v2-retrieve-target-per-muncity');
-                    Route::post('/update-target-per-muncity', [ProfilingTargetPerMuncityController::class, 'updateTargetPerMuncity'])->name('api-v2-update-target-per-muncity');
-                    Route::post('/delete-target-per-muncity', [ProfilingTargetPerMuncityController::class, 'deleteTargetPerMuncity'])->name('api-v2-delete-target-per-muncity');
+                    Route::post('/create-target-per-muncity', [ProfilingTargetPerMuncityController::class, 'createTargetPerMuncity'])->middleware('user.admin')->name('api-v2-create-target-per-muncity');
+                    Route::post('/update-target-per-muncity', [ProfilingTargetPerMuncityController::class, 'updateTargetPerMuncity'])->middleware('user.admin')->name('api-v2-update-target-per-muncity');
+
+                    // deletion functionality
+                    Route::post('/delete-target-per-muncity', [ProfilingTargetPerMuncityController::class, 'deleteTargetPerMuncity'])->middleware('user.admin')->name('api-v2-delete-target-per-muncity');
                 });
 
-                // barangayx
+                // barangay
                 Route::prefix('barangay')->group(function () {
                     Route::get('/check-if-target-barangay-mapping-exists', [ProfilingTargetPerBarangayController::class, 'checkTargetMappingPerBarangayExists'])->name('api-v2-check-if-target-per-barangay-mapping-exists');
-                    Route::post('/create-target-per-barangay', [ProfilingTargetPerBarangayController::class, 'createTargetPerBarangay'])->name('api-v2-create-target-per-barangay');
                     Route::get('/retrieve-target-per-barangay', [ProfilingTargetPerBarangayController::class, 'retrieveTargetPerBarangay'])->name('api-v2-retrieve-target-per-barangay');
-                    Route::post('/update-target-per-barangay', [ProfilingTargetPerBarangayController::class, 'updateTargetPerBarangay'])->name('api-v2-update-target-per-barangay');
-                    Route::post('/delete-target-per-barangay', [ProfilingTargetPerBarangayController::class, 'deleteTargetPerBarangay'])->name('api-v2-delete-target-per-barangay');
+                    Route::post('/create-target-per-barangay', [ProfilingTargetPerBarangayController::class, 'createTargetPerBarangay'])->middleware('user.admin')->name('api-v2-create-target-per-barangay');
+                    Route::post('/update-target-per-barangay', [ProfilingTargetPerBarangayController::class, 'updateTargetPerBarangay'])->middleware('user.admin')->name('api-v2-update-target-per-barangay');
+
+                    // deletion functionality
+                    Route::post('/delete-target-per-barangay', [ProfilingTargetPerBarangayController::class, 'deleteTargetPerBarangay'])->middleware('user.admin')->name('api-v2-delete-target-per-barangay');
                 });
             });
 
@@ -115,19 +121,23 @@ Route::prefix('v2')->group(function () {
                 // muncity
                 Route::prefix('muncity')->group(function () {
                     Route::get('/check-if-totals-per-muncity-mapping-exists', [ProfilingTotalPerMuncityController::class, 'checkPopulationMappingPerMuncityExists'])->name('api-v2-check-if-totals-per-muncity-mapping-exists');
-                    Route::post('/create-totals-per-muncity', [ProfilingTotalPerMuncityController::class, 'createTotalsPerMuncity'])->name('api-v2-create-population-totals-per-muncity');
                     Route::get('/retrieve-totals-per-muncity', [ProfilingTotalPerMuncityController::class, 'retrieveTotalsPerMuncity'])->name('api-v2-retrieve-population-totals-per-muncity');
-                    Route::post('/update-totals-per-muncity', [ProfilingTotalPerMuncityController::class, 'updateTotalsPerMuncity'])->name('api-v2-update-population-totals-per-muncity');
-                    Route::post('/delete-totals-per-muncity', [ProfilingTotalPerMuncityController::class, 'deleteTotalsPerMuncity'])->name('api-v2-delete-population-totals-per-muncity');
+
+                    // admin privilege required for creation, update, and deletion of population totals and mappings
+                    Route::post('/create-totals-per-muncity', [ProfilingTotalPerMuncityController::class, 'createTotalsPerMuncity'])->middleware('user.admin')->name('api-v2-create-population-totals-per-muncity');
+                    Route::post('/update-totals-per-muncity', [ProfilingTotalPerMuncityController::class, 'updateTotalsPerMuncity'])->middleware('user.admin')->name('api-v2-update-population-totals-per-muncity');
+                    Route::post('/delete-totals-per-muncity', [ProfilingTotalPerMuncityController::class, 'deleteTotalsPerMuncity'])->middleware('user.admin')->name('api-v2-delete-population-totals-per-muncity');
                 });
 
                 // barangay
                 Route::prefix('barangay')->group(function () {
                     Route::get('/check-if-totals-per-barangay-mapping-exists', [ProfilingTotalPerBarangayController::class, 'checkPopulationMappingPerBarangayExists'])->name('api-v2-check-if-totals-per-barangay-mapping-exists');
-                    Route::post('/create-totals-per-barangay', [ProfilingTotalPerBarangayController::class, 'createTotalsPerBarangay'])->name('api-v2-create-population-totals-per-barangay');
                     Route::get('/retrieve-totals-per-barangay', [ProfilingTotalPerBarangayController::class, 'retrieveTotalsPerBarangay'])->name('api-v2-retrieve-population-totals-per-barangay');
-                    Route::post('/update-totals-per-barangay', [ProfilingTotalPerBarangayController::class, 'updateTotalsPerBarangay'])->name('api-v2-update-population-totals-per-barangay');
-                    Route::post('/delete-totals-per-barangay', [ProfilingTotalPerBarangayController::class, 'deleteTotalsPerBarangay'])->name('api-v2-delete-population-totals-per-barangay');
+
+                    // admin privilege required for creation, update, and deletion of barangay totals and mappings
+                    Route::post('/create-totals-per-barangay', [ProfilingTotalPerBarangayController::class, 'createTotalsPerBarangay'])->middleware('user.admin')->name('api-v2-create-population-totals-per-barangay');
+                    Route::post('/update-totals-per-barangay', [ProfilingTotalPerBarangayController::class, 'updateTotalsPerBarangay'])->middleware('user.admin')->name('api-v2-update-population-totals-per-barangay');
+                    Route::post('/delete-totals-per-barangay', [ProfilingTotalPerBarangayController::class, 'deleteTotalsPerBarangay'])->middleware('user.admin')->name('api-v2-delete-population-totals-per-barangay');
                 });
             });
 
@@ -341,51 +351,67 @@ Route::prefix('v2')->group(function () {
         });
 
         // session validator
-        Route::prefix('session')->group(function () {
+        Route::prefix('session')->middleware('user.verified')->group(function () {
             Route::get('/validate', [SessionController::class, 'validate'])->name('api-v2-session-validate');
         });
 
         // User Routes
         Route::prefix('user')->group(function () {
+            // These must remain accessible regardless of verification status
             Route::post('/checkauth', [UserController::class, 'checkAuth']);
-            Route::post('/update-password', [UserController::class, 'updateUserPassword'])->name('api-v2-update-password');
-            Route::post('/update-name', [UserController::class, 'updateUserFullName'])->name('api-v2-update-name');
-            Route::post('/update-contact', [UserController::class, 'updateUserContact'])->name('api-v2-update-contact');
-            Route::post('/update-email', [UserController::class, 'updateUserEmail'])->name('api-v2-update-email');
-            Route::post('/create-remarks', [UserController::class, 'storeUserRemarks'])->name('api-v2-create-remarks');
             Route::post('/deactivate-account', [UserController::class, 'deactivateUserAccount'])->name('api-v2-deactivate-account');
-            // two logouts for different functions
             Route::post('/logout', [AuthController::class, 'logout'])->name('api-v2-logout');
             Route::post('/logout-all-sessions', [AuthController::class, 'logoutAllSessions'])->name('api-v2-logout-all-sessions');
+
+            // Account management requires a verified account
+            Route::middleware('user.verified')->group(function () {
+                Route::post('/update-password', [UserController::class, 'updateUserPassword'])->name('api-v2-update-password');
+                Route::post('/update-name', [UserController::class, 'updateUserFullName'])->name('api-v2-update-name');
+                Route::post('/update-contact', [UserController::class, 'updateUserContact'])->name('api-v2-update-contact');
+                Route::post('/update-email', [UserController::class, 'updateUserEmail'])->name('api-v2-update-email');
+                Route::post('/create-remarks', [UserController::class, 'storeUserRemarks'])->name('api-v2-create-remarks');
+            });
         });
 
         // Facility Routes
         Route::prefix('facility')->group(function () {
-            Route::post('/retrieve-facility-by-code', [FacilityController::class, 'retrieveFacilityByCode'])->name('api-v2-retrieve-facility-by-code');
-            Route::post('/add-facility', [FacilityController::class, 'addFacility'])->name('api-v2-add-facility');
-            Route::post('/update-facility', [FacilityController::class, 'updateFacility'])->name('api-v2-update-facility');
-            Route::post('/delete-facility', [FacilityController::class, 'deleteFacility'])->name('api-v2-delete-facility');
+            // retrieval remains accessible regardless of verification status since it's needed for login and registration
+            Route::post('/retrieve-facility-by-code', [FacilityController::class, 'retrieveFacilityByCode'])->middleware('user.verified')->name('api-v2-retrieve-facility-by-code');
+            Route::post('/retrieve-user-facility', [UserHealthFacilityController::class, 'retrieveUserHealthFacility'])->middleware('user.verified')->name('api-v2-retrieve-user-facility');
+
+            // management routes require admin privileges
+            Route::post('/add-facility', [FacilityController::class, 'addFacility'])->middleware('user.admin')->name('api-v2-add-facility');
+            Route::post('/update-facility', [FacilityController::class, 'updateFacility'])->middleware('user.admin')->name('api-v2-update-facility');
+            Route::post('/delete-facility', [FacilityController::class, 'deleteFacility'])->middleware('user.admin')->name('api-v2-delete-facility');
+            Route::post('/update-user-facility', [UserHealthFacilityController::class, 'updateUserHealthFacility'])->middleware('user.admin')->name('api-v2-update-user-facility');
+
+            // deletion functionality
+            Route::post('/delete-user-facility', [UserHealthFacilityController::class, 'deleteUserHealthFacility'])->middleware('user.admin')->name('api-v2-delete-user-facility');
         });
 
         // Profile Routes
-        Route::prefix('profile')->group(function () {
+        Route::prefix('profile')->middleware('user.verified')->group(function () {
             Route::post('/retrieve-profile', [ProfileController::class, 'retrieveProfile'])->name('api-v2-retrieve-profile');
             Route::post('/add-profile', [ProfileController::class, 'addProfile'])->name('api-v2-add-profile');
             Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('api-v2-update-profile');
-            Route::post('/delete-profile', [ProfileController::class, 'deleteProfile'])->name('api-v2-delete-profile');
+
+            // deletion functionality
+            Route::post('/delete-profile', [ProfileController::class, 'deleteProfile'])->middleware('user.admin')->name('api-v2-delete-profile');
         });
 
-        Route::prefix('system')->group(function () {
+        Route::prefix('system')->middleware('user.verified')->group(function () {
             Route::prefix('notifications')->group(function () {
                 Route::get('/retrieve-notification-by-facility', [NotificationController::class, 'retrieveNotificationsByFacility'])->name('api-v2-retrieve-notifications-by-facility');
                 Route::get('/retrieve-notification-count-by-facility', [NotificationController::class, 'retrieveNotificationsCountByFacility'])->name('api-v2-retrieve-notifications-count-by-facility');
                 Route::post('/add-notification', [NotificationController::class, 'addNotification'])->name('api-v2-add-notification');
                 Route::post('/mark-notification-as-read', [NotificationController::class, 'markNotificationAsRead'])->name('api-v2-mark-notification-as-read');
-                Route::post('/delete-notification', [NotificationController::class, 'deleteNotification'])->name('api-v2-delete-notification');
+
+                // deletion functionality
+                Route::post('/delete-notification', [NotificationController::class, 'deleteNotification'])->middleware('user.admin')->name('api-v2-delete-notification');
             });
         });
 
-        Route::prefix('forms')->group(function () {
+        Route::prefix('forms')->middleware('user.verified')->group(function () {
             Route::prefix('/general')->group(function () {
                 Route::get('/retrieve-all-forms', [GeneralDataController::class, 'retrieveAllForms'])->name('api-v2-retrieve-all-forms');
                 Route::get('/retrieve-recently-uploaded-forms', [GeneralDataController::class, 'retrieveRecentlyUploadedForms'])->name('api-v2-retrieve-recently-uploaded-formsg');
@@ -397,13 +423,14 @@ Route::prefix('v2')->group(function () {
                 Route::get('/retrieve-patient-risk-assessment', [PhilpenRiskDataController::class, 'retrievePatientRiskAssessment'])->name('api-v2-retrieve-patient-risk-assessment');
                 Route::get('/retrieve-patient-risk-profile-by-facility', [PhilpenRiskDataController::class, 'retrievePatientRiskProfileByFacility'])->name('api-v2-retrieve-patient-risk-profile-by-facility');
                 Route::get('/retrieve-patient-risk-profile', [PhilpenRiskDataController::class, 'retrievePatientRiskProfileWithoutFacility'])->name('api-v2-retrieve-patient-risk-profile-without-facility');
-
                 Route::post('/add-risk-profile', [PhilpenRiskDataController::class, 'addRiskProfile'])->name('api-v2-add-risk-profile');
                 Route::post('/add-risk-form', [PhilpenRiskDataController::class, 'addRiskForm'])->name('api-v2-add-risk-form');
                 Route::post('/update-risk-profile', [PhilpenRiskDataController::class, 'updateRiskProfile'])->name('api-v2-update-risk-profile');
                 Route::post('/update-risk-form', [PhilpenRiskDataController::class, 'updateRiskForm'])->name('api-v2-update-risk-form');
-                Route::post('/delete-risk-profile', [PhilpenRiskDataController::class, 'deleteRiskProfile'])->name('api-v2-delete-risk-profile');
-                Route::post('/delete-risk-form', [PhilpenRiskDataController::class, 'deleteRiskForm'])->name('api-v2-delete-risk-form');
+
+                // deletion functionalities
+                Route::post('/delete-risk-profile', [PhilpenRiskDataController::class, 'deleteRiskProfile'])->middleware('user.admin')->name('api-v2-delete-risk-profile');
+                Route::post('/delete-risk-form', [PhilpenRiskDataController::class, 'deleteRiskForm'])->middleware('user.admin')->name('api-v2-delete-risk-form');
             });
 
             // Forms - General PCH Risk Assessment Routes
@@ -412,13 +439,14 @@ Route::prefix('v2')->group(function () {
                 Route::get('/pch-retrieve-patient-risk-assessment', [PchRiskDataController::class, 'retrievePchRiskAssessmentForm'])->name('api-v2-retrieve-pch-risk-assessment');
                 Route::get('/pch-retrieve-patient-risk-profile-by-facility', [PchRiskDataController::class, 'retrievePchRiskProfileByFacility'])->name('api-v2-retrieve-pch-risk-profile-by-facility');
                 Route::get('/pch-retrieve-patient-risk-profile', [PchRiskDataController::class, 'retrievePchRiskProfileWithoutFacility'])->name('api-v2-retrieve-pch-risk-profile-without-facility');
-
                 Route::post('/pch-add-risk-profile', [PchRiskDataController::class, 'addPchRiskProfile'])->name('api-v2-add-pch-risk-profile');
                 Route::post('/pch-add-risk-form', [PchRiskDataController::class, 'addPchRiskForm'])->name('api-v2-add-pch-risk-form');
                 Route::post('/pch-update-risk-profile', [PchRiskDataController::class, 'updatePchRiskProfile'])->name('api-v2-update-pch-risk-profile');
                 Route::post('/pch-update-risk-form', [PchRiskDataController::class, 'updatePchRiskForm'])->name('api-v2-update-pch-risk-form');
-                Route::post('/pch-delete-risk-profile', [PchRiskDataController::class, 'deletePchRiskProfile'])->name('api-v2-delete-pch-risk-profile');
-                Route::post('/pch-delete-risk-form', [PchRiskDataController::class, 'deletePchRiskForm'])->name('api-v2-delete-pch-risk-form');
+
+                // deletion functionalities
+                Route::post('/pch-delete-risk-profile', [PchRiskDataController::class, 'deletePchRiskProfile'])->middleware('user.admin')->name('api-v2-delete-pch-risk-profile');
+                Route::post('/pch-delete-risk-form', [PchRiskDataController::class, 'deletePchRiskForm'])->middleware('user.admin')->name('api-v2-delete-pch-risk-form');
             });
 
             // Forms - Patient Injury Routes
@@ -427,14 +455,14 @@ Route::prefix('v2')->group(function () {
                 Route::get('/retrieve-patient-injury-preadmission-data', [PatientInjuryDataController::class, 'retrievePatientInjuryPreadmissionData'])->name('api-v2-retrieve-patient-injury-preadmission-data');
                 Route::get('/retrieve-patient-injury-data-by-facility', [PatientInjuryDataController::class, 'retrievePatientInjuryGeneralDataByFacility'])->name('api-v2-retrieve-patient-injury-data-by-facility');
                 Route::get('/retrieve-patient-injury-data-without-facility', [PatientInjuryDataController::class, 'retrievePatientInjuryGeneralDataWithoutFacility'])->name('api-v2-retrieve-patient-injury-data-without-facility');
-
                 Route::post('/patient-injury-add-general-data', [PatientInjuryDataController::class, 'addPatientInjuryGeneralData'])->name('api-v2-add-patient-injury-general-data');
                 Route::post('/patient-injury-add-preadmission-data', [PatientInjuryDataController::class, 'addPatientInjuryPreadmissionData'])->name('api-v2-add-patient-injury-preadmission-data');
-
                 Route::post('/patient-injury-update-general-data', [PatientInjuryDataController::class, 'updatePatientInjuryGeneralData'])->name('api-v2-update-patient-injury-general-data');
                 Route::post('/patient-injury-update-preadmission-data', [PatientInjuryDataController::class, 'updatePatientInjuryPreadmissionData'])->name('api-v2-update-patient-injury-preadmission-data');
-                Route::post('/patient-injury-delete-general-data', [PatientInjuryDataController::class, 'deletePatientInjuryGeneralData'])->name('api-v2-delete-patient-injury-general-data');
-                Route::post('/patient-injury-delete-preadmission-data', [PatientInjuryDataController::class, 'deletePatientInjuryPreadmissionData'])->name('api-v2-delete-patient-injury-preadmission-data');
+
+                // deletion functionalities
+                Route::post('/patient-injury-delete-general-data', [PatientInjuryDataController::class, 'deletePatientInjuryGeneralData'])->middleware('user.admin')->name('api-v2-delete-patient-injury-general-data');
+                Route::post('/patient-injury-delete-preadmission-data', [PatientInjuryDataController::class, 'deletePatientInjuryPreadmissionData'])->middleware('user.admin')->name('api-v2-delete-patient-injury-preadmission-data');
             });
         });
     });

@@ -15,31 +15,9 @@ use Exception;
 
 class AdministrativeAnalyticsDataController extends Controller
 {
-    // Get authenticated user or return unauthorized response
-    private function getAuthenticatedUser(?string $username): JsonResponse|User
-    {
-        $user = User::where('username', $username)
-            ->whereIn('user_priv', [1, 3, 5, 10])
-            ->where('verified', 1)
-            ->first();
-
-        if (!$user) {
-            Log::error('Denied administrative access for: ' . ($username ?? "unknown"));
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        return $user;
-    }
-
     // ================== GENERAL CONTROLLERS (/admin_analytics) ==================
     public function countNumberOfEntriesPerByUserPerFacility(Request $request): JsonResponse
     {
-        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-
-        if ($admin instanceof JsonResponse) {
-            return $admin;
-        }
-
         try {
             $hf = UserHealthFacility::where('user_id', $request->user()->getAttribute('id'))->first();
             if (!$hf) {
@@ -78,9 +56,9 @@ class AdministrativeAnalyticsDataController extends Controller
 
             $entriesWithNames = $entries->map(function ($entry) use ($users) {
                 $user = $users->get($entry->id);
-                $entry->fname = $user->fname ?? null;
-                $entry->mname = $user->mname ?? null;
-                $entry->lname = $user->lname ?? null;
+                $entry->fname = $user?->getAttribute('fname');
+                $entry->mname = $user?->getAttribute('mname');
+                $entry->lname = $user?->getAttribute('lname');
                 return $entry;
             });
 

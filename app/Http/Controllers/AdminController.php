@@ -14,47 +14,9 @@ use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
-    // function used in getting authenticated admins
-    private function getAuthenticatedAdmin(?string $username): JsonResponse|User
-    {
-        $queryUser = User::where('username', '=', $username)->first();
-
-        if (!$queryUser || $queryUser->getAttribute('user_priv') !== 1 || $queryUser->getAttribute('verified') !== 1) {
-            Log::error('Denied administrative access for: ' . $queryUser->getAttribute('id'));
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        return $queryUser;
-    }
-
-    // function used in getting authenticated users
-    private function getAuthenticatedUser(?string $username): JsonResponse|User
-    {
-        $queryUser = User::where('username', '=', $username)->first();
-
-        if (
-            !$queryUser ||
-            !in_array($queryUser->getAttribute('user_priv'), [1, 3, 5, 10]) ||
-            $queryUser->getAttribute('verified') !== 1
-        ) {
-            Log::error('Denied administrative access for: ' . ($queryUser->getAttribute('id') ?? 'unknown'));
-            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-        }
-
-        return $queryUser;
-    }
-
-
     // register a user
     public function registerUser(Request $request): JsonResponse
     {
-        // Ensure the user is authenticated via Sanctum
-        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-
-        if ($admin instanceof JsonResponse) {
-            return $admin; // Return the unauthorized response
-        }
-
         // Validate the input
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
@@ -132,12 +94,6 @@ class AdminController extends Controller
     // reset a user's password
     public function resetUserPassword(Request $request): JsonResponse
     {
-        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-
-        if ($admin instanceof JsonResponse) {
-            return $admin; // Return the unauthorized response
-        }
-
         // Validate the input
         $validator = Validator::make($request->all(), [
             'fields' => 'required|array',
@@ -182,12 +138,6 @@ class AdminController extends Controller
     // verify a user
     public function verifyUser(Request $request): JsonResponse
     {
-        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-
-        if ($admin instanceof JsonResponse) {
-            return $admin; // Return the unauthorized response
-        }
-
         // Validate the input
         $validator = Validator::make($request->all(), [
             'fields.user_id' => 'required|integer',
@@ -225,12 +175,6 @@ class AdminController extends Controller
     // unverify a user
     public function unverifyUser(Request $request): JsonResponse
     {
-        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-
-        if ($admin instanceof JsonResponse) {
-            return $admin; // Return the unauthorized response
-        }
-
         // Validate the input
         $validator = Validator::make($request->all(), [
             'fields.user_id' => 'required|integer',
@@ -268,12 +212,6 @@ class AdminController extends Controller
     // list unverified users
     public function listUnverifiedUsers(Request $request): JsonResponse
     {
-        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-
-        if ($admin instanceof JsonResponse) {
-            return $admin; // Return the unauthorized response
-        }
-
         try {
             $users = User::where('verified', 0)
                 ->select(['id', 'fname', 'mname', 'lname', 'username', 'user_priv'])
@@ -297,12 +235,6 @@ class AdminController extends Controller
     // list all users, verified or not (priv 1)
     public function listAllUsers(Request $request): JsonResponse
     {
-        $admin = $this->getAuthenticatedAdmin($request->user()->getAttribute('username'));
-
-        if ($admin instanceof JsonResponse) {
-            return $admin; // Return the unauthorized response
-        }
-
         try {
             $users = User::select(['id', 'fname', 'mname', 'lname', 'username', 'user_priv', 'verified', 'created_at'])
                 ->orderBy('created_at', 'desc')
@@ -324,11 +256,7 @@ class AdminController extends Controller
 
     public function listAllUsersByFacility(Request $request): JsonResponse
     {
-        $admin = $this->getAuthenticatedUser($request->user()->getAttribute('username'));
-
-        if ($admin instanceof JsonResponse) {
-            return $admin; // Return unauthorized
-        }
+        $admin = $request->user();
 
         try {
             // Only allow access if user_priv is 3, 5, or 10
