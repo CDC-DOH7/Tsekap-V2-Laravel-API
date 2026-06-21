@@ -15,60 +15,60 @@ return new class extends Migration
         try {
             Schema::create('pch_risk_assessment_tool_profile', function (Blueprint $table) {
                 // profile metadata
-                $table->increments('id');
-                $table->unsignedInteger('profile_id')->nullable();
-                $table->unsignedInteger('facility_id_updated');
-                $table->unsignedInteger('encoded_by')->index();
-                $table->tinyInteger('offline_entry')->default(0);
+                $table->increments('id'); // id
+                $table->unsignedInteger('profile_id')->nullable(); // profile_id
+                $table->unsignedInteger('facility_id_updated'); // facility_id_updated
+                $table->unsignedInteger('encoded_by')->index(); // encoded_by
+                $table->tinyInteger('offline_entry')->default(0); // offline_entry
 
                 // profile and personal information
-                $table->string('prefix', 15)->nullable();
-                $table->string('lname', 255);
-                $table->string('fname', 255);
-                $table->string('mname', 255)->nullable();
-                $table->string('suffix', 15)->nullable();
-                $table->string('sex', 10);
-                $table->date('dob');
-                $table->unsignedInteger('age');
-                $table->unsignedInteger('age_bracket_id');
-                $table->text('birth_place')->nullable();
-                $table->string('civil_status', 20);
-                $table->string('educational_attainment', 50);
-                $table->string('employment_status', 50);
-                $table->string('occupation', 255)->nullable();
-                $table->string('monthly_income', 50)->nullable();
-                $table->string('religion', 50)->nullable();
-                $table->string('other_religion', 255)->nullable();
-                $table->string('indigenous', 50)->nullable();
-                $table->string('blood_type', 5)->nullable();
-                $table->string('mother_fname', 255);
-                $table->string('mother_mname', 255)->nullable();
-                $table->string('mother_lname', 255);
-                $table->date('mother_dob');
+                $table->string('prefix', 15)->nullable(); // prefix
+                $table->string('lname', 255); // lname
+                $table->string('fname', 255); // fname
+                $table->string('mname', 255)->nullable(); // mname
+                $table->string('suffix', 15)->nullable(); // suffix
+                $table->string('sex', 10); // sex
+                $table->date('dob'); // dob
+                $table->unsignedInteger('age'); // age
+                $table->unsignedInteger('age_bracket_id'); // age_bracket_id
+                $table->text('birth_place')->nullable(); // birth_place
+                $table->string('civil_status', 20); // civil_status
+                $table->string('educational_attainment', 50); // educational_attainment
+                $table->string('employment_status', 50); // employment_status
+                $table->string('occupation', 255)->nullable(); // occupation
+                $table->string('monthly_income', 50)->nullable(); // monthly_income
+                $table->string('religion', 50)->nullable(); // religion
+                $table->string('other_religion', 255)->nullable(); // other_religion
+                $table->string('indigenous', 50)->nullable(); // indigenous
+                $table->string('blood_type', 5)->nullable(); // blood_type
+                $table->string('mother_fname', 255); // mother_fname
+                $table->string('mother_mname', 255)->nullable(); // mother_mname
+                $table->string('mother_lname', 255); // mother_lname
+                $table->date('mother_dob'); // mother_dob
 
                 // location fields with foreign keys
-                $table->unsignedInteger('country_id');
-                $table->unsignedInteger('region_id');
-                $table->unsignedInteger('province_id');
-                $table->unsignedInteger('muncity_id');
-                $table->unsignedInteger('barangay_id');
+                $table->unsignedInteger('country_id'); // country_id
+                $table->unsignedInteger('region_id'); // region_id
+                $table->unsignedInteger('province_id'); // province_id
+                $table->unsignedInteger('muncity_id'); // muncity_id
+                $table->unsignedInteger('barangay_id'); // barangay_id
 
-                $table->text('number_or_street_name')->nullable();
-                $table->unsignedInteger('zip_code');
-                $table->string('email_address', 100)->nullable();
-                $table->string('mobile_number', 25)->nullable();
-                $table->string('landline_number', 25)->nullable();
+                $table->text('number_or_street_name')->nullable(); // number_or_street_name
+                $table->unsignedInteger('zip_code'); // zip_code
+                $table->string('email_address', 100)->nullable(); // email_address 
+                $table->string('mobile_number', 25)->nullable(); // mobile_number
+                $table->string('landline_number', 25)->nullable(); // landline_number
 
-                $table->string('family_member', 50)->nullable();
-                $table->string('dswd_nhts_member', 15)->nullable();
-                $table->string('four_ps_member', 15)->nullable();
-                $table->string('facility_household_number', 50)->nullable();
-                $table->string('family_serial_number', 50)->nullable();
-                $table->string('philhealth_member', 25)->nullable();
-                $table->string('philhealth_membership_type', 255)->nullable();
-                $table->string('philhealth_number', 50)->nullable();
-                $table->string('philhealth_category', 25)->nullable();
-                $table->string('pcb_eligible', 25)->nullable();
+                $table->string('family_member', 50)->nullable(); // family_member
+                $table->string('dswd_nhts_member', 15)->nullable(); // dswd_nhts_member
+                $table->string('four_ps_member', 15)->nullable(); // four_ps_member
+                $table->string('facility_household_number', 50)->nullable(); // facility_household_number
+                $table->string('family_serial_number', 50)->nullable(); // family_serial_number
+                $table->string('philhealth_member', 25)->nullable(); // philhealth_member
+                $table->string('philhealth_membership_type', 255)->nullable(); // philhealth_membership_type
+                $table->string('philhealth_number', 50)->nullable(); // philhealth_number
+                $table->string('philhealth_category', 25)->nullable(); // philhealth_category
+                $table->string('pcb_eligible', 25)->nullable(); // pcb_eligible
 
                 // system metadata
                 $table->timestamps();
