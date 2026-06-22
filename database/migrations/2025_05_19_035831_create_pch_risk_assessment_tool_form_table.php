@@ -186,12 +186,12 @@ return new class extends Migration
                 $table->boolean('mngt_2_counseling_on_tobacco_cessation')->nullable(); // mngt_2_counseling_on_tobacco_cessation
                 $table->boolean('mngt_2_counseling_on_harmful_use_of_alcohol')->nullable(); // mngt_2_counseling_on_harmful_use_of_alcohol
                 $table->boolean('medications_anti_hypertension')->nullable(); // medications_anti_hypertension
-                $table->boolean('medications_yes_anti_hypertension_out_of_pocket')->nullable(); // medications_yes_anti_hypertension_out_of_pocket
+                $table->boolean('medications_yes_anti_hypertension_out_of_pkt')->nullable(); // medications_yes_anti_hypertension_out_of_pkt
                 $table->boolean('medications_yes_anti_hypertension_both_pbf_and_oop')->nullable(); // medications_yes_anti_hypertension_both_pbf_and_oop
-                $table->boolean('medications_yes_anti_hypertension_provided_by_facility')->nullable(); // medications_yes_anti_hypertension_provided_by_facility
+                $table->boolean('medications_yes_anti_hypertension_provided')->nullable(); // medications_yes_anti_hypertension_provided
                 $table->boolean('medications_oral_hypoglycemic_agents_or_insulin')->nullable(); // medications_oral_hypoglycemic_agents_or_insulin
-                $table->boolean('medications_yes_oral_hypoglycemic_agents_or_insulin_provided_by_facility')->nullable(); // medications_yes_oral_hypoglycemic_agents_or_insulin_provided_by_facility
-                $table->boolean('medications_yes_oral_hypoglycemic_agents_or_insulin_out_of_pocket')->nullable(); // medications_yes_oral_hypoglycemic_agents_or_insulin_out_of_pocket
+                $table->boolean('medications_yes_oral_hypoglycemic_agents_or_insulin_provided')->nullable(); // medications_yes_oral_hypoglycemic_agents_or_insulin_provided
+                $table->boolean('medications_yes_oral_hypoglycemic_agents_or_insulin_out_of_pkt')->nullable(); // medications_yes_oral_hypoglycemic_agents_or_insulin_out_of_pkt
                 $table->boolean('medications_oral_hypoglycemic_agents_or_insulin_both_pbf_and_oop')->nullable(); // medications_oral_hypoglycemic_agents_or_insulin_both_pbf_and_oop
                 $table->date('risk_assessment_ii_date_of_follow_up')->nullable(); // risk_assessment_ii_date_of_follow_up
                 $table->string('physicians_name_risk_assessment_pt_ii', 255)->nullable(); // physicians_name_risk_assessment_pt_ii
@@ -270,7 +270,7 @@ return new class extends Migration
                 $table->boolean('animal_bite_type_of_exposure_punctured_wounds')->nullable(); // animal_bite_type_of_exposure_punctured_wounds
                 $table->boolean('animal_bite_type_of_exposure_lacerations')->nullable(); // animal_bite_type_of_exposure_lacerations
                 $table->boolean('animal_bite_type_of_exposure_avulsions')->nullable(); // animal_bite_type_of_exposure_avulsions
-                $table->boolean('animal_bite_type_of_exposure_scratches_abrasions_with_spontaneous_bleeding')->nullable(); // animal_bite_type_of_exposure_scratches_abrasions_with_spontaneous_bleeding
+                $table->boolean('animal_bite_type_of_exposure_scratches_abrasions_w_sponti_bleed')->nullable(); // animal_bite_type_of_exposure_scratches_abrasions_w_sponti_bleed
                 $table->boolean('animal_bite_wash_bite')->nullable(); // animal_bite_wash_bite
                 $table->date('animal_bite_date_of_exposure')->nullable(); // animal_bite_date_of_exposure
                 $table->string('animal_bite_name_of_accompanying_adult', 100)->nullable();
@@ -288,10 +288,11 @@ return new class extends Migration
                 $table->boolean('geriatric_urinary_incontinence_counsel_specify')->nullable(); // geriatric_urinary_incontinence_counsel_specify
                 $table->string('geriatric_urinary_incontinence_refer_to_physician_specify', 100)->nullable(); // geriatric_urinary_incontinence_refer_to_physician_specify
                 $table->boolean('geriatric_physical_function_capacity')->nullable(); // geriatric_physical_function_capacity
-                $table->boolean('geriatric_physical_function_capacity_refer_to_physician_specify')->nullable(); // geriatric_physical_function_capacity_refer_to_physician
+                $table->string('geriatric_physical_function_capacity_refer_to_physician_specify', 100)->nullable(); // geriatric_physical_function_capacity_refer_to_physician
                 $table->boolean('geriatric_memory_2')->nullable(); // geriatric_memory_2
+                $table->string('geriatric_memory_2_refer_to_physician_specify', 100)->nullable(); // geriatric_memory_2_refer_to_physician_specify
                 $table->boolean('geriatric_fall')->nullable(); // geriatric_fall
-                $table->boolean('geriatric_fall_refer_to_physician_specify')->nullable(); // geriatric_fall_refer_to_physician_specify
+                $table->string('geriatric_fall_refer_to_physician_specify', 100)->nullable(); // geriatric_fall_refer_to_physician_specify
                 $table->unsignedInteger('geriatric_risk_for_falls_seconds')->nullable(); // geriatric_risk_for_falls_seconds
                 $table->text('geriatric_risk_for_falls_seconds_indication')->nullable(); // geriatric_risk_for_falls_seconds_indication
                 $table->unsignedInteger('geriatric_risk_for_falls_inches')->nullable(); // geriatric_risk_for_falls_inches
@@ -300,12 +301,12 @@ return new class extends Migration
                 $table->text('geriatric_nutrition_cm_indication')->nullable(); // geriatric_nutrition_cm_indication
                 $table->text('geriatric_hearing_test_r_ear_indication')->nullable(); // geriatric_hearing_test_r_ear_indication
                 $table->text('geriatric_hearing_test_l_ear_indication')->nullable(); // geriatric_hearing_test_l_ear_indication
-                $table->text('geriatric_hearing_test_refer_to_physician_specify')->nullable(); // geriatric_hearing_test_refer_to_physician_specify
+                $table->string('geriatric_hearing_test_refer_to_physician_specify', 100)->nullable(); // geriatric_hearing_test_refer_to_physician_specify
                 $table->text('geriatric_vision_test_unaided_r_eye')->nullable(); // geriatric_vision_test_unaided_r_eye
                 $table->text('geriatric_vision_test_unaided_l_eye')->nullable(); // geriatric_vision_test_unaided_l_eye
                 $table->text('geriatric_vision_test_aided_r_eye')->nullable(); // geriatric_vision_test_aided_r_eye
                 $table->text('geriatric_vision_test_aided_l_eye')->nullable(); // geriatric_vision_test_aided_l_eye
-                $table->text('geriatric_vision_refer_to_opthalmologist_specify')->nullable(); // geriatric_vision_refer_to_opthalmologist_specify
+                $table->string('geriatric_vision_refer_to_opthalmologist_specify', 100)->nullable(); // geriatric_vision_refer_to_opthalmologist_specify
                 $table->text('geriatric_summary_of_findings_counsel')->nullable(); // geriatric_summary_of_findings_counsel
                 $table->date('geriatric_summary_of_findings_date_of_return_visit')->nullable(); // geriatric_summary_of_findings_date_of_return_visit
                 $table->text('geriatric_summary_of_findings_refer_to_a_physician')->nullable(); // geriatric_summary_of_findings_refer_to_a_physician
