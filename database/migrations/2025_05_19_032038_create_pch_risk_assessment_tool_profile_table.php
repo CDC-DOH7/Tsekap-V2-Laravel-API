@@ -71,7 +71,7 @@ return new class extends Migration
                 $table->string('pcb_eligible', 25)->nullable(); // pcb_eligible
 
                 // system metadata
-                $table->timestamps();
+                $table->timestamps(); // created_at and updated_at
 
                 // foreign key constraints
                 $table->foreign('profile_id')->references('id')->on('profile');
