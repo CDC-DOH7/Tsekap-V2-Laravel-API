@@ -699,8 +699,8 @@ class DataController extends Controller
 
             // other identifiers and membership information
             'fields.family_member' => 'sometimes|nullable|string|max:50',
-            'fields.dswd_nhts_member' => 'sometimes|nullable|string|max:15',
-            'fields.four_ps_member' => 'sometimes|nullable|string|max:15',
+            'fields.dswd_nhts_member' => 'sometimes|nullable|boolean',
+            'fields.four_ps_member' => 'sometimes|nullable|boolean',
             'fields.facility_household_number' => 'sometimes|nullable|string|max:50',
             'fields.family_serial_number' => 'sometimes|nullable|string|max:50',
             'fields.philhealth_member' => 'sometimes|nullable|string|max:25',
@@ -1230,8 +1230,8 @@ class DataController extends Controller
             'fields.mobile_number' => 'sometimes|nullable|string|max:25',
             'fields.landline_number' => 'sometimes|nullable|string|max:25',
             'fields.family_member' => 'sometimes|nullable|string|max:50',
-            'fields.dswd_nhts_member' => 'sometimes|nullable|string|max:15',
-            'fields.four_ps_member' => 'sometimes|nullable|string|max:15',
+            'fields.dswd_nhts_member' => 'sometimes|nullable|boolean',
+            'fields.four_ps_member' => 'sometimes|nullable|boolean',
             'fields.facility_household_number' => 'sometimes|nullable|string|max:50',
             'fields.family_serial_number' => 'sometimes|nullable|string|max:50',
             'fields.philhealth_member' => 'sometimes|nullable|string|max:25',

@@ -61,8 +61,8 @@ return new class extends Migration
 
                 // other identifiers and membership information
                 $table->string('family_member', 50)->nullable(); // family_member
-                $table->string('dswd_nhts_member', 15)->nullable(); // dswd_nhts_member
-                $table->string('four_ps_member', 15)->nullable(); // four_ps_member
+                $table->boolean('dswd_nhts_member')->nullable(); // dswd_nhts_member
+                $table->boolean('four_ps_member')->nullable(); // four_ps_member
                 $table->string('facility_household_number', 50)->nullable(); // facility_household_number
                 $table->string('family_serial_number', 50)->nullable(); // family_serial_number
                 $table->string('philhealth_member', 25)->nullable(); // philhealth_member
