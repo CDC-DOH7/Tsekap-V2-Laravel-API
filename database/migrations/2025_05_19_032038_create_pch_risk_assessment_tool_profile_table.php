@@ -19,7 +19,7 @@ return new class extends Migration
                 $table->unsignedInteger('profile_id')->nullable(); // profile_id [FOREIGN_KEY]
                 $table->unsignedInteger('facility_id_updated'); // facility_id_updated
                 $table->unsignedInteger('encoded_by')->index(); // encoded_by
-                $table->tinyInteger('offline_entry')->default(0); // offline_entry
+                $table->boolean('offline_entry')->default(false); // offline_entry
 
                 // profile and personal information
                 $table->string('prefix', 15)->nullable(); // prefix
