@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm;
 
 use Exception;
+use Illuminate\Support\Arr;
 use App\Models\User;
 use App\Models\TsekapV2\UserHealthFacility;
 use App\Models\TsekapV2\Facilities;
@@ -134,9 +135,10 @@ class DataController extends Controller
                 ];
 
                 if ($filter === 'dob') {
-                    // Parse keyword as date
-                    $parsedDate = date('Y-m-d', strtotime($keyword));
-                    $q->where($columns['dob'], $parsedDate);
+                    $parsedDate = strtotime($keyword);
+                    if ($parsedDate !== false) {
+                        $q->where($columns['dob'], date('Y-m-d', $parsedDate));
+                    }
                 } elseif (isset($columns[$filter])) {
                     $q->where($columns[$filter], 'like', "%$keyword%");
                 } else {
@@ -235,9 +237,10 @@ class DataController extends Controller
                 ];
 
                 if ($filter === 'dob') {
-                    // Parse keyword as date
-                    $parsedDate = date('Y-m-d', strtotime($keyword));
-                    $q->where($columns['dob'], $parsedDate);
+                    $parsedDate = strtotime($keyword);
+                    if ($parsedDate !== false) {
+                        $q->where($columns['dob'], date('Y-m-d', $parsedDate));
+                    }
                 } elseif (isset($columns[$filter])) {
                     $q->where($columns[$filter], 'like', "%$keyword%");
                 } else {
@@ -284,6 +287,9 @@ class DataController extends Controller
             'ar_agitated_behavior',
             'ar_eye_injury',
             'ar_severe_injuries',
+            'ar_refer_physician_name',
+            'ar_refer_reason',
+            'ar_refer_facility',
 
             'pmh_hypertension',
             'pmh_heart_disease',
@@ -391,7 +397,7 @@ class DataController extends Controller
             'fields.citizenship' => 'required|string|max:50',
             'fields.other_citizenship' => 'nullable|string|max:50',
             'fields.indigenous_person' => 'required|string|max:8',
-            'fields.employment_status' => 'required|string|max:50',
+            'fields.employment_status' => 'required|string|max:25',
             'fields.facility_id_updated' => 'required|integer',
             'fields.encoded_by' => 'required|integer',
             'fields.offline_entry' => 'required|boolean',
@@ -482,6 +488,9 @@ class DataController extends Controller
             'fields.ar_agitated_behavior' => 'required|string|max:8',
             'fields.ar_eye_injury' => 'required|string|max:8',
             'fields.ar_severe_injuries' => 'required|string|max:8',
+            'fields.ar_refer_physician_name' => 'nullable|string',
+            'fields.ar_refer_reason' => 'nullable|string',
+            'fields.ar_refer_facility' => 'nullable|string',
 
             // pmh
             'fields.pmh_hypertension' => 'required|string|max:8',
@@ -555,7 +564,7 @@ class DataController extends Controller
             'fields.mngm_med_diabetes_options' => 'nullable|string|max:50',
             'fields.mngm_med_diabetes_specify' => 'nullable|string|max:255',
             'fields.mngm_date_follow_up' => 'nullable|date',
-            'fields.mngm_remarks' => 'nullable|string|max:255',
+            'fields.mngm_remarks' => 'nullable|string',
 
             // offline entry field
             'fields.offline_entry' => 'required|boolean',
@@ -589,7 +598,7 @@ class DataController extends Controller
             $riskform->save();
             return response()->json(['message' => 'Entry successfully saved.'], 200);
         } catch (Exception $e) {
-            Log::error('An error has occurred in adding of risk form: ' + $e->getMessage());
+            Log::error('An error has occurred in adding of risk form: ' . $e->getMessage());
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
@@ -647,8 +656,8 @@ class DataController extends Controller
         }
 
         try {
-            // Update the RiskProfile with new data
-            $riskprofile->update($fields);
+            // Update the RiskProfile with new data (exclude id to prevent PK mutation)
+            $riskprofile->update(Arr::except($fields, ['id']));
             return response()->json(['message' => 'Profile successfully updated.'], 200);
         } catch (Exception $e) {
             Log::error('Error updating risk profile: ' . $e->getMessage(), ['exception' => $e]);
@@ -679,6 +688,9 @@ class DataController extends Controller
             'fields.ar_agitated_behavior' => 'sometimes|string|max:8',
             'fields.ar_eye_injury' => 'sometimes|string|max:8',
             'fields.ar_severe_injuries' => 'sometimes|string|max:8',
+            'fields.ar_refer_physician_name' => 'sometimes|nullable|string',
+            'fields.ar_refer_reason' => 'sometimes|nullable|string',
+            'fields.ar_refer_facility' => 'sometimes|nullable|string',
 
             // pmh
             'fields.pmh_hypertension' => 'sometimes|string|max:8',
@@ -752,7 +764,7 @@ class DataController extends Controller
             'fields.mngm_med_diabetes_options' => 'sometimes|nullable|string|max:50',
             'fields.mngm_med_diabetes_specify' => 'sometimes|nullable|string|max:255',
             'fields.mngm_date_follow_up' => 'sometimes|nullable|date',
-            'fields.mngm_remarks' => 'sometimes|nullable|string|max:255',
+            'fields.mngm_remarks' => 'sometimes|nullable|string',
 
             // offline entry field
             'fields.offline_entry' => 'sometimes|boolean',
@@ -773,8 +785,8 @@ class DataController extends Controller
         }
 
         try {
-            // Update the RiskFormAssessment with new data
-            $riskform->update($fields);
+            // Update the RiskFormAssessment with new data (exclude lookup key to prevent FK mutation)
+            $riskform->update(Arr::except($fields, ['risk_profile_id']));
             return response()->json(['message' => 'Risk form successfully updated.'], 200);
         } catch (Exception $e) {
             Log::error('Error updating risk form: ' . $e->getMessage(), ['exception' => $e]);
@@ -824,9 +836,6 @@ class DataController extends Controller
         }
 
         $id = $request->input('fields.risk_profile_id');
-
-        // Ensure the user is authenticated via Sanctum
-        $user = $request->user(); // This replaces Auth::check()
 
         try {
             $riskForm = RiskAssessmentForm::where('risk_profile_id', '=', $id)->first();

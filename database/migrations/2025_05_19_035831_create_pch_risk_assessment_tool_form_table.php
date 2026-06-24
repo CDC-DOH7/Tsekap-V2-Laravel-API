@@ -24,18 +24,18 @@ return new class extends Migration
                 $table->string('vit_bp_1st_reading', 10); // vit_bp_1st_reading
                 $table->string('vit_bp_2nd_reading', 10); // vit_bp_2nd_reading
                 $table->string('vit_bp_3rd_reading', 10); // vit_bp_3rd_reading
-                $table->string('vit_bp_average_2nd_to_3rd_reading', 10); // vit_bp_aveage_2nd_to_3rd_reading
-            
-                $table->unsignedInteger('vit_oxygen_saturation'); // vit_oxygen_saturation
-                $table->unsignedInteger('vit_heart_rate_or_pulse_rate'); // vit_heart_rate_or_pulse_rate
+                $table->string('vit_bp_average_2nd_to_3rd_reading', 10); // vit_bp_average_2nd_to_3rd_reading
+
+                $table->string('vit_oxygen_saturation'); // vit_oxygen_saturation
+                $table->string('vit_heart_rate_or_pulse_rate'); // vit_heart_rate_or_pulse_rate
                 $table->boolean('vit_is_normal_rate'); // vit_is_normal_rate
                 $table->boolean('vit_is_regular_rhythm'); // vit_is_regular_rhythm
-                $table->double('vit_respiratory_rate', 10, 2); // vit_respiratory_rate
-                $table->double('vit_temperature', 10, 2); // vit_temperature
-                $table->double('vit_weight', 10, 2); // vit_weight
-                $table->double('vit_height', 10, 2); // vit_height
-                $table->double('vit_waist_circumference', 10, 2); // vit_waist_circumference 
-                $table->double('vit_bmi', 10, 2); // vit_bmi
+                $table->double('vit_respiratory_rate'); // vit_respiratory_rate
+                $table->double('vit_temperature'); // vit_temperature
+                $table->double('vit_weight'); // vit_weight
+                $table->double('vit_height'); // vit_height
+                $table->double('vit_waist_circumference'); // vit_waist_circumference 
+                $table->double('vit_bmi'); // vit_bmi
                 $table->text('vit_chief_complaint'); // vit_chief_complaint
                 $table->text('vit_history_of_present_illness_and_remarks')->nullable(); // vit_history_of_present_illness_and_remarks
 
@@ -49,7 +49,7 @@ return new class extends Migration
                 $table->boolean('comorb_high_cholesterol')->nullable(); // comorb_high_cholesterol
                 $table->boolean('comorb_high_cholesterol_if_yes_taking_medications')->nullable(); // comorb_high_cholesterol_if_yes_taking_medications
                 $table->boolean('comorb_tuberculosis')->nullable(); // comorb_tuberculosis
-                
+
                 // lifestyle fields
                 $table->boolean('lifestyle_current_smoker')->nullable(); // lifestyle_current_smoker
                 $table->boolean('lifestyle_current_smoker_if_yes_tobacco_products')->nullable(); // lifestyle_current_smoker_if_yes_tobacco_products
@@ -59,7 +59,7 @@ return new class extends Migration
                 $table->boolean('lifestyle_moderate_physical_activity_throughout_the_week')->nullable(); // lifestyle_moderate_physical_activity_throughout_the_week
                 $table->boolean('lifestyle_intake_of_fruits_and_veg_below_five_portions')->nullable(); // lifestyle_intake_of_fruits_and_veg_below_five_portions
                 $table->string('lifestyle_non_laboratory_cvd_risk_percentage_color_code', 10)->nullable(); // lifestyle_non_laboratory_cvd_risk_percentage_color_code
-                
+
                 // management fields
                 $table->boolean('mngt_counseling_on_healthy_diet')->nullable(); // mngt_counseling_on_healthy_diet
                 $table->boolean('mngt_counseling_on_physical_activity')->nullable(); // mngt_counseling_on_physical_activity
@@ -85,9 +85,9 @@ return new class extends Migration
                 $table->boolean('imm_record_child_dpt2')->nullable(); // imm_record_child_dpt2
                 $table->boolean('imm_record_child_dpt3')->nullable(); // imm_record_child_dpt3
                 $table->boolean('imm_record_child_hib1')->nullable(); // imm_record_child_hib1
-                $table->boolean('imm_record_child_hib2')->nullable();// imm_record_child_hib2
-                $table->boolean('imm_record_child_hib3')->nullable();// imm_record_child_hib3
-                $table->boolean('imm_record_child_covid19')->nullable();// imm_record_child_covid19
+                $table->boolean('imm_record_child_hib2')->nullable(); // imm_record_child_hib2
+                $table->boolean('imm_record_child_hib3')->nullable(); // imm_record_child_hib3
+                $table->boolean('imm_record_child_covid19')->nullable(); // imm_record_child_covid19
 
                 $table->boolean('imm_record_child_measles_mcv1_mr')->nullable(); // imm_record_child_measles_mcv1_mr
                 $table->boolean('imm_record_child_measles_mcv1_mmr')->nullable(); // imm_record_child_measles_mcv1_mmr
@@ -117,13 +117,13 @@ return new class extends Migration
 
                 // menstrual history fields
                 $table->boolean('menst_hist_menarche')->nullable(); // menst_hist_menarche
-                $table->double('menst_hist_age_menarche', 10, 2)->nullable(); // menst_hist_age_menarche
+                $table->double('menst_hist_age_menarche')->nullable(); // menst_hist_age_menarche
                 $table->boolean('menst_hist_menopause')->nullable(); // menst_hist_menopause
-                $table->double('menst_hist_age_menopause', 10, 2)->nullable(); // menst_hist_age_menopause
+                $table->double('menst_hist_age_menopause')->nullable(); // menst_hist_age_menopause
                 $table->unsignedInteger('menst_hist_no_of_pads_used_per_day')->nullable(); // menst_hist_no_of_pads_used_per_day
-                $table->double('menst_hist_interval_cycle_of_menstruation_in_days', 10, 2)->nullable(); // menst_hist_interval_cycle_of_menstruation_in_days
+                $table->double('menst_hist_interval_cycle_of_menstruation_in_days')->nullable(); // menst_hist_interval_cycle_of_menstruation_in_days
                 $table->text('menst_hist_birth_control_method_used')->nullable(); // menst_hist_birth_control_method_used
-                $table->double('menst_hist_onset_of_sexual_intercourse_age', 10, 2)->nullable(); // menst_hist_onset_of_sexual_intercourse_age
+                $table->double('menst_hist_onset_of_sexual_intercourse_age')->nullable(); // menst_hist_onset_of_sexual_intercourse_age
 
                 // pregnancy history fields
                 $table->unsignedInteger('preg_hist_gravidity')->nullable(); // preg_hist_gravidity
@@ -132,6 +132,8 @@ return new class extends Migration
                 $table->unsignedInteger('preg_hist_no_of_premature_pregnancy')->nullable(); // preg_hist_no_of_premature_pregnancy
                 $table->unsignedInteger('preg_hist_no_of_abortion')->nullable(); // preg_hist_no_of_abortion
                 $table->unsignedInteger('preg_hist_no_of_living_children')->nullable(); // preg_hist_no_of_living_children
+                $table->boolean('preg_hist_pre_eclampsia')->nullable(); // preg_hist_pre_eclampsia
+                $table->boolean('preg_hist_with_access_to_family_planning')->nullable(); // preg_hist_with_access_to_family_planning
 
                 // family history fields
                 $table->boolean('fam_hist_asthma')->nullable(); // fam_hist_asthma
@@ -166,15 +168,15 @@ return new class extends Migration
                 $table->string('bp_2nd_encounter_3rd_reading', 10)->nullable(); // bp_2nd_encounter_3rd_reading
                 $table->string('bp_2nd_encounter_average_2nd_to_3rd_reading', 10)->nullable(); // bp_2nd_encounter_average_2nd_to_3rd_reading
                 $table->boolean('individual_have_all_classic_symptoms_marked')->nullable(); // individual_have_all_classic_symptoms_marked
-                $table->double('urine_ketones_result', 10, 2)->nullable(); // urine_ketones_result
+                $table->double('urine_ketones_result')->nullable(); // urine_ketones_result
                 $table->date('urine_ketones_result_date_taken')->nullable(); // urine_ketones_result_date_taken
-                $table->double('total_cholesterol_result', 10, 2)->nullable(); // total_cholesterol_result
+                $table->double('total_cholesterol_result')->nullable(); // total_cholesterol_result
                 $table->date('total_cholesterol_result_date_taken')->nullable(); // total_cholesterol_result_date_taken
-                $table->double('random_plasma_glucose_result', 10, 2)->nullable(); // random_plasma_glucose_result
+                $table->double('random_plasma_glucose_result')->nullable(); // random_plasma_glucose_result
                 $table->date('random_plasma_glucose_result_date_taken')->nullable(); // random_plasma_glucose_result_date_taken
-                $table->double('fasting_plasma_glucose_result', 10, 2)->nullable(); // fasting_plasma_glucose_result
+                $table->double('fasting_plasma_glucose_result')->nullable(); // fasting_plasma_glucose_result
                 $table->date('fasting_plasma_glucose_result_date_taken')->nullable(); // fasting_plasma_glucose_result_date_taken
-                $table->double('confirmatory_fpg_result', 10, 2)->nullable(); // confirmatory_fpg_result
+                $table->double('confirmatory_fpg_result')->nullable(); // confirmatory_fpg_result
                 $table->date('confirmatory_fpg_result_date_taken')->nullable(); // confirmatory_fpg_result_date_taken
                 $table->boolean('basic_labs_for_confirmed_hypertensives_12l_ecg')->nullable(); // basic_labs_for_confirmed_hypertensives_12l_ecg
                 $table->boolean('basic_labs_for_confirmed_hypertensives_blood_test')->nullable(); // basic_labs_for_confirmed_hypertensives_blood_test
@@ -329,7 +331,7 @@ return new class extends Migration
                 $table->boolean('lab_req_complete_blood_count')->nullable(); // lab_req_complete_blood_count
                 $table->boolean('lab_req_immunology')->nullable(); // lab_req_immunology
                 $table->boolean('lab_req_sputum_microscopy')->nullable(); // lab_req_sputum_microscopy
-                
+
                 // imaging fields
                 $table->boolean('imaging_ecg')->nullable(); // imaging_ecg 
                 $table->boolean('imaging_xray')->nullable(); // imaging_xray

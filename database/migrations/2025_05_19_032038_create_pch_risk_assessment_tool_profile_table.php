@@ -15,8 +15,8 @@ return new class extends Migration
         try {
             Schema::create('pch_risk_assessment_tool_profile', function (Blueprint $table) {
                 // profile metadata
-                $table->increments('id'); // id
-                $table->unsignedInteger('profile_id')->nullable(); // profile_id
+                $table->increments('id'); // id [PRIMARY_KEY]
+                $table->unsignedInteger('profile_id')->nullable(); // profile_id [FOREIGN_KEY]
                 $table->unsignedInteger('facility_id_updated'); // facility_id_updated
                 $table->unsignedInteger('encoded_by')->index(); // encoded_by
                 $table->tinyInteger('offline_entry')->default(0); // offline_entry
@@ -31,7 +31,7 @@ return new class extends Migration
                 $table->date('dob'); // dob
                 $table->unsignedInteger('age'); // age
                 $table->unsignedInteger('age_bracket_id'); // age_bracket_id
-                $table->text('birth_place')->nullable(); // birth_place
+                $table->text('birth_place'); // birth_place
                 $table->string('civil_status', 20); // civil_status
                 $table->string('educational_attainment', 50); // educational_attainment
                 $table->string('employment_status', 50); // employment_status
@@ -46,7 +46,7 @@ return new class extends Migration
                 $table->string('mother_lname', 255); // mother_lname
                 $table->date('mother_dob'); // mother_dob
 
-                // location fields with foreign keys
+                // location fields with foreign keys and contact information
                 $table->unsignedInteger('country_id'); // country_id
                 $table->unsignedInteger('region_id'); // region_id
                 $table->unsignedInteger('province_id'); // province_id
@@ -55,17 +55,18 @@ return new class extends Migration
 
                 $table->text('number_or_street_name')->nullable(); // number_or_street_name
                 $table->unsignedInteger('zip_code'); // zip_code
-                $table->string('email_address', 100)->nullable(); // email_address 
+                $table->string('email_address', 50)->nullable(); // email_address 
                 $table->string('mobile_number', 25)->nullable(); // mobile_number
                 $table->string('landline_number', 25)->nullable(); // landline_number
 
+                // other identifiers and membership information
                 $table->string('family_member', 50)->nullable(); // family_member
                 $table->string('dswd_nhts_member', 15)->nullable(); // dswd_nhts_member
                 $table->string('four_ps_member', 15)->nullable(); // four_ps_member
                 $table->string('facility_household_number', 50)->nullable(); // facility_household_number
                 $table->string('family_serial_number', 50)->nullable(); // family_serial_number
                 $table->string('philhealth_member', 25)->nullable(); // philhealth_member
-                $table->string('philhealth_membership_type', 255)->nullable(); // philhealth_membership_type
+                $table->string('philhealth_membership_type', 50)->nullable(); // philhealth_membership_type
                 $table->string('philhealth_number', 50)->nullable(); // philhealth_number
                 $table->string('philhealth_category', 25)->nullable(); // philhealth_category
                 $table->string('pcb_eligible', 25)->nullable(); // pcb_eligible
