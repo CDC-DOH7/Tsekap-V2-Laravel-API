@@ -15,11 +15,10 @@ class RiskProfile extends Model
 {
     protected $connection = 'mysql';
     protected $table = 'risk_profile';
-    protected $guarded = array();
+    protected $guarded = [];
 
     // Attributes
     protected $fillable = [
-        'id',
         'profile_id',
         'lname',
         'fname',

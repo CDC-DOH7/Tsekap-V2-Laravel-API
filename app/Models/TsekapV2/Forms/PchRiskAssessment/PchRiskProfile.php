@@ -15,7 +15,7 @@ class PchRiskProfile extends Model
 {
     protected $connection = 'mysql';
     protected $table = 'pch_risk_assessment_tool_profile';
-    protected $guarded = array();
+    protected $guarded = [];
 
     // Attributes
     protected $fillable = [
@@ -37,8 +37,9 @@ class PchRiskProfile extends Model
         'civil_status',
         'educational_attainment',
         'employment_status',
-        'monthly_income',
         'occupation',
+
+        'monthly_income',
         'religion',
         'other_religion',
         'indigenous',
@@ -63,8 +64,8 @@ class PchRiskProfile extends Model
         'facility_household_number',
         'family_serial_number',
         'philhealth_member',
-        'philhealth_membership_type',
         'philhealth_number',
+        'philhealth_membership_type',
         'philhealth_category',
         'pcb_eligible',
         'created_at',
@@ -99,6 +100,6 @@ class PchRiskProfile extends Model
 
     public function riskForm()
     {
-        return $this->hasOne(PchRiskAssessmentForm::class, 'profile_id', 'id');
+        return $this->hasOne(PchRiskAssessmentForm::class, 'pch_profile_id', 'id');
     }
 }

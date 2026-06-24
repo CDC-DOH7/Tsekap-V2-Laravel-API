@@ -160,7 +160,7 @@ class UserController extends Controller
     }
 
     // deactivate own account
-    public function deactivateUserAccount(Request $request)
+    public function deactivateUserAccount(Request $request): JsonResponse
     {
         $authUser = $request->user();
 

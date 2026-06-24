@@ -8,7 +8,7 @@ class RiskAssessmentForm extends Model
 {
     protected $connection = 'mysql';
     protected $table = 'risk_form';
-    protected $guarded = array();
+    protected $guarded = [];
     protected $fillable = [
         'risk_profile_id',
         'ar_chest_pain',
@@ -45,27 +45,16 @@ class RiskAssessmentForm extends Model
         'pmh_thyroid_disorders',
         'pmh_kidney_disorders',
         'fmh_hypertension',
-        'fmh_side_hypertension',
         'fmh_stroke',
-        'fmh_side_stroke',
         'fmh_heart_disease',
-        'fmh_side_heart_disease',
         'fmh_diabetes_mellitus',
-        'fmh_side_diabetes_mellitus',
         'fmh_asthma',
-        'fmh_side_asthma',
         'fmh_cancer',
-        'fmh_side_cancer',
         'fmh_kidney_disease',
-        'fmh_side_kidney_disease',
         'fmh_first_degree_relative',
-        'fmh_side_coronary_disease',
         'fmh_having_tuberculosis_5_years',
-        'fmh_side_tuberculosis',
         'fmh_mn_and_s_disorder',
-        'fmh_side_m_and_s_disorder',
         'fmh_copd',
-        'fmh_side_copd',
         'rf_tobacco_use',
         'rf_alcohol_intake',
         'rf_alcohol_binge_drinker',
@@ -102,10 +91,11 @@ class RiskAssessmentForm extends Model
         'mngm_med_diabetes_specify',
         'mngm_date_follow_up',
         'mngm_remarks',
-        'offline_entry'
+        'offline_entry',
     ];
-    
-    public function risk_profile_Id(){
-        return $this->belongsTo(RiskProfile::class, "id");
+
+    public function riskProfile()
+    {
+        return $this->belongsTo(RiskProfile::class, 'risk_profile_id');
     }
 }
