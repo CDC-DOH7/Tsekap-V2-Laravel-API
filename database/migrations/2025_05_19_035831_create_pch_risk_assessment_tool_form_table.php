@@ -66,9 +66,9 @@ return new class extends Migration
                 $table->boolean('mngt_counseling_on_referred_for_bti')->nullable(); // mngt_counseling_on_referred_for_bti
                 $table->boolean('mngt_harmful_use_of_alcohol')->nullable(); // mngt_harmful_use_of_alcohol
                 $table->boolean('mngt_referred_to_pcf_for_risk_screening')->nullable(); // mngt_referred_to_pcf_for_risk_screening
-                $table->date('date_next_risk_assessment')->nullable(); // date_next_risk_assessment
 
                 // management and lifestyle metadata
+                $table->date('date_next_risk_assessment')->nullable(); // date_next_risk_assessment
                 $table->string('assessed_by', 100)->nullable(); // assessed_by
                 $table->string('verified_by', 100)->nullable(); // verified_by
 
@@ -275,9 +275,9 @@ return new class extends Migration
                 $table->boolean('animal_bite_type_of_exposure_scratches_abrasions_w_sponti_bleed')->nullable(); // animal_bite_type_of_exposure_scratches_abrasions_w_sponti_bleed
                 $table->boolean('animal_bite_wash_bite')->nullable(); // animal_bite_wash_bite
                 $table->date('animal_bite_date_of_exposure')->nullable(); // animal_bite_date_of_exposure
-                $table->string('animal_bite_name_of_accompanying_adult', 100)->nullable();
-                $table->string('animal_bite_contact_number', 25)->nullable();
-                $table->string('animal_bite_relationship_to_patient', 50)->nullable();
+                $table->string('animal_bite_name_of_accompanying_adult', 100)->nullable(); // animal_bite_name_of_accompanying_adult
+                $table->string('animal_bite_contact_number', 25)->nullable(); // animal_bite_contact_number
+                $table->string('animal_bite_relationship_to_patient', 50)->nullable(); // animal_bite_relationship_to_patient
 
                 // geriatric assessment fields
                 $table->boolean('geriatric_memory_1')->nullable(); // geriatric_memory_1
@@ -286,8 +286,8 @@ return new class extends Migration
                 $table->boolean('geriatric_medication')->nullable(); // geriatric_medication
                 $table->string('geriatric_medication_refer_to_physician_specify', 100)->nullable(); // geriatric_medication_refer_to_physician_specify
                 $table->boolean('geriatric_urinary_incontinence')->nullable(); // geriatric_urinary_incontinence
-                $table->boolean('geriatric_urinary_incontinence_symptoms_specify')->nullable(); // geriatric_urinary_incontinence_symptoms_specify
-                $table->boolean('geriatric_urinary_incontinence_counsel_specify')->nullable(); // geriatric_urinary_incontinence_counsel_specify
+                $table->string('geriatric_urinary_incontinence_symptoms_specify', 100)->nullable(); // geriatric_urinary_incontinence_symptoms_specify
+                $table->string('geriatric_urinary_incontinence_counsel_specify', 100)->nullable(); // geriatric_urinary_incontinence_counsel_specify
                 $table->string('geriatric_urinary_incontinence_refer_to_physician_specify', 100)->nullable(); // geriatric_urinary_incontinence_refer_to_physician_specify
                 $table->boolean('geriatric_physical_function_capacity')->nullable(); // geriatric_physical_function_capacity
                 $table->string('geriatric_physical_function_capacity_refer_to_physician_specify', 100)->nullable(); // geriatric_physical_function_capacity_refer_to_physician
