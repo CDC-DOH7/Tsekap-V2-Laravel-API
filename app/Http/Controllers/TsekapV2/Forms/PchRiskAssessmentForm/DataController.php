@@ -352,6 +352,7 @@ class DataController extends Controller
             'pch_risk_assessment_tool_form.assessed_by',
             'pch_risk_assessment_tool_form.verified_by',
 
+            'pch_risk_assessment_tool_form.imm_record_child_none',
             'pch_risk_assessment_tool_form.imm_record_child_bcg',
             'pch_risk_assessment_tool_form.imm_record_child_opv',
             'pch_risk_assessment_tool_form.imm_record_child_polio_1',
@@ -375,6 +376,7 @@ class DataController extends Controller
             'pch_risk_assessment_tool_form.imm_record_child_booster',
             'pch_risk_assessment_tool_form.imm_record_child_others',
             'pch_risk_assessment_tool_form.imm_record_child_others_please_specify',
+            'pch_risk_assessment_tool_form.imm_record_schoolage_none',
             'pch_risk_assessment_tool_form.imm_record_schoolage_mr',
             'pch_risk_assessment_tool_form.imm_record_schoolage_td',
             'pch_risk_assessment_tool_form.imm_record_schoolage_hpv',
@@ -553,19 +555,13 @@ class DataController extends Controller
 
             'pch_risk_assessment_tool_form.geriatric_memory_1',
             'pch_risk_assessment_tool_form.geriatric_depression',
-            'pch_risk_assessment_tool_form.geriatric_depression_refer_to_physician_specify',
             'pch_risk_assessment_tool_form.geriatric_medication',
-            'pch_risk_assessment_tool_form.geriatric_medication_refer_to_physician_specify',
             'pch_risk_assessment_tool_form.geriatric_urinary_incontinence',
-            'pch_risk_assessment_tool_form.geriatric_urinary_incontinence_symptoms_specify',
-            'pch_risk_assessment_tool_form.geriatric_urinary_incontinence_counsel_specify',
-            'pch_risk_assessment_tool_form.geriatric_urinary_incontinence_refer_to_physician_specify',
+            // 'pch_risk_assessment_tool_form.geriatric_urinary_incontinence_symptoms_specify',
+            // 'pch_risk_assessment_tool_form.geriatric_urinary_incontinence_counsel_specify',
             'pch_risk_assessment_tool_form.geriatric_physical_function_capacity',
-            'pch_risk_assessment_tool_form.geriatric_physical_function_capacity_refer_to_physician_specify',
             'pch_risk_assessment_tool_form.geriatric_memory_2',
-            'pch_risk_assessment_tool_form.geriatric_memory_2_refer_to_physician_specify',
             'pch_risk_assessment_tool_form.geriatric_fall',
-            'pch_risk_assessment_tool_form.geriatric_fall_refer_to_physician_specify',
             'pch_risk_assessment_tool_form.geriatric_risk_for_falls_seconds',
             'pch_risk_assessment_tool_form.geriatric_risk_for_falls_seconds_indication',
             'pch_risk_assessment_tool_form.geriatric_risk_for_falls_inches',
@@ -574,12 +570,10 @@ class DataController extends Controller
             'pch_risk_assessment_tool_form.geriatric_nutrition_cm_indication',
             'pch_risk_assessment_tool_form.geriatric_hearing_test_r_ear_indication',
             'pch_risk_assessment_tool_form.geriatric_hearing_test_l_ear_indication',
-            'pch_risk_assessment_tool_form.geriatric_hearing_test_refer_to_physician_specify',
             'pch_risk_assessment_tool_form.geriatric_vision_test_unaided_r_eye',
             'pch_risk_assessment_tool_form.geriatric_vision_test_unaided_l_eye',
             'pch_risk_assessment_tool_form.geriatric_vision_test_aided_r_eye',
             'pch_risk_assessment_tool_form.geriatric_vision_test_aided_l_eye',
-            'pch_risk_assessment_tool_form.geriatric_vision_refer_to_opthalmologist_specify',
             'pch_risk_assessment_tool_form.geriatric_summary_of_findings_counsel',
             'pch_risk_assessment_tool_form.geriatric_summary_of_findings_date_of_return_visit',
             'pch_risk_assessment_tool_form.geriatric_summary_of_findings_refer_to_a_physician',
@@ -611,8 +605,7 @@ class DataController extends Controller
             'pch_risk_assessment_tool_form.imaging_via',
             'pch_risk_assessment_tool_form.imaging_pap_smear',
             'pch_risk_assessment_tool_form.imaging_mammogram',
-            'pch_risk_assessment_tool_form.imaging_with_contrast_yes',
-            'pch_risk_assessment_tool_form.imaging_with_contrast_no',
+            'pch_risk_assessment_tool_form.imaging_with_contrast',
             'pch_risk_assessment_tool_form.diagnosis',
             'pch_risk_assessment_tool_form.treatment_plan',
             'pch_risk_assessment_tool_form.follow_up_date',
@@ -865,6 +858,7 @@ class DataController extends Controller
             'fields.verified_by' => 'nullable|string|max:100',
 
             // immunization record fields
+            'fields.imm_record_child_none' => 'nullable|boolean',
             'fields.imm_record_child_bcg' => 'nullable|boolean',
             'fields.imm_record_child_opv' => 'nullable|boolean',
             'fields.imm_record_child_polio_1' => 'nullable|boolean',
@@ -887,6 +881,7 @@ class DataController extends Controller
             'fields.imm_record_child_booster' => 'nullable|boolean',
             'fields.imm_record_child_others' => 'nullable|boolean',
             'fields.imm_record_child_others_please_specify' => 'nullable|string',
+            'fields.imm_record_schoolage_none' => 'nullable|boolean',
             'fields.imm_record_schoolage_mr' => 'nullable|boolean',
             'fields.imm_record_schoolage_td' => 'nullable|boolean',
             'fields.imm_record_schoolage_hpv' => 'nullable|boolean',
@@ -1073,19 +1068,19 @@ class DataController extends Controller
             // geriatric assessment fields
             'fields.geriatric_memory_1' => 'nullable|boolean',
             'fields.geriatric_depression' => 'nullable|boolean',
-            'fields.geriatric_depression_refer_to_physician_specify' => 'nullable|string|max:100',
+            // 'fields.geriatric_depression_refer_to_physician_specify' => 'nullable|string|max:100',
             'fields.geriatric_medication' => 'nullable|boolean',
-            'fields.geriatric_medication_refer_to_physician_specify' => 'nullable|string|max:100',
+            // 'fields.geriatric_medication_refer_to_physician_specify' => 'nullable|string|max:100',
             'fields.geriatric_urinary_incontinence' => 'nullable|boolean',
-            'fields.geriatric_urinary_incontinence_symptoms_specify' => 'nullable|string|max:100',
-            'fields.geriatric_urinary_incontinence_counsel_specify' => 'nullable|string|max:100',
-            'fields.geriatric_urinary_incontinence_refer_to_physician_specify' => 'nullable|string|max:100',
+            // 'fields.geriatric_urinary_incontinence_symptoms_specify' => 'nullable|string|max:100',
+            // 'fields.geriatric_urinary_incontinence_counsel_specify' => 'nullable|string|max:100',
+            // 'fields.geriatric_urinary_incontinence_refer_to_physician_specify' => 'nullable|string|max:100',
             'fields.geriatric_physical_function_capacity' => 'nullable|boolean',
-            'fields.geriatric_physical_function_capacity_refer_to_physician_specify' => 'nullable|string|max:100',
+            // 'fields.geriatric_physical_function_capacity_refer_to_physician_specify' => 'nullable|string|max:100',
             'fields.geriatric_memory_2' => 'nullable|boolean',
-            'fields.geriatric_memory_2_refer_to_physician_specify' => 'nullable|string|max:100',
+            // 'fields.geriatric_memory_2_refer_to_physician_specify' => 'nullable|string|max:100',
             'fields.geriatric_fall' => 'nullable|boolean',
-            'fields.geriatric_fall_refer_to_physician_specify' => 'nullable|string|max:100',
+            // 'fields.geriatric_fall_refer_to_physician_specify' => 'nullable|string|max:100',
             'fields.geriatric_risk_for_falls_seconds' => 'nullable|integer|min:0',
             'fields.geriatric_risk_for_falls_seconds_indication' => 'nullable|string',
             'fields.geriatric_risk_for_falls_inches' => 'nullable|integer|min:0',
@@ -1094,13 +1089,13 @@ class DataController extends Controller
             'fields.geriatric_nutrition_cm_indication' => 'nullable|string',
             'fields.geriatric_hearing_test_r_ear_indication' => 'nullable|string',
             'fields.geriatric_hearing_test_l_ear_indication' => 'nullable|string',
-            'fields.geriatric_hearing_test_refer_to_physician_specify' => 'nullable|string|max:100',
+            // 'fields.geriatric_hearing_test_refer_to_physician_specify' => 'nullable|string|max:100',
             'fields.geriatric_vision_test_unaided_r_eye' => 'nullable|string',
             'fields.geriatric_vision_test_unaided_l_eye' => 'nullable|string',
             'fields.geriatric_vision_test_aided_r_eye' => 'nullable|string',
             'fields.geriatric_vision_test_aided_l_eye' => 'nullable|string',
-            'fields.geriatric_vision_refer_to_opthalmologist_specify' => 'nullable|string|max:100',
-            'fields.geriatric_summary_of_findings_counsel' => 'nullable|string',
+            // 'fields.geriatric_vision_refer_to_opthalmologist_specify' => 'nullable|string|max:100',
+            'fields.geriatric_summary_of_findings_counsel' => 'nullable|boolean',
             'fields.geriatric_summary_of_findings_date_of_return_visit' => 'nullable|date',
             'fields.geriatric_summary_of_findings_refer_to_a_physician' => 'nullable|string',
             'fields.geriatric_summary_of_findings_date_of_referral' => 'nullable|date',
@@ -1133,8 +1128,7 @@ class DataController extends Controller
             'fields.imaging_via' => 'nullable|boolean',
             'fields.imaging_pap_smear' => 'nullable|boolean',
             'fields.imaging_mammogram' => 'nullable|boolean',
-            'fields.imaging_with_contrast_yes' => 'nullable|boolean',
-            'fields.imaging_with_contrast_no' => 'nullable|boolean',
+            'fields.imaging_with_contrast' => 'nullable|boolean',
             'fields.diagnosis' => 'nullable|string',
             'fields.treatment_plan' => 'nullable|string',
             'fields.follow_up_date' => 'nullable|date',
@@ -1256,11 +1250,44 @@ class DataController extends Controller
         }
 
         try {
+            // Recalculate age and age_bracket_id if dob is being updated
+            if (!empty($fields['dob'])) {
+                $fields['age'] = $this->calculateAge($fields['dob']);
+
+                $ageBrackets = [
+                    [0, 0.0164, 1],
+                    [0.0165, 0.0767, 2],
+                    [0.0768, 0.9167, 3],
+                    [1, 4, 4],
+                    [5, 9, 5],
+                    [10, 14, 6],
+                    [15, 19, 7],
+                    [20, 24, 8],
+                    [25, 29, 9],
+                    [30, 34, 10],
+                    [35, 39, 11],
+                    [40, 44, 12],
+                    [45, 49, 13],
+                    [50, 54, 14],
+                    [55, 59, 15],
+                    [60, 64, 16],
+                    [65, 69, 17],
+                    [70, PHP_INT_MAX, 18]
+                ];
+
+                foreach ($ageBrackets as [$min, $max, $bracketId]) {
+                    if ($fields['age'] >= $min && $fields['age'] <= $max) {
+                        $fields['age_bracket_id'] = $bracketId;
+                        break;
+                    }
+                }
+            }
+
             // Update the RiskProfile with new data
             $pchRiskProfile->update($fields);
             return response()->json(['message' => 'Profile successfully updated.'], 200);
         } catch (Exception $e) {
-            Log::error('Error deleting risk form: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error updating risk profile: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json(['error' => 'Something went wrong. Please try again later'], 500);
         }
     }
@@ -1328,6 +1355,7 @@ class DataController extends Controller
             'fields.verified_by' => 'sometimes|nullable|string|max:100',
 
             // immunization records
+            'fields.imm_record_child_none' => 'sometimes|nullable|boolean',
             'fields.imm_record_child_bcg' => 'sometimes|nullable|boolean',
             'fields.imm_record_child_opv' => 'sometimes|nullable|boolean',
             'fields.imm_record_child_polio_1' => 'sometimes|nullable|boolean',
@@ -1350,6 +1378,7 @@ class DataController extends Controller
             'fields.imm_record_child_booster' => 'sometimes|nullable|boolean',
             'fields.imm_record_child_others' => 'sometimes|nullable|boolean',
             'fields.imm_record_child_others_please_specify' => 'sometimes|nullable|string',
+            'fields.imm_record_schoolage_none' => 'sometimes|nullable|boolean',
             'fields.imm_record_schoolage_mr' => 'sometimes|nullable|boolean',
             'fields.imm_record_schoolage_td' => 'sometimes|nullable|boolean',
             'fields.imm_record_schoolage_hpv' => 'sometimes|nullable|boolean',
@@ -1536,19 +1565,19 @@ class DataController extends Controller
             // geriatric assessment
             'fields.geriatric_memory_1' => 'sometimes|nullable|boolean',
             'fields.geriatric_depression' => 'sometimes|nullable|boolean',
-            'fields.geriatric_depression_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
+            // 'fields.geriatric_depression_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
             'fields.geriatric_medication' => 'sometimes|nullable|boolean',
-            'fields.geriatric_medication_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
+            // 'fields.geriatric_medication_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
             'fields.geriatric_urinary_incontinence' => 'sometimes|nullable|boolean',
-            'fields.geriatric_urinary_incontinence_symptoms_specify' => 'sometimes|nullable|string|max:100',
-            'fields.geriatric_urinary_incontinence_counsel_specify' => 'sometimes|nullable|string|max:100',
-            'fields.geriatric_urinary_incontinence_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
+            // 'fields.geriatric_urinary_incontinence_symptoms_specify' => 'sometimes|nullable|string|max:100',
+            // 'fields.geriatric_urinary_incontinence_counsel_specify' => 'sometimes|nullable|string|max:100',
+            // 'fields.geriatric_urinary_incontinence_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
             'fields.geriatric_physical_function_capacity' => 'sometimes|nullable|boolean',
-            'fields.geriatric_physical_function_capacity_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
+            // 'fields.geriatric_physical_function_capacity_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
             'fields.geriatric_memory_2' => 'sometimes|nullable|boolean',
-            'fields.geriatric_memory_2_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
+            // 'fields.geriatric_memory_2_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
             'fields.geriatric_fall' => 'sometimes|nullable|boolean',
-            'fields.geriatric_fall_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
+            // 'fields.geriatric_fall_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
             'fields.geriatric_risk_for_falls_seconds' => 'sometimes|nullable|integer|min:0',
             'fields.geriatric_risk_for_falls_seconds_indication' => 'sometimes|nullable|string',
             'fields.geriatric_risk_for_falls_inches' => 'sometimes|nullable|integer|min:0',
@@ -1557,13 +1586,13 @@ class DataController extends Controller
             'fields.geriatric_nutrition_cm_indication' => 'sometimes|nullable|string',
             'fields.geriatric_hearing_test_r_ear_indication' => 'sometimes|nullable|string',
             'fields.geriatric_hearing_test_l_ear_indication' => 'sometimes|nullable|string',
-            'fields.geriatric_hearing_test_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
+            // 'fields.geriatric_hearing_test_refer_to_physician_specify' => 'sometimes|nullable|string|max:100',
             'fields.geriatric_vision_test_unaided_r_eye' => 'sometimes|nullable|string',
             'fields.geriatric_vision_test_unaided_l_eye' => 'sometimes|nullable|string',
             'fields.geriatric_vision_test_aided_r_eye' => 'sometimes|nullable|string',
             'fields.geriatric_vision_test_aided_l_eye' => 'sometimes|nullable|string',
-            'fields.geriatric_vision_refer_to_opthalmologist_specify' => 'sometimes|nullable|string|max:100',
-            'fields.geriatric_summary_of_findings_counsel' => 'sometimes|nullable|string',
+            // 'fields.geriatric_vision_refer_to_opthalmologist_specify' => 'sometimes|nullable|string|max:100',
+            'fields.geriatric_summary_of_findings_counsel' => 'sometimes|nullable|boolean',
             'fields.geriatric_summary_of_findings_date_of_return_visit' => 'sometimes|nullable|date',
             'fields.geriatric_summary_of_findings_refer_to_a_physician' => 'sometimes|nullable|string',
             'fields.geriatric_summary_of_findings_date_of_referral' => 'sometimes|nullable|date',
@@ -1596,8 +1625,7 @@ class DataController extends Controller
             'fields.imaging_via' => 'sometimes|nullable|boolean',
             'fields.imaging_pap_smear' => 'sometimes|nullable|boolean',
             'fields.imaging_mammogram' => 'sometimes|nullable|boolean',
-            'fields.imaging_with_contrast_yes' => 'sometimes|nullable|boolean',
-            'fields.imaging_with_contrast_no' => 'sometimes|nullable|boolean',
+            'fields.imaging_with_contrast' => 'sometimes|nullable|boolean',
             'fields.diagnosis' => 'sometimes|nullable|string',
             'fields.treatment_plan' => 'sometimes|nullable|string',
             'fields.follow_up_date' => 'sometimes|nullable|date',

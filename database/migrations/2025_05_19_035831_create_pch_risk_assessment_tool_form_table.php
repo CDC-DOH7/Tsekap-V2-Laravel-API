@@ -73,6 +73,7 @@ return new class extends Migration
                 $table->string('verified_by', 100)->nullable(); // verified_by
 
                 // immunization record fields
+                $table->boolean('imm_record_child_none')->nullable(); // imm_record_child_none
                 $table->boolean('imm_record_child_bcg')->nullable(); // imm_record_child_bcg
                 $table->boolean('imm_record_child_opv')->nullable(); // imm_record_child_opv
                 $table->boolean('imm_record_child_polio_1')->nullable(); // imm_record_child_polio_1
@@ -96,6 +97,7 @@ return new class extends Migration
                 $table->boolean('imm_record_child_booster')->nullable(); // imm_record_child_booster
                 $table->boolean('imm_record_child_others')->nullable(); // imm_record_child_others
                 $table->text('imm_record_child_others_please_specify')->nullable(); // imm_record_child_others_please_specify
+                $table->boolean('imm_record_schoolage_none')->nullable(); // imm_record_schoolage_none
                 $table->boolean('imm_record_schoolage_mr')->nullable(); // imm_record_schoolage_mr
                 $table->boolean('imm_record_schoolage_td')->nullable(); // imm_record_schoolage_td
                 $table->boolean('imm_record_schoolage_hpv')->nullable(); // imm_record_schoolage_hpv
@@ -282,19 +284,19 @@ return new class extends Migration
                 // geriatric assessment fields
                 $table->boolean('geriatric_memory_1')->nullable(); // geriatric_memory_1
                 $table->boolean('geriatric_depression')->nullable(); // geriatric_depression
-                $table->string('geriatric_depression_refer_to_physician_specify', 100)->nullable(); // geriatric_depression_refer_to_physician_specify
+                // $table->string('geriatric_depression_refer_to_physician_specify', 100)->nullable(); // geriatric_depression_refer_to_physician_specify
                 $table->boolean('geriatric_medication')->nullable(); // geriatric_medication
-                $table->string('geriatric_medication_refer_to_physician_specify', 100)->nullable(); // geriatric_medication_refer_to_physician_specify
+                // $table->string('geriatric_medication_refer_to_physician_specify', 100)->nullable(); // geriatric_medication_refer_to_physician_specify
                 $table->boolean('geriatric_urinary_incontinence')->nullable(); // geriatric_urinary_incontinence
-                $table->string('geriatric_urinary_incontinence_symptoms_specify', 100)->nullable(); // geriatric_urinary_incontinence_symptoms_specify
-                $table->string('geriatric_urinary_incontinence_counsel_specify', 100)->nullable(); // geriatric_urinary_incontinence_counsel_specify
-                $table->string('geriatric_urinary_incontinence_refer_to_physician_specify', 100)->nullable(); // geriatric_urinary_incontinence_refer_to_physician_specify
+                // $table->string('geriatric_urinary_incontinence_symptoms_specify', 100)->nullable(); // geriatric_urinary_incontinence_symptoms_specify
+                // $table->string('geriatric_urinary_incontinence_counsel_specify', 100)->nullable(); // geriatric_urinary_incontinence_counsel_specify
+                // $table->string('geriatric_urinary_incontinence_refer_to_physician_specify', 100)->nullable(); // geriatric_urinary_incontinence_refer_to_physician_specify
                 $table->boolean('geriatric_physical_function_capacity')->nullable(); // geriatric_physical_function_capacity
-                $table->string('geriatric_physical_function_capacity_refer_to_physician_specify', 100)->nullable(); // geriatric_physical_function_capacity_refer_to_physician
+                // $table->string('geriatric_physical_function_capacity_refer_to_physician_specify', 100)->nullable(); // geriatric_physical_function_capacity_refer_to_physician
                 $table->boolean('geriatric_memory_2')->nullable(); // geriatric_memory_2
-                $table->string('geriatric_memory_2_refer_to_physician_specify', 100)->nullable(); // geriatric_memory_2_refer_to_physician_specify
+                // $table->string('geriatric_memory_2_refer_to_physician_specify', 100)->nullable(); // geriatric_memory_2_refer_to_physician_specify
                 $table->boolean('geriatric_fall')->nullable(); // geriatric_fall
-                $table->string('geriatric_fall_refer_to_physician_specify', 100)->nullable(); // geriatric_fall_refer_to_physician_specify
+                // $table->string('geriatric_fall_refer_to_physician_specify', 100)->nullable(); // geriatric_fall_refer_to_physician_specify
                 $table->unsignedInteger('geriatric_risk_for_falls_seconds')->nullable(); // geriatric_risk_for_falls_seconds
                 $table->text('geriatric_risk_for_falls_seconds_indication')->nullable(); // geriatric_risk_for_falls_seconds_indication
                 $table->unsignedInteger('geriatric_risk_for_falls_inches')->nullable(); // geriatric_risk_for_falls_inches
@@ -303,13 +305,13 @@ return new class extends Migration
                 $table->text('geriatric_nutrition_cm_indication')->nullable(); // geriatric_nutrition_cm_indication
                 $table->text('geriatric_hearing_test_r_ear_indication')->nullable(); // geriatric_hearing_test_r_ear_indication
                 $table->text('geriatric_hearing_test_l_ear_indication')->nullable(); // geriatric_hearing_test_l_ear_indication
-                $table->string('geriatric_hearing_test_refer_to_physician_specify', 100)->nullable(); // geriatric_hearing_test_refer_to_physician_specify
+                // $table->string('geriatric_hearing_test_refer_to_physician_specify', 100)->nullable(); // geriatric_hearing_test_refer_to_physician_specify
                 $table->text('geriatric_vision_test_unaided_r_eye')->nullable(); // geriatric_vision_test_unaided_r_eye
                 $table->text('geriatric_vision_test_unaided_l_eye')->nullable(); // geriatric_vision_test_unaided_l_eye
                 $table->text('geriatric_vision_test_aided_r_eye')->nullable(); // geriatric_vision_test_aided_r_eye
                 $table->text('geriatric_vision_test_aided_l_eye')->nullable(); // geriatric_vision_test_aided_l_eye
-                $table->string('geriatric_vision_refer_to_opthalmologist_specify', 100)->nullable(); // geriatric_vision_refer_to_opthalmologist_specify
-                $table->text('geriatric_summary_of_findings_counsel')->nullable(); // geriatric_summary_of_findings_counsel
+                // $table->string('geriatric_vision_refer_to_opthalmologist_specify', 100)->nullable(); // geriatric_vision_refer_to_opthalmologist_specify
+                $table->boolean('geriatric_summary_of_findings_counsel')->nullable(); // geriatric_summary_of_findings_counsel
                 $table->date('geriatric_summary_of_findings_date_of_return_visit')->nullable(); // geriatric_summary_of_findings_date_of_return_visit
                 $table->text('geriatric_summary_of_findings_refer_to_a_physician')->nullable(); // geriatric_summary_of_findings_refer_to_a_physician
                 $table->date('geriatric_summary_of_findings_date_of_referral')->nullable(); // geriatric_summary_of_findings_date_of_referral
@@ -342,8 +344,7 @@ return new class extends Migration
                 $table->boolean('imaging_via')->nullable(); // imaging_via
                 $table->boolean('imaging_pap_smear')->nullable(); // imaging_pap_smear
                 $table->boolean('imaging_mammogram')->nullable(); // imaging_mammogram
-                $table->boolean('imaging_with_contrast_yes')->nullable(); // imaging_with_contrast_yes
-                $table->boolean('imaging_with_contrast_no')->nullable(); // imaging_with_contrast_no
+                $table->boolean('imaging_with_contrast')->nullable(); // imaging_with_contrast_yes
                 $table->text('diagnosis')->nullable(); // diagnosis
                 $table->text('treatment_plan')->nullable(); // treatment_plan
                 $table->date('follow_up_date')->nullable(); // follow_up_date
