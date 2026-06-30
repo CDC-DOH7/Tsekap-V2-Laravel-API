@@ -164,7 +164,7 @@
     "pe_skin_extremities_poor_skin_turgor": false,
     "pe_skin_extremities_edema": true,
     "pe_skin_extremities_itching": false,
-    "pe_skin_extremities_enythema": false,
+    "pe_skin_extremities_erythema": false,
     "pe_skin_extremities_lesions": false,
     "pe_heent_essentially_normal": true,
     "pe_heent_abnormal_pupillary_reaction": false,

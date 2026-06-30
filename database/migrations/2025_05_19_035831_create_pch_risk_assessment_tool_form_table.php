@@ -209,7 +209,7 @@ return new class extends Migration
                 $table->boolean('pe_skin_extremities_poor_skin_turgor')->nullable(); // pe_skin_extremities_poor_skin_turgor
                 $table->boolean('pe_skin_extremities_edema')->nullable(); // pe_skin_extremities_edema
                 $table->boolean('pe_skin_extremities_itching')->nullable(); // pe_skin_extremities_itching
-                $table->boolean('pe_skin_extremities_enythema')->nullable(); // pe_skin_extremities_enythema
+                $table->boolean('pe_skin_extremities_erythema')->nullable(); // pe_skin_extremities_erythema
                 $table->boolean('pe_skin_extremities_lesions')->nullable(); // pe_skin_extremities_lesions
                 $table->boolean('pe_heent_essentially_normal')->nullable(); // pe_heent_essentially_normal
                 $table->boolean('pe_heent_abnormal_pupillary_reaction')->nullable(); // pe_heent_abnormal_pupillary_reaction
