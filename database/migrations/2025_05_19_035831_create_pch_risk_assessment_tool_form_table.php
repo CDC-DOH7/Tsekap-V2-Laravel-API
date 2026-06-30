@@ -275,7 +275,7 @@ return new class extends Migration
                 $table->boolean('animal_bite_type_of_exposure_lacerations')->nullable(); // animal_bite_type_of_exposure_lacerations
                 $table->boolean('animal_bite_type_of_exposure_avulsions')->nullable(); // animal_bite_type_of_exposure_avulsions
                 $table->boolean('animal_bite_type_of_exposure_scratches_abrasions_w_sponti_bleed')->nullable(); // animal_bite_type_of_exposure_scratches_abrasions_w_sponti_bleed
-                $table->boolean('animal_bite_wash_bite')->nullable(); // animal_bite_wash_bite
+                $table->text('animal_bite_wash_bite')->nullable(); // animal_bite_wash_bite
                 $table->date('animal_bite_date_of_exposure')->nullable(); // animal_bite_date_of_exposure
                 $table->string('animal_bite_name_of_accompanying_adult', 100)->nullable(); // animal_bite_name_of_accompanying_adult
                 $table->string('animal_bite_contact_number', 25)->nullable(); // animal_bite_contact_number
