@@ -313,7 +313,7 @@ return new class extends Migration
                 // $table->string('geriatric_vision_refer_to_opthalmologist_specify', 100)->nullable(); // geriatric_vision_refer_to_opthalmologist_specify
                 $table->boolean('geriatric_summary_of_findings_counsel')->nullable(); // geriatric_summary_of_findings_counsel
                 $table->date('geriatric_summary_of_findings_date_of_return_visit')->nullable(); // geriatric_summary_of_findings_date_of_return_visit
-                $table->text('geriatric_summary_of_findings_refer_to_a_physician')->nullable(); // geriatric_summary_of_findings_refer_to_a_physician
+                $table->boolean('geriatric_summary_of_findings_refer_to_a_physician')->nullable(); // geriatric_summary_of_findings_refer_to_a_physician
                 $table->date('geriatric_summary_of_findings_date_of_referral')->nullable(); // geriatric_summary_of_findings_date_of_referral
                 $table->text('geriatric_summary_of_findings_reason_for_referral')->nullable(); // geriatric_summary_of_findings_reason_for_referral
                 $table->text('geriatric_name_and_designation_of_the_provider')->nullable(); // geriatric_name_and_designation_of_the_provider
