@@ -19,6 +19,7 @@ use App\Http\Controllers\TsekapV2\Forms\GeneralDataController;
 use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController as PhilpenRiskDataController;
 use App\Http\Controllers\TsekapV2\Forms\PchRiskAssessmentForm\DataController as PchRiskDataController;
 use App\Http\Controllers\TsekapV2\Forms\PatientInjuryForm\DataController as PatientInjuryDataController;
+use App\Http\Controllers\TsekapV2\Data\OneissPatientInjuryData\DataController as OneissPatientInjuryDataController;
 
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics\PhilpenAnalyticsDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics\GeneralAnalyticsDataController;
@@ -463,6 +464,13 @@ Route::prefix('v2')->group(function () {
                 // deletion functionalities
                 Route::post('/patient-injury-delete-general-data', [PatientInjuryDataController::class, 'deletePatientInjuryGeneralData'])->middleware('user.admin')->name('api-v2-delete-patient-injury-general-data');
                 Route::post('/patient-injury-delete-preadmission-data', [PatientInjuryDataController::class, 'deletePatientInjuryPreadmissionData'])->middleware('user.admin')->name('api-v2-delete-patient-injury-preadmission-data');
+            });
+
+            Route::prefix('/oneiss')->group(function () {
+                Route::get('/retrieve-data', [OneissPatientInjuryDataController::class, 'retrieveOneissPatientInjuryDataWithoutFacility'])->name('api-v2-retrieve-oneiss-data');
+                Route::post('/add-data', [OneissPatientInjuryDataController::class, 'addOneissPatientInjuryData'])->name('api-v2-add-oneiss-data');
+                Route::post('/update-data', [OneissPatientInjuryDataController::class, 'updateOneissPatientInjuryData'])->name('api-v2-update-oneiss-data');
+                Route::post('/delete-data', [OneissPatientInjuryDataController::class, 'deleteOneissPatientInjuryData'])->middleware('user.admin')->name('api-v2-delete-oneiss-data');
             });
         });
     });
