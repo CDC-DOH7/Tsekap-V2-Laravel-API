@@ -77,7 +77,7 @@ class OneissPatientInjuryData extends Model
         'ext_sharp',
         'ext_sharp_sp',
         'ext_drown_r',
-        'ref_drowning_cope',
+        'ref_drowning_code',
         'ext_drown_sp',
         'ext_expo_nature_r',
         'ref_expnature_code',

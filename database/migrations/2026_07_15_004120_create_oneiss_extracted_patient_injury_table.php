@@ -106,7 +106,7 @@ return new class extends Migration
                 $table->text('etc_veh')->nullable(); // etc_veh -> NULLABLE
                 $table->text('etc_veh_sp')->nullable(); // etc_veh_sp -> NULLABLE
                 $table->text('position_code')->nullable(); // position_code -> NULLABLE
-                $table->text('pos_pat_sp'); // pos_pat_sp -> NOT NULL
+                $table->text('pos_pat_sp')->nullable(); // pos_pat_sp -> NULLABLE
                 $table->String('ext_other', 10)->nullable(); // ext_other -> NULLABLE
                 $table->text('ext_other_sp')->nullable(); // ext_other_sp -> NULLABLE
                 $table->text('place_occ_code')->nullable(); // place_occ_code -> NULLABLE
