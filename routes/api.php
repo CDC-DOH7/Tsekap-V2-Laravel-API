@@ -466,6 +466,7 @@ Route::prefix('v2')->group(function () {
                 Route::post('/patient-injury-delete-preadmission-data', [PatientInjuryDataController::class, 'deletePatientInjuryPreadmissionData'])->middleware('user.admin')->name('api-v2-delete-patient-injury-preadmission-data');
             });
 
+            // Data - ONEISS Records Routes
             Route::prefix('/oneiss')->group(function () {
                 Route::get('/retrieve-data', [OneissPatientInjuryDataController::class, 'retrieveOneissPatientInjuryDataWithoutFacility'])->name('api-v2-retrieve-oneiss-data');
                 Route::post('/add-data', [OneissPatientInjuryDataController::class, 'addOneissPatientInjuryData'])->name('api-v2-add-oneiss-data');
