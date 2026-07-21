@@ -467,11 +467,13 @@ Route::prefix('v2')->group(function () {
             });
 
             // Data - ONEISS Records Routes
-            Route::prefix('/oneiss')->group(function () {
-                Route::get('/retrieve-data', [OneissPatientInjuryDataController::class, 'retrieveOneissPatientInjuryDataWithoutFacility'])->name('api-v2-retrieve-oneiss-data');
-                Route::post('/add-data', [OneissPatientInjuryDataController::class, 'addOneissPatientInjuryData'])->name('api-v2-add-oneiss-data');
-                Route::post('/update-data', [OneissPatientInjuryDataController::class, 'updateOneissPatientInjuryData'])->name('api-v2-update-oneiss-data');
-                Route::post('/delete-data', [OneissPatientInjuryDataController::class, 'deleteOneissPatientInjuryData'])->middleware('user.admin')->name('api-v2-delete-oneiss-data');
+            Route::prefix('/bulk-upload')->middleware('user.admin')->group(function () {
+                Route::prefix('/oneiss')->group(function () {
+                    Route::get('/retrieve-data', [OneissPatientInjuryDataController::class, 'retrieveOneissPatientInjuryDataWithoutFacility'])->name('api-v2-retrieve-oneiss-data');
+                    Route::post('/add-data', [OneissPatientInjuryDataController::class, 'addOneissPatientInjuryData'])->name('api-v2-add-oneiss-data');
+                    Route::post('/update-data', [OneissPatientInjuryDataController::class, 'updateOneissPatientInjuryData'])->name('api-v2-update-oneiss-data');
+                    Route::post('/delete-data', [OneissPatientInjuryDataController::class, 'deleteOneissPatientInjuryData'])->name('api-v2-delete-oneiss-data');
+                });
             });
         });
     });
