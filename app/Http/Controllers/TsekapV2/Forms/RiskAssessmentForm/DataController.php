@@ -287,9 +287,9 @@ class DataController extends Controller
             'ar_agitated_behavior',
             'ar_eye_injury',
             'ar_severe_injuries',
-            'ar_refer_physician_name',
-            'ar_refer_reason',
-            'ar_refer_facility',
+            // 'ar_refer_physician_name',
+            // 'ar_refer_reason',
+            // 'ar_refer_facility',
 
             'pmh_hypertension',
             'pmh_heart_disease',
@@ -488,9 +488,9 @@ class DataController extends Controller
             'fields.ar_agitated_behavior' => 'required|string|max:8',
             'fields.ar_eye_injury' => 'required|string|max:8',
             'fields.ar_severe_injuries' => 'required|string|max:8',
-            'fields.ar_refer_physician_name' => 'nullable|string',
-            'fields.ar_refer_reason' => 'nullable|string',
-            'fields.ar_refer_facility' => 'nullable|string',
+            // 'fields.ar_refer_physician_name' => 'nullable|string',
+            // 'fields.ar_refer_reason' => 'nullable|string',
+            // 'fields.ar_refer_facility' => 'nullable|string',
 
             // pmh
             'fields.pmh_hypertension' => 'required|string|max:8',
@@ -688,9 +688,9 @@ class DataController extends Controller
             'fields.ar_agitated_behavior' => 'sometimes|string|max:8',
             'fields.ar_eye_injury' => 'sometimes|string|max:8',
             'fields.ar_severe_injuries' => 'sometimes|string|max:8',
-            'fields.ar_refer_physician_name' => 'sometimes|nullable|string',
-            'fields.ar_refer_reason' => 'sometimes|nullable|string',
-            'fields.ar_refer_facility' => 'sometimes|nullable|string',
+            // 'fields.ar_refer_physician_name' => 'sometimes|nullable|string',
+            // 'fields.ar_refer_reason' => 'sometimes|nullable|string',
+            // 'fields.ar_refer_facility' => 'sometimes|nullable|string',
 
             // pmh
             'fields.pmh_hypertension' => 'sometimes|string|max:8',
