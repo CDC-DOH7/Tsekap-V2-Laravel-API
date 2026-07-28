@@ -19,7 +19,6 @@ use App\Http\Controllers\TsekapV2\Forms\GeneralDataController;
 use App\Http\Controllers\TsekapV2\Forms\RiskAssessmentForm\DataController as PhilpenRiskDataController;
 use App\Http\Controllers\TsekapV2\Forms\PchRiskAssessmentForm\DataController as PchRiskDataController;
 use App\Http\Controllers\TsekapV2\Forms\PatientInjuryForm\DataController as PatientInjuryDataController;
-use App\Http\Controllers\TsekapV2\Data\OneissPatientInjuryData\DataController as OneissPatientInjuryDataController;
 
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics\PhilpenAnalyticsDataController;
 use App\Http\Controllers\TsekapV2\Analytics\DataRetrieval\Analytics\GeneralAnalyticsDataController;
@@ -30,6 +29,10 @@ use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\Muncity\Profi
 use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\Muncity\ProfilingTargetPerMuncityController;
 use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\Barangay\ProfilingTotalPerBarangayController;
 use App\Http\Controllers\TsekapV2\Analytics\ProfilingTargetSetting\Barangay\ProfilingTargetPerBarangayController;
+
+// Bulk/Aggregate uploads
+use App\Http\Controllers\TsekapV2\Data\OneissPatientInjuryData\DataController as OneissPatientInjuryDataController;
+use App\Http\Controllers\TsekapV2\Data\KoboToolBoxPatientInjuryData\DataController as PatientInjuryBulkDataController;
 
 Route::prefix('v2')->group(function () {
     // Non-authenticated Routes 
@@ -468,11 +471,21 @@ Route::prefix('v2')->group(function () {
 
             // Data - ONEISS Records Routes
             Route::prefix('/bulk-upload')->middleware('user.admin')->group(function () {
+
+                // oneiss
                 Route::prefix('/oneiss')->group(function () {
                     Route::get('/retrieve-data', [OneissPatientInjuryDataController::class, 'retrieveOneissPatientInjuryDataWithoutFacility'])->name('api-v2-retrieve-oneiss-data');
                     Route::post('/add-data', [OneissPatientInjuryDataController::class, 'addOneissPatientInjuryData'])->name('api-v2-add-oneiss-data');
                     Route::post('/update-data', [OneissPatientInjuryDataController::class, 'updateOneissPatientInjuryData'])->name('api-v2-update-oneiss-data');
                     Route::post('/delete-data', [OneissPatientInjuryDataController::class, 'deleteOneissPatientInjuryData'])->name('api-v2-delete-oneiss-data');
+                });
+
+                // patient-injury (Bulk)
+                Route::prefix('/patient-injury')->group(function () {
+                    Route::get('/retrieve-data', [PatientInjuryBulkDataController::class, 'retrieveKoboToolBoxPatientInjuryDataWithoutFacility'])->name('api-v2-retrieve-patient-injury-data');
+                    Route::post('/add-data', [PatientInjuryBulkDataController::class, 'addKoboToolBoxPatientInjuryData'])->name('api-v2-add-patient-injury-data');
+                    Route::post('/update-data', [PatientInjuryBulkDataController::class, 'updateKoboToolBoxPatientInjuryData'])->name('api-v2-update-patient-injury-data');
+                    Route::post('/delete-data', [PatientInjuryBulkDataController::class, 'deleteKoboToolBoxPatientInjuryData'])->name('api-v2-delete-patient-injury-data');
                 });
             });
         });

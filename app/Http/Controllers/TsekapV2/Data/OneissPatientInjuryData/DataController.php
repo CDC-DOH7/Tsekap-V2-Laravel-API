@@ -220,6 +220,7 @@ class DataController extends Controller
             return response()->json(['error' => $validator->errors()], 422);
         }
 
+        // --- allow duplicates
         $duplicate = OneissPatientInjuryData::query()
             ->where('pno', $fields['pno'])
             ->where('date_report', $fields['date_report'])
