@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\TsekapV2;
 
 use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\TsekapV2\Facilities;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
