@@ -29,9 +29,9 @@ return new class extends Migration {
             $table->string('ar_agitated_behavior', 8)->nullable();
             $table->string('ar_eye_injury', 8)->nullable();
             $table->string('ar_severe_injuries', 8)->nullable();
-            $table->string('ar_refer_physician_name')->nullable();
-            $table->string('ar_refer_reason')->nullable();
-            $table->string('ar_refer_facility')->nullable();
+            // $table->string('ar_refer_physician_name')->nullable();
+            // $table->string('ar_refer_reason')->nullable();
+            // $table->string('ar_refer_facility')->nullable();
 
             // Past Medical History
             $table->string('pmh_hypertension', 8)->nullable();

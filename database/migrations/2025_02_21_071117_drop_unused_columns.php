@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('risk_form', function (Blueprint $table) {
-				$table->dropColumn([
-					 'ar_refer_physician_name',
-					 'ar_refer_reason',
-					 'ar_refer_facility',
-				]); 
-		  });
+            $table->dropColumn([
+                'ar_refer_physician_name',
+                'ar_refer_reason',
+                'ar_refer_facility',
+            ]);
+        });
     }
 
     /**
@@ -26,9 +26,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('risk_form', function (Blueprint $table) {
-				$table->string('ar_refer_physician_name')->nullable();
-				$table->string('ar_refer_reason')->nullable();
-				$table->string('ar_refer_facility')->nullable();
-		  });
+            $table->string('ar_refer_physician_name')->nullable();
+            $table->string('ar_refer_reason')->nullable();
+            $table->string('ar_refer_facility')->nullable();
+        });
     }
 };

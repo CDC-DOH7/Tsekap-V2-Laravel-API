@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models\TsekapV2\Forms\RiskAssessment;
+
 use Illuminate\Database\Eloquent\Model;
 use App\Models\TsekapV2\Forms\RiskAssessment\RiskProfile;
 
@@ -24,9 +25,9 @@ class RiskAssessmentForm extends Model
         'ar_agitated_behavior',
         'ar_eye_injury',
         'ar_severe_injuries',
-        'ar_refer_physician_name',
-        'ar_refer_reason',
-        'ar_refer_facility',
+        // 'ar_refer_physician_name',
+        // 'ar_refer_reason',
+        // 'ar_refer_facility',
         'pmh_hypertension',
         'pmh_heart_disease',
         'pmh_diabetes',

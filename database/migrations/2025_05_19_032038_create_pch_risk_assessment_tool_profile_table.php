@@ -66,8 +66,8 @@ return new class extends Migration
                 $table->string('facility_household_number', 50)->nullable(); // facility_household_number
                 $table->string('family_serial_number', 50)->nullable(); // family_serial_number
                 $table->string('philhealth_member', 25)->nullable(); // philhealth_member
-                $table->string('philhealth_membership_type', 50)->nullable(); // philhealth_membership_type
                 $table->string('philhealth_number', 50)->nullable(); // philhealth_number
+                $table->string('philhealth_membership_type', 50)->nullable(); // philhealth_membership_type
                 $table->string('philhealth_category', 25)->nullable(); // philhealth_category
                 $table->string('pcb_eligible', 25)->nullable(); // pcb_eligible
 

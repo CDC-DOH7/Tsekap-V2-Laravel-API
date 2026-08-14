@@ -16,6 +16,7 @@ class GeneralDataController extends Controller
 {
     private function getProfileTypes(): array
     {
+        // encoder columns are shared across all profile types, so we define them once here.
         $encoderColumns = [
             'muncity.description as municipal_name',
             'province.description as province_name',
@@ -23,12 +24,15 @@ class GeneralDataController extends Controller
             DB::raw('CONCAT(users.fname, " ", users.mname, " ", users.lname) as encoder'),
         ];
 
+        // encoder columns with facility info are used for profile types that have a facility association.
         $encoderColumnsWithFacility = array_merge($encoderColumns, [
             'facilities.id as encoder_hf_id',
             'facilities.name as encoder_hf_name',
         ]);
 
         return [
+
+            // for risk profile forms
             'RiskProfile' => [
                 'table' => 'risk_profile',
                 'muncity_col'   => 'municipal_id',
@@ -73,6 +77,7 @@ class GeneralDataController extends Controller
                 'additional_columns' => $encoderColumnsWithFacility,
             ],
 
+            // for patient injury general data forms
             'PatientInjuryGeneralData' => [
                 'table' => 'patient_injury_form_general_data',
                 'muncity_col'   => 'perm_municipal_id',
@@ -106,6 +111,7 @@ class GeneralDataController extends Controller
                 'additional_columns' => $encoderColumnsWithFacility,
             ],
 
+            // for pch risk profile forms
             'PchRiskProfile' => [
                 'table' => 'pch_risk_assessment_tool_profile',
                 'muncity_col'   => 'muncity_id',
@@ -320,7 +326,6 @@ class GeneralDataController extends Controller
     // -------------------------------------------------------------------------
     // Public endpoints
     // -------------------------------------------------------------------------
-
     public function retrieveAllForms(Request $request): JsonResponse
     {
         try {
@@ -387,7 +392,6 @@ class GeneralDataController extends Controller
     // -------------------------------------------------------------------------
     // Utilities
     // -------------------------------------------------------------------------
-
     /** Parse a MM-DD-YYYY date string into YYYY-MM-DD, returning null on failure. */
     private function parseDate(?string $date): ?string
     {

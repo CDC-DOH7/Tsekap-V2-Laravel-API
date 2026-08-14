@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\TsekapV2\Websockets;
 
 use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\TsekapV2\Facilities;
 use App\Models\TsekapV2\Websockets\NotificationModel;
 use App\Http\Controllers\Controller;
