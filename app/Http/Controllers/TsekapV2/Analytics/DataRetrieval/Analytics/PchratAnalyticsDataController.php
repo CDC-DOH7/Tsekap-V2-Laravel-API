@@ -10,7 +10,6 @@ use Illuminate\Http\JsonResponse;
 use Exception;
 
 class PchratAnalyticsDataController extends Controller
-
 {
     // ================== 1. VISIT INFO SUMMARY FUNCTIONS (/visit_info_summary) ==================
     // Controller Count: 3
