@@ -40,8 +40,14 @@ return new class extends Migration
         // retain new migration
         try {
             Schema::table('push_notifications', function (Blueprint $table) {
-                $table->dropForeign(['facility_id']);
-                $table->dropForeign(['user_id']);
+                // $table->dropForeign(['facility_id']);
+                // $table->dropForeign(['user_id']);
+
+                // Drop foreign keys for the new columns
+                $table->dropForeign(['origin_facility_id']);
+                $table->dropForeign(['destination_facility_id']);
+                $table->dropForeign(['sent_by_user_id']);
+                $table->dropForeign(['sent_to_user_id']);
             });
 
             Schema::dropIfExists('push_notifications');
