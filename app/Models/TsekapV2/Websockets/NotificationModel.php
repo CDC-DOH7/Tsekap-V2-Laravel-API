@@ -19,7 +19,7 @@ class NotificationModel extends Model
         'data',
     ];
 
-    protected $cast = [
+    protected $casts = [
         'is_read' => 'boolean',
         'data' => 'array',
     ];

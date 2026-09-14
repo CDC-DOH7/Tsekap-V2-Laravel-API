@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\TsekapV2\Websockets;
 
 use Illuminate\Http\Request;
-use App\Models\TsekapV2\Facilities;
 use App\Models\TsekapV2\Websockets\NotificationModel;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -70,8 +69,6 @@ class NotificationController extends Controller
     // add notification
     public function addNotification(Request $request): JsonResponse
     {
-        $fields = $request->input('fields');
-
         $rules = [
             'fields' => 'required|array',
             'fields.facility_id' => 'required|integer',
@@ -120,7 +117,7 @@ class NotificationController extends Controller
             $notification = NotificationModel::where('id', "=", $fields['id'])->first();
 
             if (!$notification) {
-                return response()->json(['status' => 'error', 'message' => 'Facility not found'], 404);
+                return response()->json(['status' => 'error', 'message' => 'Notification not found'], 404);
             }
 
             $notification->update($fields);
@@ -149,7 +146,7 @@ class NotificationController extends Controller
         $fields = $request->input('fields');
 
         try {
-            $notification = Facilities::where('id', "=", $fields['id'])->first();
+            $notification = NotificationModel::where('id', "=", $fields['id'])->first();
 
             if (!$notification) {
                 return response()->json(['status' => 'error', 'message' => 'Notification not found'], 404);
